@@ -1,6 +1,6 @@
 from pymclevel import TAG_Compound, TAG_Int, TAG_Short, TAG_Byte, TAG_String, TAG_Float, TAG_Double, TAG_List
 
-displayName = "Generate Test Building"
+displayName = "Generate Test Building (blockAt)"
 
 def perform(level, box, options): 
     
