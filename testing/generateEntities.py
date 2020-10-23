@@ -2,7 +2,7 @@
 
 from pymclevel import TAG_Compound, TAG_Int, TAG_Short, TAG_Byte, TAG_String, TAG_Float, TAG_Double, TAG_List
 
-displayName = "Generate Chests"
+displayName = "Generate Entities"
 
 def perform(level, box, options):
     for (chunk, slices, point) in level.getChunkSlices(box):
