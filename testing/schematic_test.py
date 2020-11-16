@@ -4,7 +4,7 @@ from pymclevel.box import Vector
 displayName = "600 Schematic Test"
 
 inputs = (
-	  ("To test placement of structure via schematics, initial hex at min x and minz", "label"),
+	  ("To test placement of structure via schematics, initial hex @ min x and minz", "label"),
 )
 
 def perform(level, box, options):
