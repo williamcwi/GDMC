@@ -1,8 +1,6 @@
-import logging
-import logging.config
-
-logging.config.fileConfig('logging.conf')
-logger = logging.getLogger('Generate Settlement')
+from pymclevel import TAG_Compound, TAG_Int, TAG_Short, TAG_Byte, TAG_String, TAG_Float, TAG_Double, TAG_List
+from pymclevel import MCSchematic
+from pymclevel.box import Vector
 
 inputs = [
     (
@@ -14,8 +12,17 @@ inputs = [
     ),
     (
         ('Settlement Settings', 'title'),
-        (),
+        ('simple house design', (1, 1, 5)),
     )
 ]
 
 def perform(level, box, options):
+
+    selection = options['simple house design']
+    print(selection)
+
+    filename = './schematics/simple_house/simple_house_{}.schematic'.format(selection)
+    print(filename)
+    schematic = MCSchematic(shape=(11,6,11), filename=filename)
+    print(schematic)
+    level.copyBlocksFrom(schematic, schematic.bounds, Vector(box.minx, box.miny, box.minz))
