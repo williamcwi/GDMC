@@ -19,8 +19,3 @@ inputs = [
 ]
 
 def perform(level, box, options):
-
-
-def loadFile(filePath):
-    with open(filePath) as f:
-        return json.load(f)
