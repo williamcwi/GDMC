@@ -2,6 +2,8 @@ from pymclevel import TAG_Compound, TAG_Int, TAG_Short, TAG_Byte, TAG_String, TA
 from pymclevel import MCSchematic
 from pymclevel.box import Vector
 
+import os
+
 inputs = [
     (
         ('Settlement Generator', 'title'),
@@ -20,7 +22,8 @@ def perform(level, box, options):
 
     selection = options['simple house design']
 
-    filename = '.\schematics\simple_house\simple_house_{}.schematic'.format(selection)
+    filename = '{}/../schematics/simple_house/simple_house_{}.schematic'.format(__file__, selection)
 
     schematic = MCSchematic(shape=(11,6,11), filename=filename)
+
     level.copyBlocksFrom(schematic, schematic.bounds, Vector(box.minx, box.miny+1, box.minz))
