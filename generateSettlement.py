@@ -19,10 +19,8 @@ inputs = [
 def perform(level, box, options):
 
     selection = options['simple house design']
-    print(selection)
 
-    filename = './schematics/simple_house/simple_house_{}.schematic'.format(selection)
-    print(filename)
+    filename = '.\schematics\simple_house\simple_house_{}.schematic'.format(selection)
+
     schematic = MCSchematic(shape=(11,6,11), filename=filename)
-    print(schematic)
-    level.copyBlocksFrom(schematic, schematic.bounds, Vector(box.minx, box.miny, box.minz))
+    level.copyBlocksFrom(schematic, schematic.bounds, Vector(box.minx, box.miny+1, box.minz))
