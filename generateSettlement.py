@@ -1,6 +1,7 @@
 import os.path
-from datetime import datetime as dt
 import random
+
+from logger import Logger
 
 from pymclevel import TAG_Compound, TAG_Int, TAG_Short, TAG_Byte, TAG_String, TAG_Float, TAG_Double, TAG_List
 from pymclevel import MCSchematic
@@ -20,6 +21,7 @@ inputs = [
 ]
 
 name = 'generateSettlement'
+logger = Logger(name)
 
 def perform(level, box, options):
 
@@ -31,4 +33,4 @@ def perform(level, box, options):
     schematic = MCSchematic(shape=(11,6,11), filename=filename)
     level.copyBlocksFrom(schematic, schematic.bounds, Vector(box.minx, box.miny+1, box.minz))
     
-    print('{} {} INFO: Placing {} from {}'.format(dt.now(), name, building, filename))
+    logger.info('Placing {} from {}'.format(building, filename))
