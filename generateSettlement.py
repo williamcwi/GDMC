@@ -1,5 +1,6 @@
 import os.path
 from datetime import datetime as dt
+import random
 
 from pymclevel import TAG_Compound, TAG_Int, TAG_Short, TAG_Byte, TAG_String, TAG_Float, TAG_Double, TAG_List
 from pymclevel import MCSchematic
@@ -15,7 +16,6 @@ inputs = [
     ),
     (
         ('Settlement Settings', 'title'),
-        ('simple house design', (1, 1, 5)),
     )
 ]
 
@@ -24,10 +24,10 @@ name = 'generateSettlement'
 def perform(level, box, options):
 
     building_type = 'simple house'
-    selection = options['simple house design']
-    building = '{} {}'.format(building_type, selection)
+    randomHouse = random.randint(1, 5)
+    building = '{} {}'.format(building_type, randomHouse)
 
-    filename = '{}\schematics\simple_house\simple_house_{}.schematic'.format(os.path.dirname(__file__), selection)
+    filename = '{}\schematics\simple_house\simple_house_{}.schematic'.format(os.path.dirname(__file__), randomHouse)
     schematic = MCSchematic(shape=(11,6,11), filename=filename)
     level.copyBlocksFrom(schematic, schematic.bounds, Vector(box.minx, box.miny+1, box.minz))
     
