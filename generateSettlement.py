@@ -9,7 +9,7 @@ from pymclevel import TAG_Compound, TAG_Int, TAG_Short, TAG_Byte, TAG_String, TA
 from pymclevel import MCSchematic
 from pymclevel import alphaMaterials
 from pymclevel.level import extractHeights
-from pymclevel.box import Vector
+from pymclevel.box import Vector, BoundingBox
 
 #Export
 import datetime
@@ -54,7 +54,13 @@ blocks = [
 ]
 blocktypes = [b.ID for b in blocks]
 
+def expandBoundingBox(box):
+    # set miny to 0
+    origin = box.origin - (0, box.miny, 0)
+    # set box size (y) to 256
+    size = box.size + (0, 255, 0)
 
+    return BoundingBox(origin, size)
 
 def createHeightMap(level, box):
     blockmask = zeros((256,), dtype='bool')
@@ -70,7 +76,7 @@ def createHeightMap(level, box):
 
         logger.info('Heightmap: \n{}'.format(heightMap))
 
-        heightMap2File(heightMap)
+        # heightMap2File(heightMap)
 
     # return heightMap
 
@@ -88,18 +94,21 @@ def heightMap2File(heightMap):
 def perform(level, box, options):
 
     try:
+        # Expand box to include entire y-axis
+        box = expandBoundingBox(box)
 
+        # Create Height Map
         createHeightMap(level, box)
 
-        # building_type = 'simple house'
-        # randomHouse = random.randint(1, 5)
-        # building = '{} {}'.format(building_type, randomHouse)
+        building_type = 'simple house'
+        randomHouse = random.randint(1, 5)
+        building = '{} {}'.format(building_type, randomHouse)
 
-        # filename = os.path.join(os.path.dirname(__file__), 'schematics', 'simple_house', 'simple_house_{}.schematic'.format(randomHouse))
-        # schematic = MCSchematic(shape=(11,6,11), filename=filename)
-        # level.copyBlocksFrom(schematic, schematic.bounds, Vector(box.minx, box.miny+1, box.minz))
+        filename = os.path.join(os.path.dirname(__file__), 'schematics', 'simple_house', 'simple_house_{}.schematic'.format(randomHouse))
+        schematic = MCSchematic(shape=(11,6,11), filename=filename)
+        level.copyBlocksFrom(schematic, schematic.bounds, Vector(box.minx, box.miny+1, box.minz))
         
-        # logger.info('Placing {} from {}'.format(building, filename))
+        logger.info('Placing {} from {}'.format(building, filename))
         
 
     except Exception as e:
