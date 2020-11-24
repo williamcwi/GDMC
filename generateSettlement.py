@@ -61,24 +61,24 @@ def createHeightMap(level, box):
     blockmask[blocktypes] = True
 
     for chunk, slices, point in level.getChunkSlices(box):
-            blocks = chunk.Blocks[slices]
-            data = chunk.Data[slices]
+        blocks = chunk.Blocks[slices]
+        data = chunk.Data[slices]
 
-            maskedBlocks = blockmask[blocks]
-    
-    heightMap = extractHeights(maskedBlocks)
+        maskedBlocks = blockmask[blocks]
 
-    logger.info(heightMap)
+        heightMap = extractHeights(maskedBlocks)
 
-    heightMap2File(heightMap)
+        logger.info('Heightmap: \n{}'.format(heightMap))
 
+        heightMap2File(heightMap)
 
     # return heightMap
 
 def heightMap2File(heightMap):
     #TODO[Windows]:Check File Path 
     try:
-        with open(os.path.join(os.path.expanduser("~/Desktop"),"HM-"+ datetime.datetime.now().strftime("%H%M%S") +".txt"), 'w+') as f:
+        with open(os.path.join(os.path.expanduser("~/Desktop"),"HM-"+ datetime.datetime.now().strftime("%H%M%S") +".txt"), 'ab') as f:
+            f.write(b"\n")
             numpy.savetxt(f, numpy.column_stack(heightMap), fmt='%s')
             f.close()
 
@@ -89,7 +89,7 @@ def perform(level, box, options):
 
     try:
 
-        # createHeightMap(level, box)
+        createHeightMap(level, box)
 
         # building_type = 'simple house'
         # randomHouse = random.randint(1, 5)
