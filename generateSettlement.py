@@ -1,10 +1,10 @@
 import os.path
 import random
 import numpy
+from numpy import zeros
 
 from logger import Logger
 
-from numpy import zeros
 from pymclevel import TAG_Compound, TAG_Int, TAG_Short, TAG_Byte, TAG_String, TAG_Float, TAG_Double, TAG_List
 from pymclevel import MCSchematic
 from pymclevel import alphaMaterials
@@ -73,7 +73,7 @@ def createHeightMap(level, box):
     heightMap2File(heightMap)
 
 
-    '''return heightMap'''
+    # return heightMap
 
 def heightMap2File(heightMap):
     #TODO[Windows]:Check File Path 
@@ -89,18 +89,18 @@ def perform(level, box, options):
 
     try:
 
-        createHeightMap(level, box)
+        # createHeightMap(level, box)
 
-        """building_type = 'simple house'
-        randomHouse = random.randint(1, 5)
-        building = '{} {}'.format(building_type, randomHouse)
+        # building_type = 'simple house'
+        # randomHouse = random.randint(1, 5)
+        # building = '{} {}'.format(building_type, randomHouse)
 
-        filename = os.path.join(os.path.dirname(__file__), 'schematics', 'simple_house', 'simple_house_{}.schematic'.format(randomHouse))
-        schematic = MCSchematic(shape=(11,6,11), filename=filename)
-        level.copyBlocksFrom(schematic, schematic.bounds, Vector(box.minx, box.miny+1, box.minz))
+        # filename = os.path.join(os.path.dirname(__file__), 'schematics', 'simple_house', 'simple_house_{}.schematic'.format(randomHouse))
+        # schematic = MCSchematic(shape=(11,6,11), filename=filename)
+        # level.copyBlocksFrom(schematic, schematic.bounds, Vector(box.minx, box.miny+1, box.minz))
         
-        logger.info('Placing {} from {}'.format(building, filename))
-        """
+        # logger.info('Placing {} from {}'.format(building, filename))
+        
 
     except Exception as e:
         logger.error(e)
