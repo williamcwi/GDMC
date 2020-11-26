@@ -1,6 +1,6 @@
 import os.path
 import numpy
-from numpy import zeros
+from numpy import zeros, array
 import datetime
 
 from logger import Logger
@@ -35,33 +35,33 @@ blocks = [
 ]
 blocktypes = [b.ID for b in blocks]
 
+
+#TODO Verify generation
 def createHeightMap(level, box):
     try:
         blockmask = zeros((256,), dtype='bool')
         blockmask[blocktypes] = True
 
-        for chunk, slices, point in level.getChunkSlices(box):
-            blocks = chunk.Blocks[slices]
-            data = chunk.Data[slices]
+        schema = level.extractSchematic(box)
+        schema.removeEntitiesInBox(schema.bounds)
+        schema.removeTileEntitiesInBox(schema.bounds)
 
-            maskedBlocks = blockmask[blocks]
+        maskedBlocks = blockmask[schema.Blocks]
 
-            heightMap = extractHeights(maskedBlocks)
+        heightMap = extractHeights(maskedBlocks)
 
-            logger.info('Heightmap: \n{}'.format(heightMap))
+        logger.info('Heightmap: \n{}'.format(heightMap))
 
-            # heightMap2File(heightMap)
+        heightMap2File(heightMap)
 
-        # return heightMap
+        return heightMap
 
     except Exception as e:
         logger.error(e)
 
 def heightMap2File(heightMap):
-    #TODO[Windows]:Check File Path 
     try:
         with open(os.path.join(os.path.expanduser("~/Desktop"),"HM-"+ datetime.datetime.now().strftime("%H%M%S") +".txt"), 'ab') as f:
-            f.write(b"\n")
             numpy.savetxt(f, numpy.column_stack(heightMap), fmt='%s')
             f.close()
 
