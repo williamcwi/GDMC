@@ -1,3 +1,4 @@
 .vscode/settings.json
 testing.py
 .env
+env/
