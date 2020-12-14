@@ -36,7 +36,7 @@ blocks = [
 blocktypes = [b.ID for b in blocks]
 
 
-#TODO Verify generation
+
 def createHeightMap(level, box):
     try:
         blockmask = zeros((256,), dtype='bool')
@@ -49,6 +49,8 @@ def createHeightMap(level, box):
         maskedBlocks = blockmask[schema.Blocks]
 
         heightMap = extractHeights(maskedBlocks)
+        # Row: -x to +x
+        # Column: -z to +z
 
         logger.info('Heightmap: \n{}'.format(heightMap))
 
