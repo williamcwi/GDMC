@@ -3,7 +3,8 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-df = pd.read_csv('HM-135951.txt', header=None, delimiter=r'\s+')
+heightmap = input()
+df = pd.read_csv('{}'.format(heightmap), header=None, delimiter=r'\s+')
 
 fig, ax = plt.subplots(figsize=(12, 7))
 title = 'Heightmap of Box Selection'
