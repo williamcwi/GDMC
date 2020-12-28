@@ -12,10 +12,10 @@ logger = Logger(name)
 def generateSimpleHouse(level, box):
     try:
         building_type = 'simple house'
-        randomHouse = random.randint(1, 5)
+        random_house = random.randint(1, 5)
         building = '{} {}'.format(building_type, randomHouse)
 
-        filename = os.path.join(os.path.dirname(__file__), 'schematics', 'simple_house', 'simple_house_{}.schematic'.format(randomHouse))
+        filename = os.path.join(os.path.dirname(__file__), 'schematics', 'simple_house', 'simple_house_{}.schematic'.format(random_house))
         schematic = MCSchematic(shape=(11,6,11), filename=filename)
         level.copyBlocksFrom(schematic, schematic.bounds, Vector(box.minx, box.miny+1, box.minz))
         
