@@ -1,4 +1,5 @@
 import os.path
+import platform
 import numpy
 from numpy import zeros, array
 import datetime
@@ -63,9 +64,14 @@ def createHeightMap(level, box):
 
 def heightMap2File(heightMap):
     try:
-        with open(os.path.join(os.path.dirname(__file__),'heightmap','HM-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
-            numpy.savetxt(f, numpy.column_stack(heightMap), fmt='%s')
-            f.close()
+        if platform.system()==("Darwin") and platform.release()[:2] > 19:
+                with open(os.path.join(os.path.expanduser("~/Desktop"),'HM-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
+                    numpy.savetxt(f, numpy.column_stack(heightMap), fmt='%s')
+                    f.close()
+        else:
+            with open(os.path.join(os.path.dirname(__file__),'heightmap','HM-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
+                numpy.savetxt(f, numpy.column_stack(heightMap), fmt='%s')
+                f.close()
 
     except Exception as e:
         logger.error(e)
