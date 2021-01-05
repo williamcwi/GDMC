@@ -8,7 +8,8 @@ df = pd.read_csv('{}'.format(heightmap), header=None, delimiter=r'\s+')
 data = df.to_numpy()
 print(data)
 #Translates 2D array to 3D Binary array
-for height in range(50, 75): # for height in dataset
+3D_binary_heightmap = []
+for height in range(min(map(min, data))-1, max(map(max, data))+1): # for height in dataset
     new_heightmap = []
     for i in data: # row
         new_row = []
@@ -18,7 +19,7 @@ for height in range(50, 75): # for height in dataset
             else:
                 new_row.append(0)
         new_heightmap.append(new_row)
-    # print(new_heightmap)
+    3D_binary_heightmap.append(new_heightmap)
 
     # # Sobel Operator
     # edge_map = []
