@@ -37,13 +37,13 @@ blocks = [
 blocktypes = [b.ID for b in blocks]
 
 water = [
-    am.Water
+    am.Water,
     am.Bedrock
 ]
 waterID = [w.ID for w in water]
 
 lava = [
-    am.Lava
+    am.Lava,
     am.Bedrock
 ]
 lavaID = [l.ID for l in lava]
@@ -122,17 +122,17 @@ def lavaHeightMap (level, box):
     except Exception as e:
         logger.error(e)
 
-def heightMap():
+def heightMap(level, box):
     try:
         ground_heightmap = createHeightMap(level, box)
         water_heightmap = waterHeightMap(level, box)
-        lava_heightmap = lavaHeightMap(level,box)
+        lava_heightmap = lavaHeightMap(level, box)
 
         heightmap = []
         for ga, wa, la in zip(ground_heightmap, water_heightmap, lava_heightmap):
             row = []
             for g, w, l in zip(ga, wa, la):
-                if g > w or g > l
+                if g > w and g > l:
                     row.append(g)
                 elif w > l:
                     row.append(-1)
