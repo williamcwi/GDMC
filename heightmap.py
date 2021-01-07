@@ -36,7 +36,17 @@ blocks = [
 ]
 blocktypes = [b.ID for b in blocks]
 
+water = [
+    am.Water,
+    am.Bedrock
+]
+waterID = [w.ID for w in water]
 
+lava = [
+    am.Lava,
+    am.Bedrock
+]
+lavaID = [l.ID for l in lava]
 
 def createHeightMap(level, box):
     try:
@@ -53,12 +63,88 @@ def createHeightMap(level, box):
         # Row: -x to +x
         # Column: -z to +z
 
-        logger.info('Heightmap: \n{}'.format(heightMap))
+        # logger.info('Heightmap: \n{}'.format(heightMap))
 
-        heightMap2File(heightMap)
+        # heightMap2File(heightMap)
 
         return heightMap
 
+    except Exception as e:
+        logger.error(e)
+
+# Gets the height of the water
+def waterHeightMap(level, box):
+    try:
+        blockmask = zeros((256,), dtype='bool')
+        blockmask[waterID] = True
+
+        schema = level.extractSchematic(box)
+        schema.removeEntitiesInBox(schema.bounds)
+        schema.removeTileEntitiesInBox(schema.bounds)
+
+        maskedBlocks = blockmask[schema.Blocks]
+
+        waterHeightMap = extractHeights(maskedBlocks)
+        # Row: -x to +x
+        # Column: -z to +z
+
+        # logger.info('Water Heightmap: \n{}'.format(waterHeightMap))
+
+        # heightMap2File(waterHeightMap)
+
+        return waterHeightMap
+        
+    except Exception as e:
+        logger.error(e)
+
+# Gets the height of the lava
+def lavaHeightMap (level, box):
+    try:
+        blockmask = zeros((256,), dtype='bool')
+        blockmask[lavaID] = True
+
+        schema = level.extractSchematic(box)
+        schema.removeEntitiesInBox(schema.bounds)
+        schema.removeTileEntitiesInBox(schema.bounds)
+
+        maskedBlocks = blockmask[schema.Blocks]
+
+        lavaHeightMap = extractHeights(maskedBlocks)
+        # Row: -x to +x
+        # Column: -z to +z
+
+
+        # logger.info('Lava Heightmap: \n{}'.format(lavaHeightMap))
+
+        # heightMap2File(lavaHeightMap)
+
+        return lavaHeightMap
+    except Exception as e:
+        logger.error(e)
+
+def heightMap(level, box):
+    try:
+        ground_heightmap = createHeightMap(level, box)
+        water_heightmap = waterHeightMap(level, box)
+        lava_heightmap = lavaHeightMap(level, box)
+
+        heightmap = []
+        for ga, wa, la in zip(ground_heightmap, water_heightmap, lava_heightmap):
+            row = []
+            for g, w, l in zip(ga, wa, la):
+                if g > w and g > l:
+                    row.append(g)
+                elif w > l:
+                    row.append(-1)
+                else:
+                    row.append(-2)
+            heightmap.append(row)
+        
+        logger.info('Heightmap: \n{}'.format(heightmap))
+
+        heightMap2File(heightmap)
+
+        return heightmap
     except Exception as e:
         logger.error(e)
 

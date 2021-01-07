@@ -31,7 +31,7 @@ def heightmap2binary(data):
     return binary_heightmap
 
 # Connected Component Labelling
-def CCL(heightMap): ################## TODO:VERIFY ##################
+def CCL(heightMap): ################# TODO:VERIFY #################
     region = 1 # region label
     minHM = min(map(min,heightMap)) # get lowerbound of level
     maxHM = max(map(max,heightMap)) # get upperbound of level
