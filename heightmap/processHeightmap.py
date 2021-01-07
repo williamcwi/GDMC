@@ -40,19 +40,19 @@ def CCL(heightMap): ################# TODO:VERIFY #################
     maxHM = max(map(max,heightMap)) # get upperbound of level
     maskedHM = [[[0 for k in range(len(heightMap))] for j in range(len(heightMap[0]))] for i in range((maxHM - minHM) + 1)] # initialse post-process HM
 
-    for x in range(0, len(heightMap)): # for row
-        for z in range(0, len(heightMap[x])): # for column
+    for x in range(len(heightMap)): # for row
+        for z in range(len(heightMap[x])): # for column
             upregion = leftregion = -1 # initalise neighbour region
             uplevel = leftlevel = 999 # initalise neighbour level
             level = heightMap[x][z]
             maskedlevel = level - minHM
             if level >= 0: # if not lava or water
-                if x != 0:
+                if x - 1 >= 0:
                     if heightMap[x-1][z] == level:
                         upregion = maskedHM[maskedlevel][x-1][z]
                         uplevel = heightMap[x-1][z]
-                if z != 0:
-                    if heightmap[x][z-1] == level:
+                if z - 1 >= 0:
+                    if heightMap[x][z-1] == level:
                         leftregion = maskedHM[maskedlevel][x][z-1]
                         leftlevel = heightMap[x][z-1]
                 
@@ -106,9 +106,7 @@ def CCL2DFF(heightMap, minimumArea): # CCL2D via Flood Fill RECURSIVE ##########
 
 def CCL3DFF(heightMap, minimumArea): # CCL3D via Flood Fill RECURSIVE ################# TODO:VERIFY #################
     tempHM = heightMap.copy()
-    minHM = min(map(min,heightMap)) # get lowerbound of level
-    maxHM = max(map(max,heightMap)) # get upperbound of level
-    maskedHM = [[['%04d' % 0 for k in range(len(heightMap))] for j in range(len(heightMap[0]))] for i in range((maxHM - minHM))]  # initialse post-process HM
+    maskedHM = [[['%04d' % 0 for k in range(len(heightMap))] for j in range(len(heightMap[0]))] for i in range((max(map(max,heightMap)) - min(map(min,heightMap))))]  # initialse post-process HM
     currentLevel = 999
     currentRegion = 1
 
@@ -168,3 +166,5 @@ def heightMap2File(heightMap):
     # print(edge_map)
 
 CCL2DFF(data, 169)
+
+CCL(data)
