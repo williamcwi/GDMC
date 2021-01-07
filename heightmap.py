@@ -64,7 +64,7 @@ def createHeightMap(level, box):
 
 def heightMap2File(heightMap):
     try:
-        if platform.system()==("Darwin") and platform.release()[:2] > 19:
+        if platform.system()==("Darwin") and platform.release()[:2] >= 19:
                 with open(os.path.join(os.path.expanduser("~/Desktop"),'HM-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
                     numpy.savetxt(f, numpy.column_stack(heightMap), fmt='%s')
                     f.close()
