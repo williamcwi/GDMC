@@ -77,13 +77,14 @@ def CCL2DFF(heightMap, minimumArea): # CCL2D via Flood Fill RECURSIVE ##########
 
     def CCL(x, y, area):
         tempHM[x][y] = -1
-        if ((x + 1) < 256): # go to east
+
+        if ((x + 1) < len(tempHM[x])): # go to east
             if tempHM[x + 1][y] == currentLevel:
                 area = CCL(x + 1, y, area + 1)
         if ((x - 1) >= 0): # go to west
             if tempHM[x - 1][y] == currentLevel:
                 area = CCL(x - 1, y, area + 1)
-        if ((y + 1) < 256): # go to north
+        if ((y + 1) < len(tempHM)): # go to north
             if tempHM[x][y + 1] == currentLevel:
                 area = CCL(x, y + 1, area + 1)
         if ((y - 1) >= 0):  # go to south
@@ -93,8 +94,8 @@ def CCL2DFF(heightMap, minimumArea): # CCL2D via Flood Fill RECURSIVE ##########
             maskedHM[x][y] = '%04d' % currentRegion
         return area
 
-    for x in range(0, len(tempHM)):
-        for y in range(0, len(tempHM[0])):
+    for x in range(len(tempHM)):
+        for y in range(len(tempHM[0])):
             if tempHM[x][y] < 257 and tempHM[x][y] >= 0:
                 currentLevel = tempHM[x][y]
                 area = CCL(x, y, 1)
@@ -113,13 +114,13 @@ def CCL3DFF(heightMap, minimumArea): # CCL3D via Flood Fill RECURSIVE ##########
 
     def CCL(x, y, HMLevel, area):
         tempHM[x][y] = -1
-        if ((x + 1) < 256): # go to east
+        if ((x + 1) < len(tempHM[x])): # go to east
             if tempHM[x + 1][y] == currentLevel:
                 area = CCL(x + 1, y, HMLevel, area + 1)
         if ((x - 1) >= 0): # go to west
             if tempHM[x - 1][y] == currentLevel:
                 area = CCL(x - 1, y, HMLevel, area + 1)
-        if ((y + 1) < 256): # go to north
+        if ((y + 1) < len(tempHM)): # go to north
             if tempHM[x][y + 1] == currentLevel:
                 area = CCL(x, y + 1, HMLevel, area + 1)
         if ((y - 1) >= 0): # go to south
@@ -129,8 +130,8 @@ def CCL3DFF(heightMap, minimumArea): # CCL3D via Flood Fill RECURSIVE ##########
             maskedHM[HMLevel][x][y] = '%04d' % currentRegion
         return area
 
-    for x in range(0, len(tempHM)):
-        for y in range(0, len(tempHM[0])):
+    for x in range(len(tempHM)):
+        for y in range(len(tempHM[0])):
             if tempHM[x][y] < 257 and tempHM[x][y] >= 0:
                 currentLevel = tempHM[x][y]
                 HMLevel = currentLevel - minHM
