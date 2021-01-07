@@ -6,6 +6,9 @@ import platform
 import os.path
 import datetime
 
+import sys
+sys.setrecursionlimit(65536) #!!IMPORTANT to allow CCL2DFF and CCL3DFF RECURSIVE
+
 
 heightmap = "/Users/hokiulam/Desktop/HM-154425.txt"
 df = pd.read_csv('{}'.format(heightmap), header=None, delimiter=r'\s+')
@@ -66,6 +69,77 @@ def CCL(heightMap): ################# TODO:VERIFY #################
     #heightMap2File(maskedHM[0])
     return maskedHM
 
+def CCL2DFF(heightMap, minimumArea): # CCL2D via Flood Fill RECURSIVE ################# TODO:VERIFY #################
+    tempHM = heightMap.copy()
+    maskedHM = [['%04d' % 0 for k in range(len(heightMap))] for j in range(len(heightMap[0]))]  # initialse post-process HM
+    currentLevel = 999
+    currentRegion = 1
+
+    def CCL(x, y, area):
+        tempHM[x][y] = -1
+        if ((x + 1) < 256): # go to east
+            if tempHM[x + 1][y] == currentLevel:
+                area = CCL(x + 1, y, area + 1)
+        if ((x - 1) >= 0): # go to west
+            if tempHM[x - 1][y] == currentLevel:
+                area = CCL(x - 1, y, area + 1)
+        if ((y + 1) < 256): # go to north
+            if tempHM[x][y + 1] == currentLevel:
+                area = CCL(x, y + 1, area + 1)
+        if ((y - 1) >= 0):  # go to south
+            if tempHM[x][y - 1] == currentLevel:
+                area = CCL(x, y - 1, area + 1)
+        if area > minimumArea: # if area greater the threshold
+            maskedHM[x][y] = '%04d' % currentRegion
+        return area
+
+    for x in range(0, len(tempHM)):
+        for y in range(0, len(tempHM[0])):
+            if tempHM[x][y] < 257 and tempHM[x][y] >= 0:
+                currentLevel = tempHM[x][y]
+                area = CCL(x, y, 1)
+                if area > minimumArea:
+                    currentRegion = currentRegion + 1
+
+    return maskedHM # return 2D array
+
+def CCL3DFF(heightMap, minimumArea): # CCL3D via Flood Fill RECURSIVE ################# TODO:VERIFY #################
+    tempHM = heightMap.copy()
+    minHM = min(map(min,heightMap)) # get lowerbound of level
+    maxHM = max(map(max,heightMap)) # get upperbound of level
+    maskedHM = [[['%04d' % 0 for k in range(len(heightMap))] for j in range(len(heightMap[0]))] for i in range((maxHM - minHM))]  # initialse post-process HM
+    currentLevel = 999
+    currentRegion = 1
+
+    def CCL(x, y, HMLevel, area):
+        tempHM[x][y] = -1
+        if ((x + 1) < 256): # go to east
+            if tempHM[x + 1][y] == currentLevel:
+                area = CCL(x + 1, y, HMLevel, area + 1)
+        if ((x - 1) >= 0): # go to west
+            if tempHM[x - 1][y] == currentLevel:
+                area = CCL(x - 1, y, HMLevel, area + 1)
+        if ((y + 1) < 256): # go to north
+            if tempHM[x][y + 1] == currentLevel:
+                area = CCL(x, y + 1, HMLevel, area + 1)
+        if ((y - 1) >= 0): # go to south
+            if tempHM[x][y - 1] == currentLevel:
+                area = CCL(x, y - 1, HMLevel, area + 1)
+        if area > minimumArea: # if area greater the threshold
+            maskedHM[HMLevel][x][y] = '%04d' % currentRegion
+        return area
+
+    for x in range(0, len(tempHM)):
+        for y in range(0, len(tempHM[0])):
+            if tempHM[x][y] < 257 and tempHM[x][y] >= 0:
+                currentLevel = tempHM[x][y]
+                HMLevel = currentLevel - minHM
+                area = CCL(x, y, HMLevel, 1)
+                if area > minimumArea:
+                    currentRegion = currentRegion + 1
+
+    return maskedHM # return 3D array
+
 def heightMap2File(heightMap):
     if platform.system()==("Darwin") and int(platform.release()[:2]) >= 19:
         with open(os.path.join(os.path.expanduser("~/Desktop"),'HMS-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
@@ -92,4 +166,4 @@ def heightMap2File(heightMap):
     #         edge_map.append(edge_row)
     # print(edge_map)
 
-CCL(data)
+CCL2DFF(data, 169)
