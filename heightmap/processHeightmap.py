@@ -102,6 +102,8 @@ def CCL2DFF(heightMap, minimumArea): # CCL2D via Flood Fill RECURSIVE ##########
                 if area > minimumArea:
                     currentRegion = currentRegion + 1
 
+    # print(maskedHM)
+    heightMap2File(maskedHM)
     return maskedHM # return 2D array
 
 def CCL3DFF(heightMap, minimumArea): # CCL3D via Flood Fill RECURSIVE ################# TODO:VERIFY #################
@@ -146,7 +148,7 @@ def heightMap2File(heightMap):
             np.savetxt(f, heightMap, fmt='%s')
             f.close()
     else:
-        with open(os.path.join(os.path.dirname(__file__),'heightmap','HMS-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
+        with open('HMS-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt', 'w+') as f:
             np.savetxt(f, heightMap, fmt='%s')
             f.close()
 
@@ -168,4 +170,4 @@ def heightMap2File(heightMap):
 
 CCL2DFF(data, 169)
 
-CCL(data)
+# CCL(data)
