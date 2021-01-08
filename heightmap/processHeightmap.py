@@ -10,7 +10,7 @@ import sys
 sys.setrecursionlimit(65536) #!!IMPORTANT to allow CCL2DFF and CCL3DFF RECURSIVE
 
 
-heightmap = "/Users/hokiulam/Desktop/HM-154425.txt"
+heightmap = input()
 df = pd.read_csv('{}'.format(heightmap), header=None, delimiter=r'\s+')
 
 data = df.to_numpy()
