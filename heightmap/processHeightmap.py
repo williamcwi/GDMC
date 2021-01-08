@@ -106,6 +106,7 @@ def CCL2DFF(heightMap, minimumArea): # CCL2D via Flood Fill RECURSIVE ##########
 
 def CCL3DFF(heightMap, minimumArea): # CCL3D via Flood Fill RECURSIVE ################# TODO:VERIFY #################
     tempHM = heightMap.copy()
+    minHM = min(map(min,heightMap)) 
     maskedHM = [[['%04d' % 0 for k in range(len(heightMap))] for j in range(len(heightMap[0]))] for i in range((max(map(max,heightMap)) - min(map(min,heightMap))))]  # initialse post-process HM
     currentLevel = 999
     currentRegion = 1
