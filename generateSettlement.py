@@ -5,6 +5,7 @@ from pymclevel import TAG_Compound, TAG_Int, TAG_Short, TAG_Byte, TAG_String, TA
 import common
 import heightmap
 import generateStructure
+import deforestation
 
 inputs = [
     (
