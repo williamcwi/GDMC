@@ -1,4 +1,5 @@
 from datetime import datetime as dt
+import os.path
 
 class Logger:
 
@@ -6,16 +7,27 @@ class Logger:
         self.name = name
 
     def debug(self, message):
-        print('{} - {} - {} - {}'.format(dt.now(), self.name, 'DEBUG', message))
+        log = '{} - {} - {} - {}'.format(dt.now(), self.name, 'DEBUG', message)
+        print(log)
 
     def info(self, message):
-        print('{} - {} - {} - {}'.format(dt.now(), self.name, 'INFO', message))
+        log = '{} - {} - {} - {}'.format(dt.now(), self.name, 'INFO', message)
+        print(log)
 
     def warning(self, message):
-        print('{} - {} - {} - {}'.format(dt.now(), self.name, 'WARNING', message))
+        log = '{} - {} - {} - {}'.format(dt.now(), self.name, 'WARNING', message)
+        print(log)
 
     def error(self, message):
-        print('{} - {} - {} - {}'.format(dt.now(), self.name, 'ERROR', message))
+        log = '{} - {} - {} - {}'.format(dt.now(), self.name, 'ERROR', message)
+        print(log)
+        self.to_file(log)
 
     def critical(self, message):
-        print('{} - {} - {} - {}'.format(dt.now(), self.name, 'CRITICAL', message))
+        log = '{} - {} - {} - {}'.format(dt.now(), self.name, 'CRITICAL', message)
+        print(log)
+
+    def to_file(self, log):
+        with open(os.path.join(os.path.dirname(__file__),'logs', 'gdmc.log'), 'a+') as f:
+            f.write(log + '\n')
+            f.close()
