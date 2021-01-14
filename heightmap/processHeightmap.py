@@ -9,12 +9,10 @@ import datetime
 import sys
 sys.setrecursionlimit(65536) #!!IMPORTANT to allow CCL2DFF and CCL3DFF RECURSIVE
 
-
 heightmap = input()
 df = pd.read_csv('{}'.format(heightmap), header=None, delimiter=r'\s+')
 
 data = df.to_numpy()
-# print(data)
 
 # Translates 2D array to 3D Binary array
 def heightmap2binary(data):
@@ -69,52 +67,60 @@ def CCL(heightMap): ################# TODO:VERIFY #################
     #heightMap2File(maskedHM[0])
     return maskedHM
 
-def CCL2DFF(heightMap, minimumArea): # CCL2D via Flood Fill RECURSIVE ################# TODO:VERIFY #################
+def CCL2DFF(heightMap, minimumArea): # CCL2D via Flood Fill RECURSIVE ################# POC PASSED TODO:VERIFY #################
     tempHM = heightMap.copy()
-    maskedHM = [['%04d' % 0 for k in range(len(heightMap))] for j in range(len(heightMap[0]))]  # initialse post-process HM
+    maskedHM = [['%04d' % 0 for k in range(len(heightMap[0]))] for j in range(len(heightMap))]  # initialse post-process HM
     currentLevel = 999
     currentRegion = 1
+    excludedBlocks = { # excluded blocks - excluded from labelling 
+        -1 : "wate",
+        -2 : "lava"
+    }
 
     def CCL(x, y, area):
-        tempHM[x][y] = -1
-
-        if ((x + 1) < len(tempHM[x])): # go to east
+        tempHM[x][y] = 999
+        if ((x + 1) < len(tempHM)): # go to east
             if tempHM[x + 1][y] == currentLevel:
                 area = CCL(x + 1, y, area + 1)
         if ((x - 1) >= 0): # go to west
             if tempHM[x - 1][y] == currentLevel:
                 area = CCL(x - 1, y, area + 1)
-        if ((y + 1) < len(tempHM)): # go to north
+        if ((y + 1) < len(tempHM[x])): # go to north
             if tempHM[x][y + 1] == currentLevel:
                 area = CCL(x, y + 1, area + 1)
         if ((y - 1) >= 0):  # go to south
             if tempHM[x][y - 1] == currentLevel:
                 area = CCL(x, y - 1, area + 1)
-        if area > minimumArea: # if area greater the threshold
-            maskedHM[x][y] = '%04d' % currentRegion
+        if area >= minimumArea: # if area greater equals to the threshold
+            maskedHM[x][y] = regionAlias
         return area
 
     for x in range(len(tempHM)):
         for y in range(len(tempHM[0])):
-            if tempHM[x][y] < 257 and tempHM[x][y] >= 0:
+            if tempHM[x][y] < 257 and tempHM[x][y] >= -20:
                 currentLevel = tempHM[x][y]
+                regionAlias = excludedBlocks.get(currentLevel, '%04d' % currentRegion) # switch between excluded blocks and region label
                 area = CCL(x, y, 1)
-                if area > minimumArea:
+                if area >= minimumArea:
                     currentRegion = currentRegion + 1
 
     # print(maskedHM)
     heightMap2File(maskedHM)
     return maskedHM # return 2D array
 
-def CCL3DFF(heightMap, minimumArea): # CCL3D via Flood Fill RECURSIVE ################# TODO:VERIFY #################
+def CCL3DFF(heightMap, minimumArea): # CCL3D via Flood Fill RECURSIVE ################# POC PASSED TODO:VERIFY #################
     tempHM = heightMap.copy()
     minHM = min(map(min,heightMap)) 
-    maskedHM = [[['%04d' % 0 for k in range(len(heightMap))] for j in range(len(heightMap[0]))] for i in range((max(map(max,heightMap)) - min(map(min,heightMap))))]  # initialse post-process HM
+    maskedHM = [[['%04d' % 0 for k in range(len(heightMap[0]))] for j in range(len(heightMap))] for i in range((max(map(max,heightMap)) - min(map(min,heightMap))))]  # initialse post-process HM
     currentLevel = 999
     currentRegion = 1
+    excludedBlocks = { # excluded blocks - excluded from labelling 
+        -1 : "wate",
+        -2 : "lava"
+    }
 
     def CCL(x, y, HMLevel, area):
-        tempHM[x][y] = -1
+        tempHM[x][y] = -999 
         if ((x + 1) < len(tempHM[x])): # go to east
             if tempHM[x + 1][y] == currentLevel:
                 area = CCL(x + 1, y, HMLevel, area + 1)
@@ -128,13 +134,14 @@ def CCL3DFF(heightMap, minimumArea): # CCL3D via Flood Fill RECURSIVE ##########
             if tempHM[x][y - 1] == currentLevel:
                 area = CCL(x, y - 1, HMLevel, area + 1)
         if area > minimumArea: # if area greater the threshold
-            maskedHM[HMLevel][x][y] = '%04d' % currentRegion
+            maskedHM[HMLevel][x][y] = regionAlias
         return area
 
     for x in range(len(tempHM)):
         for y in range(len(tempHM[0])):
-            if tempHM[x][y] < 257 and tempHM[x][y] >= 0:
+            if tempHM[x][y] < 257 and tempHM[x][y] >= -900:
                 currentLevel = tempHM[x][y]
+                regionAlias = excludedBlocks.get(currentLevel, '%04d' % currentRegion) # switch between excluded blocks and region label
                 HMLevel = currentLevel - minHM
                 area = CCL(x, y, HMLevel, 1)
                 if area > minimumArea:
@@ -168,6 +175,6 @@ def heightMap2File(heightMap):
     #         edge_map.append(edge_row)
     # print(edge_map)
 
-CCL2DFF(data, 169)
+CCL2DFF(data, 2)
 
 # CCL(data)

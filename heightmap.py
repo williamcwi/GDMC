@@ -135,9 +135,9 @@ def heightMap(level, box):
                 if g > w and g > l:
                     row.append(g)
                 elif w > l:
-                    row.append(-1)
+                    row.append(-1) # water
                 else:
-                    row.append(-2)
+                    row.append(-2) # lava
             heightmap.append(row)
         
         logger.info('Heightmap: \n{}'.format(heightmap))
