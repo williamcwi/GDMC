@@ -28,8 +28,13 @@ def perform(level, box, options):
     try:
         # Expand box to include entire y-axis
         box = common.expandBoundingBox(box)
+
+        # Deforestation
+        deforestation.deforestation(level, box)
+
         # Create Height Map
-        heightmap.heightMap(level, box)
+        # heightmap.heightMap(level, box)
+
         # Generate simple house
         # generateStructure.generateSimpleHouse(level, box)
 
