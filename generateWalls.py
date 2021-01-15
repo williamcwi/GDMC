@@ -65,66 +65,101 @@ def place_wall_corners(level, box, heightmap):
         building = 'wall {}'.format(wall_type)
 
         # +x -z:
-        # |----------|
-        # |          |
-        # |          |
-        # |          |
-        # |          *
-        # |_________**
-        
         filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'wall_{}.schematic'.format(wall_type))
-        schematic = MCSchematic(shape=(8,12,8), filename=filename)
+        wall_corner = MCSchematic(shape=(8,12,8), filename=filename)
         ground = heightmap[len(heightmap)-1][0]
-        level.copyBlocksFrom(schematic, schematic.bounds, Vector(box.maxx-8, ground, box.minz))
+        level.copyBlocksFrom(wall_corner, wall_corner.bounds, Vector(box.maxx-8, ground, box.minz))
+        logger.info('Placing {}s... (1/4)'.format(building))
 
         # -x -z:
-        # |----------|
-        # |          |
-        # |          |
-        # |          |
-        # *          |
-        # **_________|
-
-        schematic.rotateLeft()
+        wall_corner.rotateLeft()
         ground = heightmap[0][0]
-        level.copyBlocksFrom(schematic, schematic.bounds, Vector(box.minx, ground, box.minz))
+        level.copyBlocksFrom(wall_corner, wall_corner.bounds, Vector(box.minx, ground, box.minz))
+        logger.info('Placing {}s... (2/4)'.format(building))
 
         # -x +z:
-        # **---------|
-        # *          |
-        # |          |
-        # |          |
-        # |          |
-        # |__________|
-
-        schematic.rotateLeft()
+        wall_corner.rotateLeft()
         ground = heightmap[0][len(heightmap[0])-1]
-        level.copyBlocksFrom(schematic, schematic.bounds, Vector(box.minx, ground, box.maxz-8))
+        level.copyBlocksFrom(wall_corner, wall_corner.bounds, Vector(box.minx, ground, box.maxz-8))
+        logger.info('Placing {}s... (3/4)'.format(building))
         
         # +x +z:
-        # |---------**
-        # |          *
-        # |          |
-        # |          |
-        # |          |
-        # |__________|
-
-        schematic.rotateLeft()
+        wall_corner.rotateLeft()
         ground = heightmap[len(heightmap)-1][len(heightmap[len(heightmap)-1])-1]
-        level.copyBlocksFrom(schematic, schematic.bounds, Vector(box.maxx-8, ground, box.maxz-8))
+        level.copyBlocksFrom(wall_corner, wall_corner.bounds, Vector(box.maxx-8, ground, box.maxz-8))
+        logger.info('Placing {}s... (4/4)'.format(building))
 
         pass
     except Exception as e:
         logger.error(e)
 
-def place_wall_sections(level, box, heightmap):
+def place_wall_sections(level, box, heightmap, x_left, x_right, z_left, z_right):
     try:
         # TODO: place wall sections
-        # wall_pillar (1x12x9)
-        # wall_left (1x11x8)
-        # wall_middle (1x11x8)
-        # wall_right (1x11x8)
-        # wall_base (3x6x7)
+
+        wall_type = 'pillar' # wall_pillar (1x12x9)
+        filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'wall_{}.schematic'.format(wall_type))
+        wall_pillar = MCSchematic(shape=(1,12,9), filename=filename)
+        
+        wall_type = 'left' # wall_left (1x11x8)
+        filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'wall_{}.schematic'.format(wall_type))
+        wall_left = MCSchematic(shape=(1,11,8), filename=filename)
+
+        wall_type = 'middle' # wall_middle (1x11x8)
+        filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'wall_{}.schematic'.format(wall_type))
+        wall_middle = MCSchematic(shape=(1,11,8), filename=filename)
+
+        wall_type = 'right' # wall_right (1x11x8)
+        filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'wall_{}.schematic'.format(wall_type))
+        wall_right = MCSchematic(shape=(1,11,8), filename=filename)
+
+        wall_type = 'base' # wall_base (3x6x7)
+        filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'wall_{}.schematic'.format(wall_type))
+        wall_base = MCSchematic(shape=(3,6,7), filename=filename)
+
+        # -z:
+        # left: 
+        i = 1
+        for sections in range(x_left):
+            for wt in range(4): # wall type
+                if wt == 0: #left
+                    ground = heightmap[len(heightmap)-8-i][1]
+                    level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.maxx-8-i, ground, box.minz+1))
+                    i += 1
+                elif wt == 1: # middle
+                    ground = heightmap[len(heightmap)-8-i][1]
+                    level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.maxx-8-i, ground, box.minz+1))
+                    i += 1
+                elif wt == 2: # right
+                    ground = heightmap[len(heightmap)-8-i][1]
+                    level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.maxx-8-i, ground, box.minz+1))
+                    i += 1
+                elif wt == 3: # pillar
+                    ground = heightmap[len(heightmap)-8-i][1]
+                    level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.maxx-8-i, ground, box.minz))
+                    i += 1
+
+        # right: 
+        i = 1
+        for sections in range(x_right):
+            for wt in range(4): # wall type
+                if wt == 0: # right
+                    ground = heightmap[8+i][1]
+                    level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.minx+7+i, ground, box.minz+1))
+                    i += 1
+                elif wt == 1: # middle
+                    ground = heightmap[8+i][1]
+                    level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.minx+7+i, ground, box.minz+1))
+                    i += 1
+                elif wt == 2: #left
+                    ground = heightmap[8+i][1]
+                    level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.minx+7+i, ground, box.minz+1))
+                    i += 1
+                elif wt == 3: # pillar
+                    ground = heightmap[8+i][1]
+                    level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.minx+7+i, ground, box.minz))
+                    i += 1
+
             # +z:
             # |-********-|
             # |          |
@@ -160,7 +195,7 @@ def place_wall_sections(level, box, heightmap):
     except Exception as e:
         logger.error(e)
 
-def place_gates(level, box, heightmap):
+def place_gates(level, box, heightmap, x_gate, z_gate):
     try:
         # TODO: place gates based on gate size
         pass
@@ -173,8 +208,8 @@ def place_walls(level, box, heightmap):
         x_left, x_right, x_gate, z_left, z_right, z_gate = calc_wall_sections(box) # calculate wall sections and gate sizes
         
         place_wall_corners(level, box, heightmap)
-        place_wall_sections(level, box, heightmap)
-        place_gates(level, box, heightmap)
+        place_wall_sections(level, box, heightmap, x_left, x_right, z_left, z_right)
+        place_gates(level, box, heightmap, x_gate, z_gate)
 
     except Exception as e:
         logger.error(e)
