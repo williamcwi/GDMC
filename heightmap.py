@@ -140,7 +140,7 @@ def heightMap(level, box):
                     row.append(-2) # lava
             heightmap.append(row)
         
-        logger.info('Heightmap: \n{}'.format(heightmap))
+        logger.info('Generating heightmap...')
 
         heightMap2File(heightmap)
 
