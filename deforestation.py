@@ -7,33 +7,33 @@ logger = Logger(name)
 
 tree = [
     #Leaves
-    am.OakLeaves
-    am.SpruceLeaves
-    am.BirchLeaves
-    am.JungleLeaves
-    am.AcaciaLeaves
-    am.DarkOakLeaves
+    am.Leaves,
+    am.SpruceLeaves,
+    am.BirchLeaves,
+    am.JungleLeaves,
+    am.AcaciaLeaves,
+    am.DarkOakLeaves,
     #Logs
-    am.OakWood
-    am.SpruceWood
-    am.BirchWood
-    am.JungleWood
-    am.AcaciaWood
+    am.Wood,
+    am.SpruceWood,
+    am.BirchWood,
+    am.JungleWood,
+    am.AcaciaWood,
     am.DarkOakWood
 ]
 
 logs = [
-    am.OakWood
-    am.SpruceWood
-    am.BirchWood
-    am.JungleWood
-    am.AcaciaWood
+    am.Wood,
+    am.SpruceWood,
+    am.BirchWood,
+    am.JungleWood,
+    am.AcaciaWood,
     am.DarkOakWood
 ]
 
 treeID = [t.ID for t in tree]
 logsID = [l.ID for l in logs]
-# print(blocktypes)
+print(treeID)
 
 def setBoundingBox(box):
     # TODO: smaller bounding box
@@ -69,12 +69,12 @@ def removeLogs(level, box):
 
 def deforestation(level, box):
     try:
+        pass
+        # big_box = box
+        # small_box = setBoundingBox(box)
 
-        big_box = box
-        small_box = setBoundingBox(box)
-
-        removeTrees(level, small_box)
-        removeLogs(level, big_box)
+        # removeTrees(level, small_box)
+        # removeLogs(level, big_box)
 
     except Exception as e:
         logger.error(e)
