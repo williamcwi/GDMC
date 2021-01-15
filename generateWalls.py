@@ -59,9 +59,72 @@ def calc_wall_sections(box):
     except Exception as e:
         logger.error(e)
 
-def place_wall_sections(level, box):
+def place_wall_corners(level, box, heightmap):
+    try:
+        wall_type = 'corner'
+        building = 'wall {}'.format(wall_type)
+
+        # +x -z:
+        # |----------|
+        # |          |
+        # |          |
+        # |          |
+        # |          *
+        # |_________**
+        
+        filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'wall_{}.schematic'.format(wall_type))
+        schematic = MCSchematic(shape=(8,12,8), filename=filename)
+        ground = heightmap[len(heightmap)-1][0]
+        level.copyBlocksFrom(schematic, schematic.bounds, Vector(box.maxx-8, ground, box.minz))
+
+        # -x -z:
+        # |----------|
+        # |          |
+        # |          |
+        # |          |
+        # *          |
+        # **_________|
+
+        schematic.rotateLeft()
+        ground = heightmap[0][0]
+        level.copyBlocksFrom(schematic, schematic.bounds, Vector(box.minx, ground, box.minz))
+
+        # -x +z:
+        # **---------|
+        # *          |
+        # |          |
+        # |          |
+        # |          |
+        # |__________|
+
+        schematic.rotateLeft()
+        ground = heightmap[0][len(heightmap[0])-1]
+        level.copyBlocksFrom(schematic, schematic.bounds, Vector(box.minx, ground, box.maxz-8))
+        
+        # +x +z:
+        # |---------**
+        # |          *
+        # |          |
+        # |          |
+        # |          |
+        # |__________|
+
+        schematic.rotateLeft()
+        ground = heightmap[len(heightmap)-1][len(heightmap[len(heightmap)-1])-1]
+        level.copyBlocksFrom(schematic, schematic.bounds, Vector(box.maxx-8, ground, box.maxz-8))
+
+        pass
+    except Exception as e:
+        logger.error(e)
+
+def place_wall_sections(level, box, heightmap):
     try:
         # TODO: place wall sections
+        # wall_pillar (1x12x9)
+        # wall_left (1x11x8)
+        # wall_middle (1x11x8)
+        # wall_right (1x11x8)
+        # wall_base (3x6x7)
             # +z:
             # |-********-|
             # |          |
@@ -97,55 +160,21 @@ def place_wall_sections(level, box):
     except Exception as e:
         logger.error(e)
 
-def place_wall_corners(level, box):
-    try:
-        # TODO: place wall corners
-            # -x +z:
-            # **---------|
-            # *          |
-            # |          |
-            # |          |
-            # |          |
-            # |__________|
-
-            # +x +z:
-            # |---------**
-            # |          *
-            # |          |
-            # |          |
-            # |          |
-            # |__________|
-
-            # -x -z:
-            # |----------|
-            # |          |
-            # |          |
-            # |          |
-            # *          |
-            # **_________|
-
-            # +x -z:
-            # |----------|
-            # |          |
-            # |          |
-            # |          |
-            # |          *
-            # |_________**
-        pass
-    except Exception as e:
-        logger.error(e)
-
-def place_gates(level, box):
+def place_gates(level, box, heightmap):
     try:
         # TODO: place gates based on gate size
         pass
     except Exception as e:
         logger.error(e)
 
-def place_walls(level, box):
+def place_walls(level, box, heightmap):
     try:
         # TODO: place walls together
-        x_left, x_right, x_gate, z_left, z_right, z_gate = calc_wall_sections(box)
-        print(x_left, x_right, x_gate, z_left, z_right, z_gate)
+        x_left, x_right, x_gate, z_left, z_right, z_gate = calc_wall_sections(box) # calculate wall sections and gate sizes
+        
+        place_wall_corners(level, box, heightmap)
+        place_wall_sections(level, box, heightmap)
+        place_gates(level, box, heightmap)
+
     except Exception as e:
         logger.error(e)

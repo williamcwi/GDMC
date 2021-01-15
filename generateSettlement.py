@@ -29,14 +29,14 @@ def perform(level, box, options):
         # Expand box to include entire y-axis
         box = common.expandBoundingBox(box)
 
-        # # Create Height Map
-        # heightmap.heightMap(level, box)
+        # Create Height Map
+        hm = heightmap.heightMap(level, box)
 
         # # Generate simple house
         # generateStructure.generateSimpleHouse(level, box)
 
         # Generate walls
-        generateWalls.place_walls(level, box)
+        generateWalls.place_walls(level, box, hm)
 
     except Exception as e:
         logger.error(e)
