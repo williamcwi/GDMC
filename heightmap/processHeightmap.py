@@ -70,6 +70,8 @@ def CCL(heightMap): ################# TODO:VERIFY #################
 def CCL2DFF(heightMap, minimumArea, exclusion = 0): # CCL2D via Flood Fill RECURSIVE ################# POC OK TODO:VERIFY #################
     tempHM = heightMap.copy()
     maskedHM = [['%04d' % 0 for k in range(len(heightMap[0]))] for j in range(len(heightMap))]  # initialse post-process HM
+    diffHM = [[0 for k in range(len(heightMap[0]))] for j in range(len(heightMap))]
+
     if exclusion >= len(heightMap) / 2 or exclusion >= len(heightMap[0]) / 2:
         print("Invalid Exclusion block width")
         return maskedHM
@@ -80,36 +82,95 @@ def CCL2DFF(heightMap, minimumArea, exclusion = 0): # CCL2D via Flood Fill RECUR
         -1 : "wate",
         -2 : "lava"
     }
+    regionDict = {
+        "wate" : -1,
+        "lava" : -2,
+    }
 
     def CCL(x, y, area):
         tempHM[x][y] = 999
-        if ((x + 1) < len(tempHM) - exclusion): # go to east
-            if tempHM[x + 1][y] == currentLevel:
-                area = CCL(x + 1, y, area + 1)
-        if ((x - 1) >= 0 + exclusion): # go to west
-            if tempHM[x - 1][y] == currentLevel:
-                area = CCL(x - 1, y, area + 1)
-        if ((y + 1) < len(tempHM[x]) - exclusion): # go to south
-            if tempHM[x][y + 1] == currentLevel:
-                area = CCL(x, y + 1, area + 1)
-        if ((y - 1) >= 0 + exclusion):  # go to north
+        area.append([x,y])
+        if ((y - 1) >= (0 + exclusion)):  # go to west
             if tempHM[x][y - 1] == currentLevel:
-                area = CCL(x, y - 1, area + 1)
-        if area >= minimumArea: # if area greater equals to the threshold
-            maskedHM[x][y] = regionAlias
+                area = CCL(x, y - 1, area)
+        if ((y + 1) < (len(tempHM[x]) - exclusion)): # go to east
+            if tempHM[x][y + 1] == currentLevel:
+                area = CCL(x, y + 1, area)
+        if ((x + 1) < (len(tempHM) - exclusion)): # go to south
+            if tempHM[x + 1][y] == currentLevel:
+                area = CCL(x + 1, y, area)
+        if ((x - 1) >= (0 + exclusion)): # go to north
+            if tempHM[x - 1][y] == currentLevel:
+                area = CCL(x - 1, y, area)
         return area
 
-    for x in range(exclusion, len(tempHM) - exclusion):
-        for y in range(exclusion, len(tempHM[0]) - exclusion):
+    def CCLZero(x, y, area, surroundingRegion):
+        maskedHM[x][y] = 999
+        area.append([x,y])
+        if ((x + 1) < (len(maskedHM) - exclusion)): # go to south
+            if maskedHM[x + 1][y] == "0000":
+                area, surroundingRegion = CCLZero(x + 1, y, area, surroundingRegion)
+        if ((y - 1) >= (0 + exclusion)):  # go to west
+            if maskedHM[x][y - 1] == "0000":
+                area, surroundingRegion = CCLZero(x, y - 1, area, surroundingRegion)
+        if ((x - 1) >= (0 + exclusion)): # go to north
+            if maskedHM[x - 1][y] == "0000":
+                area, surroundingRegion = CCLZero(x - 1, y, area, surroundingRegion)
+        if ((y + 1) < (len(maskedHM[x]) - exclusion)): # go to east
+            if maskedHM[x][y + 1] == "0000":
+                area, surroundingRegion = CCLZero(x, y + 1, area, surroundingRegion)
+        
+        if ((x + 1) < (len(maskedHM) - exclusion)): # go to south
+            if maskedHM[x + 1][y] != "0000" and maskedHM[x + 1][y] != 999 and maskedHM[x + 1][y] not in excludedBlocks.values():
+                surroundingRegion.append(maskedHM[x + 1][y])
+        if ((y - 1) >= (0 + exclusion)):  # go to west
+            if maskedHM[x][y - 1] != "0000" and maskedHM[x][y - 1] != 999 and maskedHM[x][y - 1] not in excludedBlocks.values():
+                surroundingRegion.append(maskedHM[x][y - 1])
+        if ((x - 1) >= (0 + exclusion)): # go to north
+            if maskedHM[x + 1][y] != "0000" and maskedHM[x + 1][y] != 999 and maskedHM[x - 1][y] not in excludedBlocks.values():
+                surroundingRegion.append(maskedHM[x + 1][y])
+        if ((y + 1) < (len(maskedHM[x]) - exclusion)): # go to east
+            if maskedHM[x][y + 1] != "0000" and maskedHM[x][y + 1] != 999 and maskedHM[x][y + 1] not in excludedBlocks.values():
+                surroundingRegion.append(maskedHM[x][y + 1])
+
+        return area, surroundingRegion 
+
+    for x in range(exclusion, (len(tempHM) - exclusion)):
+        for y in range(exclusion, (len(tempHM[0]) - exclusion)):
             if tempHM[x][y] < 257 and tempHM[x][y] >= -20:
                 currentLevel = tempHM[x][y]
                 regionAlias = excludedBlocks.get(currentLevel, '%04d' % currentRegion) # switch between excluded blocks and region label
-                area = CCL(x, y, 1)
-                if area >= minimumArea:
-                    currentRegion = currentRegion + 1
+                area = CCL(x, y, [])
+                
+                if len(area) >= minimumArea or currentLevel < 0: # if area greater equals to the threshold
+                    for blocks in area:
+                        maskedHM[blocks[0]][blocks[1]] = regionAlias
+                    if currentLevel > 0:
+                        regionDict[currentRegion] = currentLevel
+                        currentRegion = currentRegion + 1
+                
+    for x in range(exclusion, (len(maskedHM) - exclusion)):
+        for y in range(exclusion, (len(maskedHM[0]) - exclusion)):
+            if maskedHM[x][y] == "0000":
+                area, surroundingRegion = CCLZero(x, y, [], [])
+                if len(surroundingRegion) > 0:
+                    region = max(set(surroundingRegion), key=surroundingRegion.count)
+                else:
+                    region =  None
+                if region != None:
+                    for item in area:
+                        maskedHM[item[0]][item[1]] = region
+                        diffHM[item[0]][item[1]] =  - (heightMap[item[0]][item[1]] - regionDict.get(maskedHM[item[0]][item[1]]) if maskedHM[item[0]][item[1]] in excludedBlocks.values() else regionDict.get(int(maskedHM[item[0]][item[1]])))
 
-    # print(maskedHM)
-    heightMap2File(maskedHM)
+    afterHM = [[regionDict.get(maskedHM[j][k], tempHM[j][k]) if maskedHM[j][k] in excludedBlocks.values() else regionDict.get(int(maskedHM[j][k]), tempHM[j][k]) for k in range(len(maskedHM[j]))] for j in range(len(maskedHM))]
+    # ---------------HM naming---------------
+    # diffHM - List height difference before and after moderification
+    # afterHM - List height after moderification
+    # maskedHM - List region group after moderification
+
+    heightMap2File(afterHM, "HMA")
+    heightMap2File(diffHM, "HMD")
+    heightMap2File(maskedHM, "HMM")
     return maskedHM # return 2D array
 
 def CCL3DFF(heightMap, minimumArea, exclusion = 0): # CCL3D via Flood Fill RECURSIVE ################# NOT TESTED TODO:VERIFY #################
@@ -119,7 +180,7 @@ def CCL3DFF(heightMap, minimumArea, exclusion = 0): # CCL3D via Flood Fill RECUR
     if exclusion >= len(heightMap) / 2 or exclusion >= len(heightMap[0]) / 2 :
         print("Invalid Exclusion block width")
         return maskedHM
-        
+
     currentLevel = 999
     currentRegion = 1
     excludedBlocks = { # excluded blocks - excluded from labelling 
@@ -157,13 +218,13 @@ def CCL3DFF(heightMap, minimumArea, exclusion = 0): # CCL3D via Flood Fill RECUR
 
     return maskedHM # return 3D array
 
-def heightMap2File(heightMap):
+def heightMap2File(heightMap, HMname = "HMS"):
     if platform.system()==("Darwin") and int(platform.release()[:2]) >= 19:
-        with open(os.path.join(os.path.expanduser("~/Desktop"),'HMS-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
+        with open(os.path.join(os.path.expanduser("~/Desktop"), HMname + '-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
             np.savetxt(f, heightMap, fmt='%s')
             f.close()
     else:
-        with open('HMS-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt', 'w+') as f:
+        with open(HMname + '-' + datetime.datetime.now().strftime('%H%M%S') +'.txt', 'w+') as f:
             np.savetxt(f, heightMap, fmt='%s')
             f.close()
 
