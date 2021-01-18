@@ -27,10 +27,12 @@ def removeTrees(level, box):
     try:
         for (chunk, slices, point) in level.getChunkSlices(box):
             blocks = chunk.Blocks[slices]
-        #     Change blocks to air
+            # Change blocks to air
             for t in treeID:
                 blocks[blocks == t] = 0
             chunk.dirty = True
+        
+        logger.info('Removing trees...')
 
     except Exception as e:
         logger.error(e)
