@@ -9,14 +9,17 @@ class Logger:
     def debug(self, message):
         log = '{} - {} - {} - {}'.format(dt.now(), self.name, 'DEBUG', message)
         print(log)
+        self.to_file(log)
 
     def info(self, message):
         log = '{} - {} - {} - {}'.format(dt.now(), self.name, 'INFO', message)
         print(log)
+        self.to_file(log)
 
     def warning(self, message):
         log = '{} - {} - {} - {}'.format(dt.now(), self.name, 'WARNING', message)
         print(log)
+        self.to_file(log)
 
     def error(self, message):
         log = '{} - {} - {} - {}'.format(dt.now(), self.name, 'ERROR', message)
@@ -26,6 +29,7 @@ class Logger:
     def critical(self, message):
         log = '{} - {} - {} - {}'.format(dt.now(), self.name, 'CRITICAL', message)
         print(log)
+        self.to_file(log)
 
     def to_file(self, log):
         with open(os.path.join(os.path.dirname(__file__),'logs', 'gdmc.log'), 'a+') as f:
