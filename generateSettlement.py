@@ -5,6 +5,7 @@ from pymclevel import TAG_Compound, TAG_Int, TAG_Short, TAG_Byte, TAG_String, TA
 import common
 import heightmap
 import generateStructure
+import deforestation
 
 inputs = [
     (
@@ -27,8 +28,13 @@ def perform(level, box, options):
     try:
         # Expand box to include entire y-axis
         box = common.expandBoundingBox(box)
+
+        # Deforestation
+        deforestation.deforestation(level, box)
+
         # Create Height Map
-        heightmap.heightMap(level, box)
+        # heightmap.heightMap(level, box)
+
         # Generate simple house
         # generateStructure.generateSimpleHouse(level, box)
 
