@@ -3,6 +3,8 @@ from logger import Logger
 from pymclevel import MCSchematic
 from pymclevel.box import Vector
 
+import os.path
+
 name = 'generateWalls'
 logger = Logger(name)
 
@@ -63,31 +65,36 @@ def place_wall_corners(level, box, heightmap):
     try:
         wall_type = 'corner'
         building = 'wall {}'.format(wall_type)
+        progress = 0
 
         # +x -z:
         filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'wall_{}.schematic'.format(wall_type))
         wall_corner = MCSchematic(shape=(8,12,8), filename=filename)
         ground = heightmap[len(heightmap)-1][0]
         level.copyBlocksFrom(wall_corner, wall_corner.bounds, Vector(box.maxx-8, ground, box.minz))
-        logger.info('Placing {}s... (1/4)'.format(building))
+        progress += 1
+        logger.info('Placing {}s... ({}/4)'.format(building, progress))
 
         # -x -z:
         wall_corner.rotateLeft()
         ground = heightmap[0][0]
         level.copyBlocksFrom(wall_corner, wall_corner.bounds, Vector(box.minx, ground, box.minz))
-        logger.info('Placing {}s... (2/4)'.format(building))
+        progress += 1
+        logger.info('Placing {}s... ({}/4)'.format(building, progress))
 
         # -x +z:
         wall_corner.rotateLeft()
         ground = heightmap[0][len(heightmap[0])-1]
         level.copyBlocksFrom(wall_corner, wall_corner.bounds, Vector(box.minx, ground, box.maxz-8))
-        logger.info('Placing {}s... (3/4)'.format(building))
+        progress += 1
+        logger.info('Placing {}s... ({}/4)'.format(building, progress))
         
         # +x +z:
         wall_corner.rotateLeft()
         ground = heightmap[len(heightmap)-1][len(heightmap[len(heightmap)-1])-1]
         level.copyBlocksFrom(wall_corner, wall_corner.bounds, Vector(box.maxx-8, ground, box.maxz-8))
-        logger.info('Placing {}s... (4/4)'.format(building))
+        progress += 1
+        logger.info('Placing {}s... ({}/4)'.format(building, progress))
 
         pass
     except Exception as e:
@@ -95,7 +102,8 @@ def place_wall_corners(level, box, heightmap):
 
 def place_wall_sections(level, box, heightmap, x_left, x_right, z_left, z_right):
     try:
-        # TODO: place wall sections
+        building = 'wall section'
+        progress = 0
 
         wall_type = 'pillar' # wall_pillar (1x12x9)
         filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'wall_{}.schematic'.format(wall_type))
@@ -116,6 +124,8 @@ def place_wall_sections(level, box, heightmap, x_left, x_right, z_left, z_right)
         wall_type = 'base' # wall_base (3x6x7)
         filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'wall_{}.schematic'.format(wall_type))
         wall_base = MCSchematic(shape=(3,6,7), filename=filename)
+
+        # TODO: Rotate wall_base 180 deg
 
         # -z:
         # left: 
@@ -138,6 +148,7 @@ def place_wall_sections(level, box, heightmap, x_left, x_right, z_left, z_right)
                     ground = heightmap[len(heightmap)-8-i][1]
                     level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.maxx-8-i, ground, box.minz))
                     i += 1
+            # TODO: Generate wall_base
 
         # right: 
         i = 1
@@ -159,39 +170,173 @@ def place_wall_sections(level, box, heightmap, x_left, x_right, z_left, z_right)
                     ground = heightmap[8+i][1]
                     level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.minx+7+i, ground, box.minz))
                     i += 1
+            # TODO: Generate wall_base
+        progress += 1
 
-            # +z:
-            # |-********-|
-            # |          |
-            # |          |
-            # |          |
-            # |          |
-            # |__________|
+        logger.info('Placing {}s... ({}/4)'.format(building, progress))
 
-            # -z:
-            # |----------|
-            # |          |
-            # |          |
-            # |          |
-            # |          |
-            # |_********_|
+        wall_pillar.rotateLeft()
+        wall_left.rotateLeft()
+        wall_middle.rotateLeft()
+        wall_right.rotateLeft()
+        wall_base.rotateLeft()
 
-            # +x:
-            # |----------|
-            # |          |
-            # |          *
-            # |          *
-            # |          |
-            # |__________|
+        # -x:
+        # left: 
+        i = 1
+        for sections in range(z_left):
+            for wt in range(4): # wall type
+                if wt == 0: #left
+                    ground = heightmap[1][8+i]
+                    level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.minx+1, ground, box.minz+7+i))
+                    i += 1
+                elif wt == 1: # middle
+                    ground = heightmap[1][8+i]
+                    level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.minx+1, ground, box.minz+7+i))
+                    i += 1
+                elif wt == 2: # right
+                    ground = heightmap[1][8+i]
+                    level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.minx+1, ground, box.minz+7+i))
+                    i += 1
+                elif wt == 3: # pillar
+                    ground = heightmap[1][8+i]
+                    level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.minx, ground, box.minz+7+i))
+                    i += 1
+            # TODO: Generate wall_base
 
-            # -x:
-            # |----------|
-            # |          |
-            # *          |
-            # *          |
-            # |          |
-            # |__________|
-        pass
+        # right: 
+        i = 1
+        for sections in range(z_right):
+            for wt in range(4): # wall type
+                if wt == 0: # right
+                    ground = heightmap[1][len(heightmap[1])-8-i]
+                    level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.minx+1, ground, box.maxz-8-i))
+                    i += 1
+                elif wt == 1: # middle
+                    ground = heightmap[1][len(heightmap[1])-8-i]
+                    level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.minx+1, ground, box.maxz-8-i))
+                    i += 1
+                elif wt == 2: #left
+                    ground = heightmap[1][len(heightmap[1])-8-i]
+                    level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.minx+1, ground, box.maxz-8-i))
+                    i += 1
+                elif wt == 3: # pillar
+                    ground = heightmap[1][len(heightmap[1])-8-i]
+                    level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.minx, ground, box.maxz-8-i))
+                    i += 1
+            # TODO: Generate wall_base
+        progress += 1
+
+        logger.info('Placing {}s... ({}/4)'.format(building, progress))
+
+        wall_pillar.rotateLeft()
+        wall_left.rotateLeft()
+        wall_middle.rotateLeft()
+        wall_right.rotateLeft()
+        wall_base.rotateLeft()
+
+        # +z:
+        # left: 
+        i = 1
+        for sections in range(x_left):
+            for wt in range(4): # wall type
+                if wt == 0: #left
+                    ground = heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2]
+                    level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.maxx-8-i, ground, box.maxz-9))
+                    i += 1
+                elif wt == 1: # middle
+                    ground = heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2]
+                    level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.maxx-8-i, ground, box.maxz-9))
+                    i += 1
+                elif wt == 2: # right
+                    ground = heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2]
+                    level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.maxx-8-i, ground, box.maxz-9))
+                    i += 1
+                elif wt == 3: # pillar
+                    ground = heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2]
+                    level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.maxx-8-i, ground, box.maxz-9))
+                    i += 1
+            # TODO: Generate wall_base
+
+        # right: 
+        i = 1
+        for sections in range(x_right):
+            for wt in range(4): # wall type
+                if wt == 0: # right
+                    ground = heightmap[8+i][len(heightmap[8+i])-2]
+                    level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.minx+7+i, ground, box.maxz-9))
+                    i += 1
+                elif wt == 1: # middle
+                    ground = heightmap[8+i][len(heightmap[8+i])-2]
+                    level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.minx+7+i, ground, box.maxz-9))
+                    i += 1
+                elif wt == 2: #left
+                    ground = heightmap[8+i][len(heightmap[8+i])-2]
+                    level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.minx+7+i, ground, box.maxz-9))
+                    i += 1
+                elif wt == 3: # pillar
+                    ground = heightmap[8+i][len(heightmap[8+i])-2]
+                    level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.minx+7+i, ground, box.maxz-9))
+                    i += 1
+            # TODO: Generate wall_base
+        progress += 1
+
+        logger.info('Placing {}s... ({}/4)'.format(building, progress))
+
+        wall_pillar.rotateLeft()
+        wall_left.rotateLeft()
+        wall_middle.rotateLeft()
+        wall_right.rotateLeft()
+        wall_base.rotateLeft()
+
+        # -x:
+        # left: 
+        i = 1
+        for sections in range(z_left):
+            for wt in range(4): # wall type
+                if wt == 0: #left
+                    ground = heightmap[len(heightmap)-2][8+i]
+                    level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.maxx-9, ground, box.minz+7+i))
+                    i += 1
+                elif wt == 1: # middle
+                    ground = heightmap[len(heightmap)-2][8+i]
+                    level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.maxx-9, ground, box.minz+7+i))
+                    i += 1
+                elif wt == 2: # right
+                    ground = heightmap[len(heightmap)-2][8+i]
+                    level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.maxx-9, ground, box.minz+7+i))
+                    i += 1
+                elif wt == 3: # pillar
+                    ground = heightmap[len(heightmap)-2][8+i]
+                    level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.maxx-9, ground, box.minz+7+i))
+                    i += 1
+            # TODO: Generate wall_base
+
+        # right: 
+        i = 1
+        for sections in range(z_right):
+            for wt in range(4): # wall type
+                if wt == 0: # right
+                    ground = heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i]
+                    level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.maxx-9, ground, box.maxz-8-i))
+                    i += 1
+                elif wt == 1: # middle
+                    ground = heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i]
+                    level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.maxx-9, ground, box.maxz-8-i))
+                    i += 1
+                elif wt == 2: #left
+                    ground = heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i]
+                    level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.maxx-9, ground, box.maxz-8-i))
+                    i += 1
+                elif wt == 3: # pillar
+                    ground = heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i]
+                    level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.maxx-9, ground, box.maxz-8-i))
+                    i += 1
+            # TODO: Generate wall_base
+        progress += 1
+
+        logger.info('Placing {}s... ({}/4)'.format(building, progress))
+
     except Exception as e:
         logger.error(e)
 
