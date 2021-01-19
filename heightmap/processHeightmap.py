@@ -85,6 +85,7 @@ def CCL2DFF(heightMap, minimumArea, exclusion = 0): # CCL2D via Flood Fill RECUR
     regionDict = {
         "wate" : -1,
         "lava" : -2,
+        999 : -1
     }
 
     def CCL(x, y, area):
@@ -160,7 +161,7 @@ def CCL2DFF(heightMap, minimumArea, exclusion = 0): # CCL2D via Flood Fill RECUR
                 if region != None:
                     for item in area:
                         maskedHM[item[0]][item[1]] = region
-                        diffHM[item[0]][item[1]] =  - (heightMap[item[0]][item[1]] - regionDict.get(maskedHM[item[0]][item[1]]) if maskedHM[item[0]][item[1]] in excludedBlocks.values() else regionDict.get(int(maskedHM[item[0]][item[1]])))
+                        diffHM[item[0]][item[1]] =  - (heightMap[item[0]][item[1]] - regionDict.get(maskedHM[item[0]][item[1]])) if maskedHM[item[0]][item[1]] in excludedBlocks.values() else (regionDict.get(int(maskedHM[item[0]][item[1]])) - heightMap[item[0]][item[1]])
 
     afterHM = [[regionDict.get(maskedHM[j][k], tempHM[j][k]) if maskedHM[j][k] in excludedBlocks.values() else regionDict.get(int(maskedHM[j][k]), tempHM[j][k]) for k in range(len(maskedHM[j]))] for j in range(len(maskedHM))]
     # ---------------HM naming---------------
