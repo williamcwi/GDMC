@@ -169,6 +169,8 @@ def place_wall_sections(level, box, heightmap, x_left, x_right, z_left, z_right)
                         ground = heightmap[8+i][1]
                         level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.minx+7+i, ground, box.minz+1))
                         i += 1
+                    else: 
+                        gate_pos_1 = Vector(box.minx+7+i, ground, box.minz)
                 elif wt == 3: # pillar
                     if sections is not x_right - 1:
                         ground = heightmap[8+i][1]
@@ -203,6 +205,8 @@ def place_wall_sections(level, box, heightmap, x_left, x_right, z_left, z_right)
                         ground = heightmap[1][8+i]
                         level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.minx+1, ground, box.minz+7+i))
                         i += 1
+                    else: 
+                        gate_pos_2 = Vector(box.minx, ground, box.minz+7+i)
                 elif wt == 3: # pillar
                     if sections is not z_left - 1:
                         ground = heightmap[1][8+i]
@@ -285,6 +289,8 @@ def place_wall_sections(level, box, heightmap, x_left, x_right, z_left, z_right)
                         ground = heightmap[8+i][len(heightmap[8+i])-2]
                         level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.minx+7+i, ground, box.maxz-9))
                         i += 1
+                    else: 
+                        gate_pos_3 = Vector(box.minx+7+i, ground, box.maxz-9)
                 elif wt == 3: # pillar
                     if sections is not x_right - 1:
                         ground = heightmap[8+i][len(heightmap[8+i])-2]
@@ -319,6 +325,8 @@ def place_wall_sections(level, box, heightmap, x_left, x_right, z_left, z_right)
                         ground = heightmap[len(heightmap)-2][8+i]
                         level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.maxx-9, ground, box.minz+7+i))
                         i += 1
+                    else: 
+                        gate_pos_4 = Vector(box.maxx-9, ground, box.minz+7+i)
                 elif wt == 3: # pillar
                     if sections is not z_left - 1:
                         ground = heightmap[len(heightmap)-2][8+i]
@@ -353,12 +361,58 @@ def place_wall_sections(level, box, heightmap, x_left, x_right, z_left, z_right)
 
         logger.info('Placing {}s... ({}/4)'.format(building, progress))
 
+        return gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4
+
     except Exception as e:
         logger.error(e)
 
-def place_gates(level, box, heightmap, x_gate, z_gate):
+def get_gate_schem(width):
+    try:
+        if width == 6:
+            filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'gate', 'gate_6.schematic')
+            return MCSchematic(shape=(10,12,9), filename=filename)
+        elif width == 7:
+            filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'gate', 'gate_7.schematic')
+            return MCSchematic(shape=(11,12,9), filename=filename)
+        elif width == 8:
+            filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'gate', 'gate_8.schematic')
+            return MCSchematic(shape=(12,12,9), filename=filename)
+        elif width == 9:
+            filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'gate', 'gate_9.schematic')
+            return MCSchematic(shape=(13,12,9), filename=filename)
+    except Exception as e:
+        logger.error(e)
+
+def place_gates(level, box, heightmap, gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4, x_gate, z_gate):
     try:
         # TODO: place gates based on gate size
+        gate_x = get_gate_schem(x_gate)
+        gate_z = get_gate_schem(z_gate)
+        gate_z.rotateLeft()
+
+        # -z:
+        level.copyBlocksFrom(gate_x, gate_x.bounds, gate_pos_1)
+        # -x:
+        level.copyBlocksFrom(gate_z, gate_z.bounds, gate_pos_2)
+
+        # Rotate both walls by 180 deg
+        gate_x.rotateLeft()
+        gate_x.rotateLeft()
+        gate_z.rotateLeft()
+        gate_z.rotateLeft()
+
+        # -z:
+        level.copyBlocksFrom(gate_x, gate_x.bounds, gate_pos_3)
+        # -x:
+        level.copyBlocksFrom(gate_z, gate_z.bounds, gate_pos_4)
+
+
+    except Exception as e:
+        logger.error(e)
+
+def place_gates_controls(level, box, position, gate_size):
+    try:
+        # TODO: Add gate controls 
         pass
     except Exception as e:
         logger.error(e)
@@ -369,8 +423,8 @@ def place_walls(level, box, heightmap):
         x_left, x_right, x_gate, z_left, z_right, z_gate = calc_wall_sections(box) # calculate wall sections and gate sizes
         
         place_wall_corners(level, box, heightmap)
-        place_wall_sections(level, box, heightmap, x_left, x_right, z_left, z_right)
-        place_gates(level, box, heightmap, x_gate, z_gate)
+        gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4 = place_wall_sections(level, box, heightmap, x_left, x_right, z_left, z_right)
+        place_gates(level, box, heightmap, gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4, x_gate, z_gate)
 
     except Exception as e:
         logger.error(e)
