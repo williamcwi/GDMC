@@ -6,6 +6,7 @@ import os
 import common
 import heightmap
 import generateStructure
+import generateWalls
 import deforestation
 import terrains
 
@@ -35,7 +36,7 @@ def perform(level, box, options):
         deforestation.removeTrees(level, box)
 
         # Create Height Map
-        heightMap = heightmap.heightMap(level, box)
+        hm = heightmap.heightMap(level, box)
 
         # TODO: move to separate file
         # Read height map difference file to string array (replace with correct file path)
@@ -45,10 +46,13 @@ def perform(level, box, options):
         heightMapDiffInt = [list(map(int,i)) for i in lines]
 
         # Edit terrain based on height map
-        terrains.editTerrain(level, box, heightMap, heightMapDiffInt)
+        terrains.editTerrain(level, box, hm, heightMapDiffInt)
 
-        # Generate simple house
+        # # Generate simple house
         # generateStructure.generateSimpleHouse(level, box)
+
+        # Generate walls
+        generateWalls.place_walls(level, box, hm)
 
     except Exception as e:
         logger.error(e)
