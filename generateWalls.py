@@ -3,6 +3,8 @@ from logger import Logger
 from pymclevel import MCSchematic
 from pymclevel.box import Vector
 
+from pymclevel import TAG_Compound, TAG_Int, TAG_Byte, TAG_String
+
 import os.path
 
 name = 'generateWalls'
@@ -10,7 +12,7 @@ logger = Logger(name)
 
 def calc_wall_sections(box):
     try:
-
+        # Calculates to total number of wall sections and gate sizes for each side
         x_len = box.size[0] - 16 # remove corner blocks: 8 per side
         z_len = box.size[2] - 16 # remove corner blocks: 8 per side
 
@@ -170,7 +172,7 @@ def place_wall_sections(level, box, heightmap, x_left, x_right, z_left, z_right)
                         level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.minx+7+i, ground, box.minz+1))
                         i += 1
                     else: 
-                        gate_pos_1 = Vector(box.minx+7+i, ground, box.minz)
+                        gate_pos_1 = [box.minx+7+i, ground, box.minz]
                 elif wt == 3: # pillar
                     if sections is not x_right - 1:
                         ground = heightmap[8+i][1]
@@ -206,7 +208,7 @@ def place_wall_sections(level, box, heightmap, x_left, x_right, z_left, z_right)
                         level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.minx+1, ground, box.minz+7+i))
                         i += 1
                     else: 
-                        gate_pos_2 = Vector(box.minx, ground, box.minz+7+i)
+                        gate_pos_2 = [box.minx, ground, box.minz+7+i]
                 elif wt == 3: # pillar
                     if sections is not z_left - 1:
                         ground = heightmap[1][8+i]
@@ -290,7 +292,7 @@ def place_wall_sections(level, box, heightmap, x_left, x_right, z_left, z_right)
                         level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.minx+7+i, ground, box.maxz-9))
                         i += 1
                     else: 
-                        gate_pos_3 = Vector(box.minx+7+i, ground, box.maxz-9)
+                        gate_pos_3 = [box.minx+7+i, ground, box.maxz-9]
                 elif wt == 3: # pillar
                     if sections is not x_right - 1:
                         ground = heightmap[8+i][len(heightmap[8+i])-2]
@@ -326,7 +328,7 @@ def place_wall_sections(level, box, heightmap, x_left, x_right, z_left, z_right)
                         level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.maxx-9, ground, box.minz+7+i))
                         i += 1
                     else: 
-                        gate_pos_4 = Vector(box.maxx-9, ground, box.minz+7+i)
+                        gate_pos_4 = [box.maxx-9, ground, box.minz+7+i]
                 elif wt == 3: # pillar
                     if sections is not z_left - 1:
                         ground = heightmap[len(heightmap)-2][8+i]
@@ -385,16 +387,27 @@ def get_gate_schem(width):
 
 def place_gates(level, box, heightmap, gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4, x_gate, z_gate):
     try:
-        # TODO: place gates based on gate size
+        building = 'gate'
+        progress = 0
+
         gate_x = get_gate_schem(x_gate)
         gate_z = get_gate_schem(z_gate)
         gate_z.rotateLeft()
 
         # -z:
-        level.copyBlocksFrom(gate_x, gate_x.bounds, gate_pos_1)
-        # -x:
-        level.copyBlocksFrom(gate_z, gate_z.bounds, gate_pos_2)
+        level.copyBlocksFrom(gate_x, gate_x.bounds, Vector(gate_pos_1[0], gate_pos_1[1], gate_pos_1[2]))
+        place_gates_controls(level, box, gate_pos_1, x_gate, 'north')
 
+        progress += 1
+        logger.info('Placing {}s... ({}/4)'.format(building, progress))
+
+        # -x:
+        level.copyBlocksFrom(gate_z, gate_z.bounds, Vector(gate_pos_2[0], gate_pos_2[1], gate_pos_2[2]))
+        place_gates_controls(level, box, gate_pos_2, z_gate, 'west')
+        
+        progress += 1
+        logger.info('Placing {}s... ({}/4)'.format(building, progress))
+        
         # Rotate both walls by 180 deg
         gate_x.rotateLeft()
         gate_x.rotateLeft()
@@ -402,29 +415,135 @@ def place_gates(level, box, heightmap, gate_pos_1, gate_pos_2, gate_pos_3, gate_
         gate_z.rotateLeft()
 
         # -z:
-        level.copyBlocksFrom(gate_x, gate_x.bounds, gate_pos_3)
+        level.copyBlocksFrom(gate_x, gate_x.bounds, Vector(gate_pos_3[0], gate_pos_3[1], gate_pos_3[2]))
+        place_gates_controls(level, box, gate_pos_3, x_gate, 'south')
+        
+        progress += 1
+        logger.info('Placing {}s... ({}/4)'.format(building, progress))
+        
         # -x:
-        level.copyBlocksFrom(gate_z, gate_z.bounds, gate_pos_4)
-
+        level.copyBlocksFrom(gate_z, gate_z.bounds, Vector(gate_pos_4[0], gate_pos_4[1], gate_pos_4[2]))
+        place_gates_controls(level, box, gate_pos_4, z_gate, 'east')
+        
+        progress += 1
+        logger.info('Placing {}s... ({}/4)'.format(building, progress))
+        
 
     except Exception as e:
         logger.error(e)
 
-def place_gates_controls(level, box, position, gate_size):
+def get_command(direction, gate_size, control_type):
     try:
-        # TODO: Add gate controls 
-        pass
+        start_y = '~-1'
+        end_y = '~4'
+        if direction == 'north':
+            start_z = '~-1'
+            end_z = '~-1'
+            if control_type == 'open':
+                start_x = '~2'
+                end_x = '~' + str(1 + gate_size)
+                block = 'air'
+            elif control_type == 'close':
+                start_x = '~-2'
+                end_x = '~' + str(-1 - gate_size)
+                block = 'spruce_fence'
+        elif direction == 'west':
+            start_x = '~-1'
+            end_x = '~-1'
+            if control_type == 'open':
+                start_z = '~-2'
+                end_z = '~' + str(-1 - gate_size)
+                block = 'air'
+            elif control_type == 'close':
+                start_z = '~2'
+                end_z = '~' + str(1 + gate_size)
+                block = 'spruce_fence'
+        elif direction == 'south':
+            start_z = '~1'
+            end_z = '~1'
+            if control_type == 'close':
+                start_x = '~-2'
+                end_x = '~' + str(-1 - gate_size)
+                block = 'air'
+            elif control_type == 'open':
+                start_x = '~2'
+                end_x = '~' + str(1 + gate_size)
+                block = 'spruce_fence'
+        elif direction == 'east':
+            start_x = '~1'
+            end_x = '~1'
+            if control_type == 'close':
+                start_z = '~2'
+                end_z = '~' + str(1 + gate_size)
+                block = 'air'
+            elif control_type == 'open':
+                start_z = '~-2'
+                end_z = '~' + str(-1 - gate_size)
+                block = 'spruce_fence'
+
+        command = 'fill {} {} {} {} {} {} {}'.format(start_x, start_y, start_z, end_x, end_y, end_z, block)
+        return command
+    except Exception as e:
+        logger.error(e)
+
+def gate_control_tile_entity(level, box, x, y, z, gate_size, command):
+    try:
+        
+        # Create Tile Entity
+        command_block = TAG_Compound()
+        command_block["conditionMet"] = TAG_Byte(0)
+        command_block["auto"] = TAG_Byte(0)
+        command_block["CustomName"] = TAG_String(u'@')
+        command_block["powered"] = TAG_Byte(0)
+        command_block["Command"] = TAG_String(u'{}'.format(command))
+        command_block["x"] = TAG_Int(x)
+        command_block["y"] = TAG_Int(y)
+        command_block["z"] = TAG_Int(z)
+        command_block["id"] = TAG_String(u'minecraft:command_block')
+        command_block["SuccessCount"] = TAG_Int(0)
+        command_block["TrackOutput"] = TAG_Byte(1)
+        command_block["UpdateLastExecution"] = TAG_Byte(1)
+
+        chunk = level.getChunk(x/16, z/16)
+
+        chunk.TileEntities.append(command_block)
+        chunk.dirty = True
+
+    except Exception as e:
+        logger.error(e)
+
+def place_gates_controls(level, box, pos, gate_size, direction):
+    try:
+        # Find gate controls position
+        if direction == 'north' or direction == 'south':
+            gate_open_pos = [pos[0], pos[1]+1, pos[2]+4]
+            gate_close_pos = [pos[0]+gate_size+3, pos[1]+1, pos[2]+4]
+        elif direction == 'west' or direction == 'east':
+            gate_open_pos = [pos[0]+4, pos[1]+1, pos[2]+gate_size+3]
+            gate_close_pos = [pos[0]+4, pos[1]+1, pos[2]]
+
+        # Generate Command Block
+        level.setBlockAt(gate_open_pos[0], gate_open_pos[1], gate_open_pos[2], 137)
+        level.setBlockAt(gate_close_pos[0], gate_close_pos[1], gate_close_pos[2], 137)
+
+        command = get_command(direction, gate_size, 'open')
+        gate_control_tile_entity(level, box, gate_open_pos[0], gate_open_pos[1], gate_open_pos[2], gate_size, command)
+        command = get_command(direction, gate_size, 'close')
+        gate_control_tile_entity(level, box, gate_close_pos[0], gate_close_pos[1], gate_close_pos[2], gate_size, command)
+
     except Exception as e:
         logger.error(e)
 
 def place_walls(level, box, heightmap):
     try:
-        # TODO: place walls together
+        
         x_left, x_right, x_gate, z_left, z_right, z_gate = calc_wall_sections(box) # calculate wall sections and gate sizes
         
         place_wall_corners(level, box, heightmap)
         gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4 = place_wall_sections(level, box, heightmap, x_left, x_right, z_left, z_right)
         place_gates(level, box, heightmap, gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4, x_gate, z_gate)
+
+        logger.info('Wall generation completed.')
 
     except Exception as e:
         logger.error(e)
