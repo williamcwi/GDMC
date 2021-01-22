@@ -70,7 +70,7 @@ def CCL(heightMap): ################# TODO:VERIFY #################
 def CCL2DFF(heightMap, minimumArea, exclusion = 0): # CCL2D via Flood Fill RECURSIVE ################# POC OK TODO:VERIFY #################
     tempHM = heightMap.copy()
     maskedHM = [['%04d' % 0 for k in range(len(heightMap[0]))] for j in range(len(heightMap))]  # initialse post-process HM
-    diffHM = [[0 for k in range(len(heightMap[0]))] for j in range(len(heightMap))]
+    # diffHM = [[0 for k in range(len(heightMap[0]))] for j in range(len(heightMap))]
 
     if exclusion >= len(heightMap) / 2 or exclusion >= len(heightMap[0]) / 2:
         print("Invalid Exclusion block width")
@@ -87,6 +87,8 @@ def CCL2DFF(heightMap, minimumArea, exclusion = 0): # CCL2D via Flood Fill RECUR
         "lava" : -2,
         999 : -1
     }
+    alterDict = dict()
+    alterHeightDict = dict()
 
     def CCL(x, y, area):
         tempHM[x][y] = 999
@@ -161,18 +163,20 @@ def CCL2DFF(heightMap, minimumArea, exclusion = 0): # CCL2D via Flood Fill RECUR
                 if region != None:
                     for item in area:
                         maskedHM[item[0]][item[1]] = region
-                        diffHM[item[0]][item[1]] =  - (heightMap[item[0]][item[1]] - int((heightMap[item[0]+1][item[1]] + heightMap[item[0]-1][item[1]] + heightMap[item[0]][item[1]+1] + heightMap[item[0]][item[1]-1])/4)) if maskedHM[item[0]][item[1]] in excludedBlocks.values() else (regionDict.get(int(maskedHM[item[0]][item[1]])) - heightMap[item[0]][item[1]])
+                        # diffHM[item[0]][item[1]] =  - (heightMap[item[0]][item[1]] - int((heightMap[item[0]+1][item[1]] + heightMap[item[0]-1][item[1]] + heightMap[item[0]][item[1]+1] + heightMap[item[0]][item[1]-1])/4)) if maskedHM[item[0]][item[1]] in excludedBlocks.values() else (regionDict.get(int(maskedHM[item[0]][item[1]])) - heightMap[item[0]][item[1]])
+                        alterDict[item[0],item[1]] = - (heightMap[item[0]][item[1]] - int((heightMap[item[0]+1][item[1]] + heightMap[item[0]-1][item[1]] + heightMap[item[0]][item[1]+1] + heightMap[item[0]][item[1]-1])/4)) if maskedHM[item[0]][item[1]] in excludedBlocks.values() else (regionDict.get(int(maskedHM[item[0]][item[1]])) - heightMap[item[0]][item[1]])
+                        alterHeightDict[item[0],item[1]] = heightMap[item[0]][item[1]]
 
-    afterHM = [[regionDict.get(maskedHM[j][k], tempHM[j][k]) if maskedHM[j][k] in excludedBlocks.values() else regionDict.get(int(maskedHM[j][k]), tempHM[j][k]) for k in range(len(maskedHM[j]))] for j in range(len(maskedHM))]
+    # afterHM = [[regionDict.get(maskedHM[j][k], tempHM[j][k]) if maskedHM[j][k] in excludedBlocks.values() else regionDict.get(int(maskedHM[j][k]), tempHM[j][k]) for k in range(len(maskedHM[j]))] for j in range(len(maskedHM))]
     # ---------------HM naming---------------
     # diffHM - List height difference before and after moderification
     # afterHM - List height after moderification
     # maskedHM - List region group after moderification
 
-    heightMap2File(afterHM, "HMA")
-    heightMap2File(diffHM, "HMD")
-    heightMap2File(maskedHM, "HMM")
-    return maskedHM # return 2D array
+    # heightMap2File(afterHM, "HMA")
+    # heightMap2File(diffHM, "HMD")
+    # heightMap2File(maskedHM, "HMM")
+    return alterDict, alterHeightDict # return Dict with changed blocks and orginal blocks height
 
 def CCL3DFF(heightMap, minimumArea, exclusion = 0): # CCL3D via Flood Fill RECURSIVE ################# NOT TESTED TODO:VERIFY #################
     tempHM = heightMap.copy()

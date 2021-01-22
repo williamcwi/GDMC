@@ -37,20 +37,19 @@ def perform(level, box, options):
 
         # Create Height Map
         hm = heightmap.heightMap(level, box)
-
-        # TODO: move to separate file
+        # TODO: Add test of selected area size for wall generation
+        alterDict, alterHeightDict = terrains.floodFill(hm, 169, 9)
         # Read height map difference file to string array (replace with correct file path)
-        with open('C:/Users/Rhys/Documents/coursework/Year 3/CO600 - Project/mcedit/stock-filters/HMD-145407.txt') as heightMapDiff:
-            lines = [line.split() for line in heightMapDiff]
+        # with open('C:/Users/Rhys/Documents/coursework/Year 3/CO600 - Project/mcedit/stock-filters/HMD-145407.txt') as heightMapDiff:
+        #     lines = [line.split() for line in heightMapDiff]
         # Convert string array to int
-        heightMapDiffInt = [list(map(int,i)) for i in lines]
-
+        # heightMapDiffInt = [list(map(int,i)) for i in lines]
         # Edit terrain based on height map
-        terrains.editTerrain(level, box, hm, heightMapDiffInt)
+        terrains.editTerrainFF(level, box, alterDict, alterHeightDict)
+        # terrains.editTerrain(level, box, hm, diffHM)
 
         # # Generate simple house
         # generateStructure.generateSimpleHouse(level, box)
-
         # Generate walls
         generateWalls.place_walls(level, box, hm)
 
