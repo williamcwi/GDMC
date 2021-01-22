@@ -35,10 +35,10 @@ class Logger:
 
     def to_file(self, log):
         if platform.system()==("Darwin") and int(platform.release()[:2]) >= 19:
-            with open(os.path.join(os.path.expanduser("~/Desktop"), "gdmcLog" + '-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'a+') as f:
+            with open(os.path.join(os.path.expanduser("~/Desktop"), "gdmcLog" +'.txt'), 'a+') as f:
                 f.write(log + '\n')
                 f.close()
-
+        else:
             with open(os.path.join(os.path.dirname(__file__),'logs', 'gdmc.log'), 'a+') as f:
                 f.write(log + '\n')
                 f.close()
