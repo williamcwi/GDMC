@@ -1,5 +1,6 @@
 from datetime import datetime as dt
 import os.path
+import platform
 
 class Logger:
 
@@ -32,6 +33,11 @@ class Logger:
         self.to_file(log)
 
     def to_file(self, log):
-        with open(os.path.join(os.path.dirname(__file__),'logs', 'gdmc.log'), 'a+') as f:
-            f.write(log + '\n')
-            f.close()
+        if platform.system()==("Darwin") and int(platform.release()[:2]) >= 19:
+            with open(os.path.join(os.path.expanduser("~/Desktop"), "gdmcLog" + '-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'a+') as f:
+                f.write(log + '\n')
+                f.close()
+
+            with open(os.path.join(os.path.dirname(__file__),'logs', 'gdmc.log'), 'a+') as f:
+                f.write(log + '\n')
+                f.close()
