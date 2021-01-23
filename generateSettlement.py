@@ -38,7 +38,7 @@ def perform(level, box, options):
         # Create Height Map
         hm = heightmap.heightMap(level, box)
         # TODO: Add test of selected area size for wall generation
-        alterDict, alterHeightDict = terrains.floodFill(hm, 169, 9)
+        alterDict, alterHeightDict = terrains.floodFill(hm, 169, 7)
         # Read height map difference file to string array (replace with correct file path)
         # with open('C:/Users/Rhys/Documents/coursework/Year 3/CO600 - Project/mcedit/stock-filters/HMD-145407.txt') as heightMapDiff:
         #     lines = [line.split() for line in heightMapDiff]
