@@ -142,7 +142,7 @@ def heightMap(level, box):
         
         logger.info('Generating heightmap...')
 
-        heightMap2File(heightmap)
+        # heightMap2File(heightmap)
 
         return heightmap
     except Exception as e:
