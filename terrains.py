@@ -139,9 +139,9 @@ def editTerrainFF(level, box, alterDict, alterHeightdict):
             elif diff < 0:
                 diff -= 1
             for e in xrange(abs(diff)):
-			    if alterHeightdict[x, y] < 0
-                level.setBlockAt(mappedx, (alterHeightdict[x, y] + (e * (diff / abs(diff)))), mappedz, block)
-		return heightmap.heightMap(level, box)
+                if alterHeightdict[x, y] < 0:
+                    level.setBlockAt(mappedx, (alterHeightdict[x, y] + (e * (diff / abs(diff)))), mappedz, block)
+        return heightmap.heightMap(level, box)
     except Exception as e:
         logger.error(e)
 
@@ -155,17 +155,17 @@ def editTerrain (level, box, oldHeightMap, heightMapDiff):
                 if ydiff < 0:
                     oldy = oldHeightMap[zpos][xpos]
                     newy = oldy + ydiff
-					block = level.blockAt(x, oldy, z)
+                    block = level.blockAt(x, oldy, z)
                     while oldy > newy:
                         level.setBlockAt(x, oldy, z, 0)
                         oldy -= 1
-					level.setBlockAt(x, oldy, z, block)
+                    level.setBlockAt(x, oldy, z, block)
                 if ydiff > 0:
                     oldy = oldHeightMap[zpos][xpos]
                     newy = oldy + ydiff
                     block = level.blockAt(x, oldy, z)
-                    while oldy = newy:
-						oldy += 1
+                    while oldy == newy:
+                        oldy += 1
                         level.setBlockAt(x, oldy, z, block)
                 xpos += 1
             zpos += 1
@@ -177,7 +177,7 @@ def findWaterSurface(waterHeightmap, processedHeightmap):
         combinedHM = []
         for water, processed in zip(waterHeightmap, processedHeightmap):
             row = []
-            for w, p in zip(water, processed)
+            for w, p in zip(water, processed):
                 if p == -1:
                     row.append(w)
                 else:
