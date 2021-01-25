@@ -101,11 +101,10 @@ def floodFill(heightMap, minimumArea, exclusion = 0): # Flood Fill RECURSIVE ###
             for y in range(exclusion, (len(maskedHM[0]) - exclusion)):
                 if maskedHM[x][y] == "0000":
                     area, surroundingRegion = FFZero(x, y, [], [])
+                    region =  None
                     if len(surroundingRegion) > 0:
-                        region = max(set(surroundingRegion), key=surroundingRegion.count)
-                    else:
-                        region =  None
-                    if region != None:
+                        region = max(set(surroundingRegion), key=surroundingRegion.count)   
+                    if region != None and len(area)<=(minimumArea*4):
                         for item in area:
                             maskedHM[item[0]][item[1]] = region
                             #diffHM[item[0]][item[1]] =  - (heightMap[item[0]][item[1]] - int((heightMap[item[0]+1][item[1]] + heightMap[item[0]-1][item[1]] + heightMap[item[0]][item[1]+1] + heightMap[item[0]][item[1]-1])/4)) if maskedHM[item[0]][item[1]] in excludedBlocks.values() else (regionDict.get(int(maskedHM[item[0]][item[1]])) - heightMap[item[0]][item[1]])
@@ -121,7 +120,7 @@ def floodFill(heightMap, minimumArea, exclusion = 0): # Flood Fill RECURSIVE ###
         # heightMap2File(afterHM, "HMA")
         # heightMap2File(diffHM, "HMD")
         # heightMap2File(maskedHM, "HMM")
-        return alterDict, alterHeightDict, afterHM # return 2D array
+        return alterDict, alterHeightDict # return Dict with changed blocks and orginal blocks height
     except Exception as e:
         logger.error(e)
 
