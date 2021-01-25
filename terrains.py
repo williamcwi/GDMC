@@ -166,3 +166,19 @@ def editTerrain (level, box, oldHeightMap, heightMapDiff):
             zpos += 1
     except Exception as e:
         logger.error(e)
+
+def findWaterSurface(waterHeightmap, processedHeightmap):
+    try:
+        combinedHM = []
+        for water, processed in zip(waterHeightmap, processedHeightmap):
+            row = []
+            for w, p in zip(water, processed)
+                if p == -1:
+                    row.append(w)
+                else:
+                    row.append(p)
+            combinedHM.append(row)
+        return combinedHM
+
+    except Exception as e:
+        logger.error(e)
