@@ -4,6 +4,7 @@ import platform
 import os.path
 import datetime
 from copy import deepcopy
+import heightmap
 
 import sys
 sys.setrecursionlimit(65536)  #!!IMPORTANT to allow floodFill and RECURSIVE
@@ -138,7 +139,9 @@ def editTerrainFF(level, box, alterDict, alterHeightdict):
             elif diff < 0:
                 diff -= 1
             for e in xrange(abs(diff)):
+			    if alterHeightdict[x, y] < 0
                 level.setBlockAt(mappedx, (alterHeightdict[x, y] + (e * (diff / abs(diff)))), mappedz, block)
+		return heightmap.heightMap(level, box)
     except Exception as e:
         logger.error(e)
 
@@ -152,16 +155,18 @@ def editTerrain (level, box, oldHeightMap, heightMapDiff):
                 if ydiff < 0:
                     oldy = oldHeightMap[zpos][xpos]
                     newy = oldy + ydiff
+					block = level.blockAt(x, oldy, z)
                     while oldy > newy:
                         level.setBlockAt(x, oldy, z, 0)
                         oldy -= 1
+					level.setBlockAt(x, oldy, z, block)
                 if ydiff > 0:
                     oldy = oldHeightMap[zpos][xpos]
                     newy = oldy + ydiff
                     block = level.blockAt(x, oldy, z)
-                    while oldy <= newy:
-                        level.setBlockAt(x, oldy, z, block)
+                    while oldy = newy:
 						oldy += 1
+                        level.setBlockAt(x, oldy, z, block)
                 xpos += 1
             zpos += 1
     except Exception as e:
