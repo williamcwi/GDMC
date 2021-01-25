@@ -159,9 +159,9 @@ def editTerrain (level, box, oldHeightMap, heightMapDiff):
                     oldy = oldHeightMap[zpos][xpos]
                     newy = oldy + ydiff
                     block = level.blockAt(x, oldy, z)
-                    while oldy < newy:
-                        oldy += 1
+                    while oldy <= newy:
                         level.setBlockAt(x, oldy, z, block)
+						oldy += 1
                 xpos += 1
             zpos += 1
     except Exception as e:
