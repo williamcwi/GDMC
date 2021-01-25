@@ -37,6 +37,8 @@ def perform(level, box, options):
 
         # Create Height Map
         hm = heightmap.heightMap(level, box)
+        whm = heightmap.waterHeightMap(level, box)
+
         # TODO: Add test of selected area size for wall generation
         alterDict, alterHeightDict, afterHM = terrains.floodFill(hm, 169, 7)
         # Read height map difference file to string array (replace with correct file path)
@@ -48,10 +50,14 @@ def perform(level, box, options):
         terrains.editTerrainFF(level, box, alterDict, alterHeightDict)
         # terrains.editTerrain(level, box, hm, diffHM)
 
-        # # Generate simple house
-        # generateStructure.generateSimpleHouse(level, box)
+        # Return combinedHM (water and processed heightmap)
+        combinedHM = terrains.findWaterSurface(whm, afterHM)
+
         # Generate walls
         generateWalls.place_walls(level, box, afterHM)
+
+        # # Generate simple house
+        # generateStructure.generateSimpleHouse(level, box)
 
     except Exception as e:
         logger.error(e)

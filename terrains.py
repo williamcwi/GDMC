@@ -4,6 +4,7 @@ import platform
 import os.path
 import datetime
 from copy import deepcopy
+import heightmap
 
 import sys
 sys.setrecursionlimit(65536)  #!!IMPORTANT to allow floodFill and RECURSIVE
@@ -139,6 +140,8 @@ def editTerrainFF(level, box, alterDict, alterHeightdict):
                 level.setBlockAt(mappedx, (alterHeightdict[x, y] + (e * (diff / abs(diff)))), mappedz, block)
             if diff < 0 :
                 level.setBlockAt(mappedx, (alterHeightdict[x, y] + diff), mappedz, block)
+        return heightmap.heightMap(level, box)
+
     except Exception as e:
         logger.error(e)
 
@@ -152,17 +155,35 @@ def editTerrain (level, box, oldHeightMap, heightMapDiff):
                 if ydiff < 0:
                     oldy = oldHeightMap[zpos][xpos]
                     newy = oldy + ydiff
+                    block = level.blockAt(x, oldy, z)
                     while oldy > newy:
                         level.setBlockAt(x, oldy, z, 0)
                         oldy -= 1
+                    level.setBlockAt(x, oldy, z, block)
                 if ydiff > 0:
                     oldy = oldHeightMap[zpos][xpos]
                     newy = oldy + ydiff
                     block = level.blockAt(x, oldy, z)
-                    while oldy < newy:
+                    while oldy == newy:
                         oldy += 1
                         level.setBlockAt(x, oldy, z, block)
                 xpos += 1
             zpos += 1
+    except Exception as e:
+        logger.error(e)
+
+def findWaterSurface(waterHeightmap, processedHeightmap):
+    try:
+        combinedHM = []
+        for water, processed in zip(waterHeightmap, processedHeightmap):
+            row = []
+            for w, p in zip(water, processed):
+                if p == -1:
+                    row.append(w)
+                else:
+                    row.append(p)
+            combinedHM.append(row)
+        return combinedHM
+
     except Exception as e:
         logger.error(e)
