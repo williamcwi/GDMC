@@ -397,6 +397,7 @@ def place_gates(level, box, heightmap, gate_pos_1, gate_pos_2, gate_pos_3, gate_
         # -z:
         level.copyBlocksFrom(gate_x, gate_x.bounds, Vector(gate_pos_1[0], gate_pos_1[1], gate_pos_1[2]))
         place_gates_controls(level, box, gate_pos_1, x_gate, 'north')
+        place_gate_floor(level, box, gate_pos_1, x_gate, 'north')
 
         progress += 1
         logger.info('Placing {}s... ({}/4)'.format(building, progress))
@@ -404,6 +405,7 @@ def place_gates(level, box, heightmap, gate_pos_1, gate_pos_2, gate_pos_3, gate_
         # -x:
         level.copyBlocksFrom(gate_z, gate_z.bounds, Vector(gate_pos_2[0], gate_pos_2[1], gate_pos_2[2]))
         place_gates_controls(level, box, gate_pos_2, z_gate, 'west')
+        place_gate_floor(level, box, gate_pos_2, z_gate, 'west')
         
         progress += 1
         logger.info('Placing {}s... ({}/4)'.format(building, progress))
@@ -417,6 +419,7 @@ def place_gates(level, box, heightmap, gate_pos_1, gate_pos_2, gate_pos_3, gate_
         # -z:
         level.copyBlocksFrom(gate_x, gate_x.bounds, Vector(gate_pos_3[0], gate_pos_3[1], gate_pos_3[2]))
         place_gates_controls(level, box, gate_pos_3, x_gate, 'south')
+        place_gate_floor(level, box, gate_pos_3, x_gate, 'south')
         
         progress += 1
         logger.info('Placing {}s... ({}/4)'.format(building, progress))
@@ -424,10 +427,34 @@ def place_gates(level, box, heightmap, gate_pos_1, gate_pos_2, gate_pos_3, gate_
         # -x:
         level.copyBlocksFrom(gate_z, gate_z.bounds, Vector(gate_pos_4[0], gate_pos_4[1], gate_pos_4[2]))
         place_gates_controls(level, box, gate_pos_4, z_gate, 'east')
+        place_gate_floor(level, box, gate_pos_4, z_gate, 'east')
         
         progress += 1
         logger.info('Placing {}s... ({}/4)'.format(building, progress))
         
+
+    except Exception as e:
+        logger.error(e)
+
+def place_gate_floor(level, box, pos, width, direction):
+    try:
+        filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'gate', 'gate_floor.schematic')
+        gate_floor = MCSchematic(shape=(1,1,5), filename=filename)
+
+        x = pos[0]+2
+        y = pos[1]-1
+        z = pos[2]+2
+
+        if direction == 'north' or direction == 'south':
+            for w in range(width):
+                level.copyBlocksFrom(gate_floor, gate_floor.bounds, Vector(x, y, z))
+                x += 1
+
+        elif direction == 'west' or direction == 'east':
+            gate_floor.rotateLeft()
+            for w in range(width):
+                level.copyBlocksFrom(gate_floor, gate_floor.bounds, Vector(x, y, z))
+                z += 1
 
     except Exception as e:
         logger.error(e)
