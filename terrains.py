@@ -132,13 +132,13 @@ def editTerrainFF(level, box, alterDict, alterHeightdict):
             diff = alterDict[x, y]
             mappedx = box.minx + x
             mappedz = box.minz + y
-            block = 0
-            if diff > 0:
-                block = 2
-            elif diff < 0:
+            block = level.blockAt(mappedx, alterHeightdict[x, y] - 1, mappedz)
+            if diff < 0:
                 diff -= 1
             for e in xrange(abs(diff)):
                 level.setBlockAt(mappedx, (alterHeightdict[x, y] + (e * (diff / abs(diff)))), mappedz, block)
+            if diff < 0 :
+                level.setBlockAt(mappedx, (alterHeightdict[x, y] + diff), mappedz, block)
     except Exception as e:
         logger.error(e)
 
