@@ -120,7 +120,7 @@ def floodFill(heightMap, minimumArea, exclusion = 0): # Flood Fill RECURSIVE ###
         # heightMap2File(afterHM, "HMA")
         # heightMap2File(diffHM, "HMD")
         # heightMap2File(maskedHM, "HMM")
-        return alterDict, alterHeightDict # return Dict with changed blocks and orginal blocks height
+        return alterDict, alterHeightDict, afterHM # return Dict with changed blocks and orginal blocks height
     except Exception as e:
         logger.error(e)
 
