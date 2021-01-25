@@ -112,7 +112,7 @@ def floodFill(heightMap, minimumArea, exclusion = 0): # Flood Fill RECURSIVE ###
                             alterDict[item[0],item[1]] = - (heightMap[item[0]][item[1]] - int((heightMap[item[0]+1][item[1]] + heightMap[item[0]-1][item[1]] + heightMap[item[0]][item[1]+1] + heightMap[item[0]][item[1]-1])/4)) if maskedHM[item[0]][item[1]] in excludedBlocks.values() else (regionDict.get(int(maskedHM[item[0]][item[1]])) - heightMap[item[0]][item[1]])
                             alterHeightDict[item[0],item[1]] = heightMap[item[0]][item[1]]
 
-        # afterHM = [[regionDict.get(maskedHM[j][k], tempHM[j][k]) if maskedHM[j][k] in excludedBlocks.values() else regionDict.get(int(maskedHM[j][k]), tempHM[j][k]) for k in range(len(maskedHM[j]))] for j in range(len(maskedHM))]
+        afterHM = [[regionDict.get(maskedHM[j][k], tempHM[j][k]) if maskedHM[j][k] in excludedBlocks.values() else regionDict.get(int(maskedHM[j][k]), tempHM[j][k]) for k in range(len(maskedHM[j]))] for j in range(len(maskedHM))]
         # ---------------HM naming---------------
         # diffHM - List height difference before and after moderification
         # afterHM - List height after moderification
@@ -121,7 +121,7 @@ def floodFill(heightMap, minimumArea, exclusion = 0): # Flood Fill RECURSIVE ###
         # heightMap2File(afterHM, "HMA")
         # heightMap2File(diffHM, "HMD")
         # heightMap2File(maskedHM, "HMM")
-        return alterDict, alterHeightDict # return 2D array
+        return alterDict, alterHeightDict, afterHM # return 2D array
     except Exception as e:
         logger.error(e)
 
