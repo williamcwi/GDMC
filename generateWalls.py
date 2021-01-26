@@ -142,30 +142,21 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
         i = 1
         for sections in range(x_left):
             for wt in range(4): # wall type
+                ground = heightmap[len(heightmap)-8-i][1]
+                if ground == -1:
+                    ground = combinedHM[len(heightmap)-8-i][1]
                 if wt == 0: #left
-                    ground = heightmap[len(heightmap)-8-i][1]
-                    if ground == -1:
-                        ground = combinedHM[len(heightmap)-8-i][1]
                     level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.maxx-8-i, ground, box.minz+1))
                     i += 1
                 elif wt == 1: # middle
-                    ground = heightmap[len(heightmap)-8-i][1]
-                    if ground == -1:
-                        ground = combinedHM[len(heightmap)-8-i][1]
                     level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.maxx-8-i, ground, box.minz+1))
                     i += 1
                 elif wt == 2: # right
                     if sections is not x_left - 1:
-                        ground = heightmap[len(heightmap)-8-i][1]
-                        if ground == -1:
-                            ground = combinedHM[len(heightmap)-8-i][1]
                         level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.maxx-8-i, ground, box.minz+1))
                         i += 1
                 elif wt == 3: # pillar
                     if sections is not x_left - 1:
-                        ground = heightmap[len(heightmap)-8-i][1]
-                        if ground == -1:
-                            ground = combinedHM[len(heightmap)-8-i][1]
                         level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.maxx-8-i, ground, box.minz))
                         i += 1
             # TODO: Generate wall_base
@@ -174,32 +165,23 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
         i = 1
         for sections in range(x_right):
             for wt in range(4): # wall type
+                ground = heightmap[8+i][1]
+                if ground == -1:
+                    ground = combinedHM[8+i][1]
                 if wt == 0: # right
-                    ground = heightmap[8+i][1]
-                    if ground == -1:
-                        ground = combinedHM[8+i][1]
                     level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.minx+7+i, ground, box.minz+1))
                     i += 1
                 elif wt == 1: # middle
-                    ground = heightmap[8+i][1]
-                    if ground == -1:
-                        ground = combinedHM[8+i][1]
                     level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.minx+7+i, ground, box.minz+1))
                     i += 1
                 elif wt == 2: #left
                     if sections is not x_right - 1:
-                        ground = heightmap[8+i][1]
-                        if ground == -1:
-                            ground = combinedHM[8+i][1]
                         level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.minx+7+i, ground, box.minz+1))
                         i += 1
                     else: 
                         gate_pos_1 = [box.minx+7+i, ground, box.minz]
                 elif wt == 3: # pillar
                     if sections is not x_right - 1:
-                        ground = heightmap[8+i][1]
-                        if ground == -1:
-                            ground = combinedHM[8+i][1]
                         level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.minx+7+i, ground, box.minz))
                         i += 1
             # TODO: Generate wall_base
@@ -218,32 +200,23 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
         i = 1
         for sections in range(z_left):
             for wt in range(4): # wall type
+                ground = heightmap[1][8+i]
+                if ground == -1:
+                    ground = combinedHM[1][8+i]
                 if wt == 0: #left
-                    ground = heightmap[1][8+i]
-                    if ground == -1:
-                        ground = combinedHM[1][8+i]
                     level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.minx+1, ground, box.minz+7+i))
                     i += 1
                 elif wt == 1: # middle
-                    ground = heightmap[1][8+i]
-                    if ground == -1:
-                        ground = combinedHM[1][8+i]
                     level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.minx+1, ground, box.minz+7+i))
                     i += 1
                 elif wt == 2: # right
                     if sections is not z_left - 1:
-                        ground = heightmap[1][8+i]
-                        if ground == -1:
-                            ground = combinedHM[1][8+i]
                         level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.minx+1, ground, box.minz+7+i))
                         i += 1
                     else: 
                         gate_pos_2 = [box.minx, ground, box.minz+7+i]
                 elif wt == 3: # pillar
                     if sections is not z_left - 1:
-                        ground = heightmap[1][8+i]
-                        if ground == -1:
-                            ground = combinedHM[1][8+i]
                         level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.minx, ground, box.minz+7+i))
                         i += 1
             # TODO: Generate wall_base
@@ -252,30 +225,21 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
         i = 1
         for sections in range(z_right):
             for wt in range(4): # wall type
+                ground = heightmap[1][len(heightmap[1])-8-i]
+                if ground == -1:
+                    ground = combinedHM[1][len(heightmap[1])-8-i]
                 if wt == 0: # right
-                    ground = heightmap[1][len(heightmap[1])-8-i]
-                    if ground == -1:
-                        ground = combinedHM[1][len(heightmap[1])-8-i]
                     level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.minx+1, ground, box.maxz-8-i))
                     i += 1
                 elif wt == 1: # middle
-                    ground = heightmap[1][len(heightmap[1])-8-i]
-                    if ground == -1:
-                        ground = combinedHM[1][len(heightmap[1])-8-i]
                     level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.minx+1, ground, box.maxz-8-i))
                     i += 1
                 elif wt == 2: #left
                     if sections is not z_right - 1:
-                        ground = heightmap[1][len(heightmap[1])-8-i]
-                        if ground == -1:
-                            ground = combinedHM[1][len(heightmap[1])-8-i]
                         level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.minx+1, ground, box.maxz-8-i))
                         i += 1
                 elif wt == 3: # pillar
                     if sections is not z_right - 1:
-                        ground = heightmap[1][len(heightmap[1])-8-i]
-                        if ground == -1:
-                            ground = combinedHM[1][len(heightmap[1])-8-i]
                         level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.minx, ground, box.maxz-8-i))
                         i += 1
             # TODO: Generate wall_base
@@ -294,30 +258,21 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
         i = 1
         for sections in range(x_left):
             for wt in range(4): # wall type
+                ground = heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2]
+                if ground == -1:
+                    ground = combinedHM[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2]
                 if wt == 0: #left
-                    ground = heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2]
-                    if ground == -1:
-                        ground = combinedHM[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2]
                     level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.maxx-8-i, ground, box.maxz-9))
                     i += 1
                 elif wt == 1: # middle
-                    ground = heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2]
-                    if ground == -1:
-                        ground = combinedHM[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2]
                     level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.maxx-8-i, ground, box.maxz-9))
                     i += 1
                 elif wt == 2: # right
                     if sections is not x_left - 1:
-                        ground = heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2]
-                        if ground == -1:
-                            ground = combinedHM[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2]
                         level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.maxx-8-i, ground, box.maxz-9))
                         i += 1
                 elif wt == 3: # pillar
                     if sections is not x_left - 1:
-                        ground = heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2]
-                        if ground == -1:
-                            ground = combinedHM[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2]
                         level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.maxx-8-i, ground, box.maxz-9))
                         i += 1
             # TODO: Generate wall_base
@@ -326,32 +281,23 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
         i = 1
         for sections in range(x_right):
             for wt in range(4): # wall type
+                ground = heightmap[8+i][len(heightmap[8+i])-2]
+                if ground == -1:
+                    ground = combinedHM[8+i][len(heightmap[8+i])-2]
                 if wt == 0: # right
-                    ground = heightmap[8+i][len(heightmap[8+i])-2]
-                    if ground == -1:
-                        ground = combinedHM[8+i][len(heightmap[8+i])-2]
                     level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.minx+7+i, ground, box.maxz-9))
                     i += 1
                 elif wt == 1: # middle
-                    ground = heightmap[8+i][len(heightmap[8+i])-2]
-                    if ground == -1:
-                        ground = combinedHM[8+i][len(heightmap[8+i])-2]
                     level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.minx+7+i, ground, box.maxz-9))
                     i += 1
                 elif wt == 2: #left
                     if sections is not x_right - 1:
-                        ground = heightmap[8+i][len(heightmap[8+i])-2]
-                        if ground == -1:
-                            ground = combinedHM[8+i][len(heightmap[8+i])-2]
                         level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.minx+7+i, ground, box.maxz-9))
                         i += 1
                     else: 
                         gate_pos_3 = [box.minx+7+i, ground, box.maxz-9]
                 elif wt == 3: # pillar
                     if sections is not x_right - 1:
-                        ground = heightmap[8+i][len(heightmap[8+i])-2]
-                        if ground == -1:
-                            ground = combinedHM[8+i][len(heightmap[8+i])-2]
                         level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.minx+7+i, ground, box.maxz-9))
                         i += 1
             # TODO: Generate wall_base
@@ -370,32 +316,23 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
         i = 1
         for sections in range(z_left):
             for wt in range(4): # wall type
+                ground = heightmap[len(heightmap)-2][8+i]
+                if ground == -1:
+                    ground = combinedHM[len(heightmap)-2][8+i]
                 if wt == 0: #left
-                    ground = heightmap[len(heightmap)-2][8+i]
-                    if ground == -1:
-                        ground = combinedHM[len(heightmap)-2][8+i]
                     level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.maxx-9, ground, box.minz+7+i))
                     i += 1
                 elif wt == 1: # middle
-                    ground = heightmap[len(heightmap)-2][8+i]
-                    if ground == -1:
-                        ground = combinedHM[len(heightmap)-2][8+i]
                     level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.maxx-9, ground, box.minz+7+i))
                     i += 1
                 elif wt == 2: # right
                     if sections is not z_left - 1:
-                        ground = heightmap[len(heightmap)-2][8+i]
-                        if ground == -1:
-                            ground = combinedHM[len(heightmap)-2][8+i]
                         level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.maxx-9, ground, box.minz+7+i))
                         i += 1
                     else: 
                         gate_pos_4 = [box.maxx-9, ground, box.minz+7+i]
                 elif wt == 3: # pillar
                     if sections is not z_left - 1:
-                        ground = heightmap[len(heightmap)-2][8+i]
-                        if ground == -1:
-                            ground = combinedHM[len(heightmap)-2][8+i]
                         level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.maxx-9, ground, box.minz+7+i))
                         i += 1
             # TODO: Generate wall_base
@@ -404,30 +341,21 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
         i = 1
         for sections in range(z_right):
             for wt in range(4): # wall type
+                ground = heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i]
+                if ground == -1:
+                    ground = combinedHM[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i]
                 if wt == 0: # right
-                    ground = heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i]
-                    if ground == -1:
-                        ground = combinedHM[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i]
                     level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.maxx-9, ground, box.maxz-8-i))
                     i += 1
                 elif wt == 1: # middle
-                    ground = heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i]
-                    if ground == -1:
-                        ground = combinedHM[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i]
                     level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.maxx-9, ground, box.maxz-8-i))
                     i += 1
                 elif wt == 2: #left
                     if sections is not z_right - 1:
-                        ground = heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i]
-                        if ground == -1:
-                            ground = combinedHM[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i]
                         level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.maxx-9, ground, box.maxz-8-i))
                         i += 1
                 elif wt == 3: # pillar
                     if sections is not z_right - 1:
-                        ground = heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i]
-                        if ground == -1:
-                            ground = combinedHM[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i]
                         level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.maxx-9, ground, box.maxz-8-i))
                         i += 1
             # TODO: Generate wall_base
