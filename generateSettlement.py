@@ -54,7 +54,7 @@ def perform(level, box, options):
         combinedHM = terrains.findWaterSurface(whm, afterHM)
 
         # Generate walls
-        generateWalls.place_walls(level, box, afterHM)
+        generateWalls.place_walls(level, box, afterHM, combinedHM)
 
         # # Generate simple house
         # generateStructure.generateSimpleHouse(level, box)
