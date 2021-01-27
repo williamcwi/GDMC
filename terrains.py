@@ -17,7 +17,7 @@ def floodFill(heightMap, minimumArea, exclusion = 0): # Flood Fill RECURSIVE ###
         maskedHM = [['%04d' % 0 for k in range(len(heightMap[0]))] for j in range(len(heightMap))]  # initialse post-process HM
         #diffHM = [[0 for k in range(len(heightMap[0]))] for j in range(len(heightMap))]
 
-        if exclusion >= len(heightMap) / 2 or exclusion >= len(heightMap[0]) / 2:
+        if exclusion >= len(heightMap) / 3 or exclusion >= len(heightMap[0]) / 3:
             logger.warning("Invalid Exclusion block width")
             logger.warning("Continue with 0 Exclusion block width")
             exclusion = 0
@@ -31,7 +31,7 @@ def floodFill(heightMap, minimumArea, exclusion = 0): # Flood Fill RECURSIVE ###
         regionDict = {
             "wate" : -1,
             "lava" : -2,
-            999 : -1
+            999 : -7
         }
         alterDict = dict()
         alterHeightDict = dict()
@@ -81,7 +81,6 @@ def floodFill(heightMap, minimumArea, exclusion = 0): # Flood Fill RECURSIVE ###
             if ((y + 1) < (len(maskedHM[x]) - exclusion)): # go to east
                 if maskedHM[x][y + 1] != "0000" and maskedHM[x][y + 1] != 999 and maskedHM[x][y + 1] not in excludedBlocks.values():
                     surroundingRegion.append(maskedHM[x][y + 1])
-
             return area, surroundingRegion 
 
         for x in range(exclusion, (len(tempHM) - exclusion)):
@@ -105,14 +104,14 @@ def floodFill(heightMap, minimumArea, exclusion = 0): # Flood Fill RECURSIVE ###
                     region =  None
                     if len(surroundingRegion) > 0:
                         region = max(set(surroundingRegion), key=surroundingRegion.count)   
-                    if region != None and len(area)<=(minimumArea*4):
+                    if region != None and len(area) <= (minimumArea*4):
                         for item in area:
                             maskedHM[item[0]][item[1]] = region
                             #diffHM[item[0]][item[1]] =  - (heightMap[item[0]][item[1]] - int((heightMap[item[0]+1][item[1]] + heightMap[item[0]-1][item[1]] + heightMap[item[0]][item[1]+1] + heightMap[item[0]][item[1]-1])/4)) if maskedHM[item[0]][item[1]] in excludedBlocks.values() else (regionDict.get(int(maskedHM[item[0]][item[1]])) - heightMap[item[0]][item[1]])
                             alterDict[item[0],item[1]] = - (heightMap[item[0]][item[1]] - int((heightMap[item[0]+1][item[1]] + heightMap[item[0]-1][item[1]] + heightMap[item[0]][item[1]+1] + heightMap[item[0]][item[1]-1])/4)) if maskedHM[item[0]][item[1]] in excludedBlocks.values() else (regionDict.get(int(maskedHM[item[0]][item[1]])) - heightMap[item[0]][item[1]])
                             alterHeightDict[item[0],item[1]] = heightMap[item[0]][item[1]]
 
-        afterHM = [[regionDict.get(maskedHM[j][k], tempHM[j][k]) if maskedHM[j][k] in excludedBlocks.values() else regionDict.get(int(maskedHM[j][k]), tempHM[j][k]) for k in range(len(maskedHM[j]))] for j in range(len(maskedHM))]
+        afterHM = [[regionDict.get(maskedHM[j][k], tempHM[j][k]) if maskedHM[j][k] in excludedBlocks.values() else regionDict.get(int(maskedHM[j][k]), tempHM[j][k]) if maskedHM[j][k] != -7 else heightMap[j][k] for k in range(len(maskedHM[j]))] for j in range(len(maskedHM))]
         # ---------------HM naming---------------
         # diffHM - List height difference before and after moderification
         # afterHM - List height after moderification
@@ -133,13 +132,15 @@ def editTerrainFF(level, box, alterDict, alterHeightdict):
             diff = alterDict[x, y]
             mappedx = box.minx + x
             mappedz = box.minz + y
+            topblock = level.blockAt(mappedx, alterHeightdict[x, y] - 1, mappedz)
             block = level.blockAt(mappedx, alterHeightdict[x, y] - 1, mappedz)
             if diff < 0:
                 diff -= 1
+                block = 0
             for e in xrange(abs(diff)):
                 level.setBlockAt(mappedx, (alterHeightdict[x, y] + (e * (diff / abs(diff)))), mappedz, block)
             if diff < 0 :
-                level.setBlockAt(mappedx, (alterHeightdict[x, y] + diff), mappedz, block)
+                level.setBlockAt(mappedx, (alterHeightdict[x, y] + diff), mappedz, topblock)
         return heightmap.heightMap(level, box)
 
     except Exception as e:
