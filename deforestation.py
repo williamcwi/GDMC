@@ -26,6 +26,8 @@ foliage = [
     am.Shrub,
     am.DesertShrub2,
     am.Flower,
+    am.BrownMushroom,
+    am.RedMushroom
 ]
 
 foliageID = [f.ID for f in foliage]
