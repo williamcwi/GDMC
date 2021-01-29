@@ -9,6 +9,7 @@ import generateStructure
 import generateWalls
 import deforestation
 import terrains
+import cityPlanning
 
 inputs = [
     (
@@ -50,6 +51,9 @@ def perform(level, box, options):
 
         # Generate walls
         generateWalls.place_walls(level, box, afterHM, combinedHM)
+
+        # Calculate best starting point
+        startingPoint = cityPlanning.bestStartingPoint(box, afterHM)
 
         # # Generate simple house
         # generateStructure.generateSimpleHouse(level, box)
