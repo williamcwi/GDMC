@@ -426,7 +426,7 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
         water_middle.rotateLeft()
         water_right.rotateLeft()
 
-        # -x:
+        # +x:
         # left: 
         i = 1
         for sections in range(z_left):
@@ -743,7 +743,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
                 if wt == 3: # base
 
                     ground = heightmap[len(heightmap)-8-i][7]
-                    if ground == -1:
+                    if heightmap[len(heightmap)-8-i][1] == -1 or ground == -1:
                         pass
                     else: 
 
@@ -761,7 +761,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
                 if wt == 3: # base
 
                     ground = heightmap[8+i][7]
-                    if ground == -1:
+                    if heightmap[8+i][1] == -1 or ground == -1:
                         pass
                     else: 
                         if sections is not x_right - 1:
@@ -781,7 +781,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
 
         # -x:
 
-        ground = heightmap[8][8+i]
+        ground = heightmap[8][8]
         if ground == -1:
             pass
         else:
@@ -793,7 +793,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
             for wt in range(4): # wall type
                 if wt == 3: # pillar
                     ground = heightmap[8][8+i]
-                    if ground == -1:
+                    if heightmap[1][8+i] == -1 or ground == -1:
                         pass
                     else: 
                         if sections is not z_left - 1:
@@ -809,7 +809,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
             for wt in range(4): # wall type
                 if wt == 3: # pillar
                     ground = heightmap[8][len(heightmap[1])-8-i]
-                    if ground == -1:
+                    if heightmap[1][len(heightmap[1])-8-i] == -1 or ground == -1:
                         pass
                     else: 
                         if sections is not z_right - 1:
@@ -840,7 +840,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
             for wt in range(4): # wall type
                 if wt == 3: # pillar
                     ground = heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-9]
-                    if ground == -1:
+                    if heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2] == -1 or ground == -1:
                         pass
                     else: 
                         if sections is not x_left - 1:
@@ -856,7 +856,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
             for wt in range(4): # wall type
                 if wt == 3: # pillar
                     ground = heightmap[8+i][len(heightmap[8+i])-9]
-                    if ground == -1:
+                    if heightmap[8+i][len(heightmap[8+i])-2] == -1 or ground == -1:
                         pass
                     else: 
                         if sections is not x_right - 1:
@@ -887,7 +887,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
             for wt in range(4): # wall type
                 if wt == 3: # pillar
                     ground = heightmap[len(heightmap)-9][8+i]
-                    if ground == -1:
+                    if heightmap[len(heightmap)-2][8+i] == -1 or ground == -1:
                         pass
                     else: 
                         if sections is not z_left - 1:
@@ -903,7 +903,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
             for wt in range(4): # wall type
                 if wt == 3: # pillar
                     ground = heightmap[len(heightmap)-9][len(heightmap[len(heightmap)-2])-8-i]
-                    if ground == -1:
+                    if heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i] == -1 or ground == -1:
                         pass
                     else: 
                         if sections is not z_right - 1:
