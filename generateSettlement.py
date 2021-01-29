@@ -40,10 +40,13 @@ def perform(level, box, options):
         whm = heightmap.waterHeightMap(level, box)
 
         # TODO: Add test of selected area size for wall generation
-        alterDict, alterHeightDict, afterHM = terrains.floodFill(hm, 169, 7)
+        alterDict, alterHeightDict = terrains.floodFill(hm, 169, 7)
 
         # Edit terrain based on height map
         terrains.editTerrainFF(level, box, alterDict, alterHeightDict)
+
+        # Get new heightmap
+        afterHM = heightmap.heightMap(level, box)
 
         # Return combinedHM (water and processed heightmap)
         combinedHM = terrains.findWaterSurface(whm, afterHM)
