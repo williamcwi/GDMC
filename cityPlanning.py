@@ -1,5 +1,4 @@
 from logger import Logger
-import numpy as np
 
 logger = Logger('cityPlanning')
 
