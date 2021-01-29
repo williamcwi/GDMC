@@ -5,7 +5,7 @@ from pymclevel import alphaMaterials as am
 name = 'deforestation'
 logger = Logger(name)
 
-tree = [
+foliage = [
     #Leaves
     am.Leaves,
     am.PineLeaves,
@@ -19,20 +19,27 @@ tree = [
     am.BirchWood,
     am.JungleWood,
     am.Wood2, #Acacia and dark oak wood
+    # Other foliage
+    am.Cactus,
+    am.TallGrass,
+    am.UnusedShrub,
+    am.Shrub,
+    am.DesertShrub2,
+    am.Flower,
 ]
 
-treeID = [t.ID for t in tree]
+foliageID = [f.ID for f in foliage]
 
-def removeTrees(level, box):
+def removeFoliage(level, box):
     try:
         for (chunk, slices, point) in level.getChunkSlices(box):
             blocks = chunk.Blocks[slices]
             # Change blocks to air
-            for t in treeID:
-                blocks[blocks == t] = 0
+            for f in foliageID:
+                blocks[blocks == f] = 0
             chunk.dirty = True
         
-        logger.info('Removing trees...')
+        logger.info('Removing foliage...')
 
     except Exception as e:
         logger.error(e)

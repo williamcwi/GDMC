@@ -34,7 +34,7 @@ def perform(level, box, options):
         box = common.expandBoundingBox(box)
 
         # Deforestation
-        deforestation.removeTrees(level, box)
+        deforestation.removeFoliage(level, box)
 
         # Create Height Map
         hm = heightmap.heightMap(level, box)
