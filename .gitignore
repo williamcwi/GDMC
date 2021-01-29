@@ -3,3 +3,4 @@ testing.py
 .env
 env/
 .vscode/
+__pycache__/logger.cpython-39.pyc
