@@ -46,8 +46,14 @@ def perform(level, box, options):
         # Edit terrain based on height map
         terrains.editTerrainFF(level, box, alterDict, alterHeightDict)
 
+        # Generate afterHM after Editing the terrain
+        afterHM = heightmap.heightMap(level, box)
+
         # Return combinedHM (water and processed heightmap)
         combinedHM = terrains.findWaterSurface(whm, afterHM)
+
+        # Creating Pavement for the gates
+        terrains.pavingGate(level, box, combinedHM)
 
         # Generate walls
         generateWalls.place_walls(level, box, afterHM, combinedHM)

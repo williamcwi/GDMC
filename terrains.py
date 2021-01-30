@@ -111,7 +111,7 @@ def floodFill(heightMap, minimumArea, exclusion = 0): # Flood Fill RECURSIVE ###
                             alterDict[item[0],item[1]] = - (heightMap[item[0]][item[1]] - int((heightMap[item[0]+1][item[1]] + heightMap[item[0]-1][item[1]] + heightMap[item[0]][item[1]+1] + heightMap[item[0]][item[1]-1])/4)) if maskedHM[item[0]][item[1]] in excludedBlocks.values() else (regionDict.get(int(maskedHM[item[0]][item[1]])) - heightMap[item[0]][item[1]])
                             alterHeightDict[item[0],item[1]] = heightMap[item[0]][item[1]]
 
-        afterHM = [[regionDict.get(maskedHM[j][k], tempHM[j][k]) if maskedHM[j][k] in excludedBlocks.values() else regionDict.get(int(maskedHM[j][k]), tempHM[j][k]) if maskedHM[j][k] != -7 else heightMap[j][k] for k in range(len(maskedHM[j]))] for j in range(len(maskedHM))]
+        afterHM = [[regionDict.get(maskedHM[j][k], tempHM[j][k]) if maskedHM[j][k] in excludedBlocks.values() else regionDict.get(int(maskedHM[j][k]), tempHM[j][k]) if maskedHM[j][k] != 999 else heightMap[j][k] for k in range(len(maskedHM[j]))] for j in range(len(maskedHM))]
         # ---------------HM naming---------------
         # diffHM - List height difference before and after moderification
         # afterHM - List height after moderification
@@ -172,6 +172,54 @@ def editTerrain (level, box, oldHeightMap, heightMapDiff):
             zpos += 1
     except Exception as e:
         logger.error(e)
+
+def pavingGate(level, box, heightMap):
+    alterDict = dict()
+
+    def getGatePostion(boxwidth):
+        left = 0
+        right = 0
+        gate = boxwidth % 8
+        if gate == 0:
+            gate = 8
+        else:
+            while gate < 6:
+                gate = gate + 4
+
+        if (boxwidth - gate - 16) / 4 % 2 == 0:
+            left = right = (boxwidth - gate - 16) / 8
+        else:
+            left = (((boxwidth - gate - 16) - 4) / 8)
+            right = left + 1
+        return left, right, gate
+
+    left, right, gate = getGatePostion(box.maxx - box.minx)
+
+    for i in range(((right * 4) + 6), ((right * 4) + 10 + gate)): 
+        target = heightMap[(right * 4) + 7][1] - 1 # gate_pos_1
+        for x in range(0,14):
+            alterDict[i, x] = target
+
+        target = heightMap[((right * 4) + 7)][(len(heightMap[((right * 4) + 8)]) - 2)] - 1 # gate_pos_3
+        for y in range(len(heightMap[0]) - 15,len(heightMap[0])):
+            alterDict[i, y] = target
+
+    left, right, gate = getGatePostion(box.maxz - box.minz)
+
+    for i in range(((left * 4) + 6), ((left * 4) + 10 + gate)):
+        target = heightMap[1][(left * 4) + 7] - 1 # gate_pos_2
+        for x in range(0, 14):
+            alterDict[x, i] = target
+
+        target = heightMap[(len(heightMap) - 2)][(left * 4) + 7] - 1 # gate_pos_4
+        for y in range(len(heightMap) - 15,len(heightMap)):
+            alterDict[y, i] = target
+
+    for key, value in alterDict:
+        mappedx = box.minx + key
+        mappedz = box.minz + value
+        y = alterDict[key,value]
+        level.setBlockAt(mappedx, y, mappedz, 43)
 
 def findWaterSurface(waterHeightmap, processedHeightmap):
     try:
