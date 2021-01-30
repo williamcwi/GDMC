@@ -34,14 +34,14 @@ def perform(level, box, options):
         box = common.expandBoundingBox(box)
 
         # Deforestation
-        deforestation.removeTrees(level, box)
+        deforestation.removeFoliage(level, box)
 
         # Create Height Map
         hm = heightmap.heightMap(level, box)
         whm = heightmap.waterHeightMap(level, box)
 
         # TODO: Add test of selected area size for wall generation
-        alterDict, alterHeightDict, afterHM = terrains.floodFill(hm, 169, 7)
+        alterDict, alterHeightDict = terrains.floodFill(hm, 169, 7)
 
         # Edit terrain based on height map
         terrains.editTerrainFF(level, box, alterDict, alterHeightDict)
