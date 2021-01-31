@@ -11,7 +11,7 @@ sys.setrecursionlimit(65536)  #!!IMPORTANT to allow floodFill and RECURSIVE
 
 logger = Logger('Terrains')
 
-def floodFill(heightMap, minimumArea, exclusion = 0): # Flood Fill RECURSIVE ################# POC OK TODO:VERIFY #################
+def floodFill(heightMap, minimumArea, exclusion = 0): # Flood Fill RECURSIVE
     try:
         tempHM = deepcopy(heightMap)
         maskedHM = [['%04d' % 0 for k in range(len(heightMap[0]))] for j in range(len(heightMap))]  # initialse post-process HM
@@ -220,6 +220,7 @@ def pavingGate(level, box, heightMap):
         mappedz = box.minz + value
         y = alterDict[key,value]
         level.setBlockAt(mappedx, y, mappedz, 43)
+        level.setBlockDataAt(mappedx, y, mappedz, 0)
 
 def findWaterSurface(waterHeightmap, processedHeightmap):
     try:
