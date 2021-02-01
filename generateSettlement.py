@@ -10,6 +10,7 @@ import generateWalls
 import deforestation
 import terrains
 import cityPlanning
+import biomes
 
 inputs = [
     (
@@ -40,6 +41,10 @@ def perform(level, box, options):
         hm = heightmap.heightMap(level, box)
         whm = heightmap.waterHeightMap(level, box)
 
+        # Select biome
+        biome = biomes.selectBiome(level, box, hm)
+        # print(biome)
+
         # TODO: Add test of selected area size for wall generation
         alterDict, alterHeightDict = terrains.floodFill(hm, 169, 7)
 
@@ -62,7 +67,7 @@ def perform(level, box, options):
         startingPoint = cityPlanning.bestStartingPoint(box, afterHM)
 
         # # Generate simple house
-        # generateStructure.generateSimpleHouse(level, box)
+        generateStructure.generateSimpleHouse(level, box)
 
     except Exception as e:
         logger.error(e)
