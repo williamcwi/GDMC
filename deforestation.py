@@ -26,6 +26,8 @@ foliage = [
     am.Shrub,
     am.DesertShrub2,
     am.Flower,
+    am.Rose,
+    am.TallFlowers,
     am.BrownMushroom,
     am.RedMushroom
 ]
