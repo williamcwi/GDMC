@@ -237,3 +237,20 @@ def findWaterSurface(waterHeightmap, processedHeightmap):
 
     except Exception as e:
         logger.error(e)
+
+def removeLava(level, box, lavaHeightmap, groundHeightmap, processedHeightmap):
+    try:
+        # Gets the index rather than value
+        for i in range(len(processedHeightmap)):
+            for j in range(len(processedHeightmap[i])):
+                if processedHeightmap[i][j] == -2: # lava
+                    x = box.minx + i
+                    z = box.minz + j
+                    y1 = lavaHeightmap[i][j]
+                    y2 = groundHeightmap[i][j]
+                    for l in range(y2, y1):
+                        level.setBlockAt(x, l, z, 2)
+        logger.info('Removing lava pools...')
+
+    except Exception as e:
+        logger.error(e)
