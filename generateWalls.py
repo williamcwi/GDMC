@@ -63,45 +63,103 @@ def calc_wall_sections(box):
     except Exception as e:
         logger.error(e)
 
+def calc_ma(box):
+    try:
+        x_len = box.size[0]
+        z_len = box.size[2]
+
+        percentage = 0.1
+
+        xma = int(round(x_len * 0.1, 0))
+        zma = int(round(z_len * 0.1, 0))
+
+        return xma, zma
+    except Exception as e:
+        logger.error(e)
+
+def average(arr):
+    try:
+        return int(round(sum(arr)/len(arr), 0))
+    except Exception as e:
+        logger.error(e)
+
 def place_wall_corners(level, box, heightmap, combinedHM):
     try:
         wall_type = 'corner'
         building = 'wall {}'.format(wall_type)
         progress = 0
 
+        xma, zma = calc_ma(box)
+
         # +x -z:
         filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'wall_{}.schematic'.format(wall_type))
         wall_corner = MCSchematic(shape=(8,12,8), filename=filename)
-        ground = heightmap[len(heightmap)-1][0]
-        if ground == -1:
-            ground = combinedHM[len(heightmap)-1][0]
+        arr = []
+        for i in range(xma + 8):
+            if heightmap[len(heightmap)-1-i][0] == -1:
+                arr.append(combinedHM[len(heightmap)-1-i][0])
+            else: 
+                arr.append(heightmap[len(heightmap)-1-i][0])
+        for i in range(zma + 8):
+            if heightmap[len(heightmap)-1][i] == -1:
+                arr.append(combinedHM[len(heightmap)-1][i])
+            else:
+                arr.append(heightmap[len(heightmap)-1][i])
+        ground = average(arr)
         level.copyBlocksFrom(wall_corner, wall_corner.bounds, Vector(box.maxx-8, ground, box.minz))
         progress += 1
         logger.info('Placing {}s... ({}/4)'.format(building, progress))
 
         # -x -z:
         wall_corner.rotateLeft()
-        ground = heightmap[0][0]
-        if ground == -1:
-            ground = combinedHM[0][0]
+        arr = []
+        for i in range(xma + 8):
+            if heightmap[i][0] == -1:
+                arr.append(combinedHM[i][0])
+            else: 
+                arr.append(heightmap[i][0])
+        for i in range(zma + 8):
+            if heightmap[0][i] == -1:
+                arr.append(combinedHM[0][i])
+            else:
+                arr.append(heightmap[0][i])
+        ground = average(arr)
         level.copyBlocksFrom(wall_corner, wall_corner.bounds, Vector(box.minx, ground, box.minz))
         progress += 1
         logger.info('Placing {}s... ({}/4)'.format(building, progress))
 
         # -x +z:
         wall_corner.rotateLeft()
-        ground = heightmap[0][len(heightmap[0])-1]
-        if ground == -1:
-            ground = combinedHM[0][len(heightmap[0])-1]
+        arr = []
+        for i in range(xma + 8):
+            if heightmap[i][len(heightmap[0])-1] == -1:
+                arr.append(combinedHM[i][len(combinedHM[0])-1])
+            else: 
+                arr.append(heightmap[i][len(heightmap[0])-1])
+        for i in range(zma + 8):
+            if heightmap[0][len(heightmap[0])-1-i] == -1:
+                arr.append(combinedHM[0][len(combinedHM[0])-1-i])
+            else:
+                arr.append(heightmap[0][len(heightmap[0])-1-i])
+        ground = average(arr)
         level.copyBlocksFrom(wall_corner, wall_corner.bounds, Vector(box.minx, ground, box.maxz-8))
         progress += 1
         logger.info('Placing {}s... ({}/4)'.format(building, progress))
         
         # +x +z:
         wall_corner.rotateLeft()
-        ground = heightmap[len(heightmap)-1][len(heightmap[len(heightmap)-1])-1]
-        if ground == -1:
-            ground = combinedHM[len(heightmap)-1][len(heightmap[len(heightmap)-1])-1]
+        arr = []
+        for i in range(xma + 8):
+            if heightmap[len(heightmap)-1-i][len(heightmap[len(heightmap)-1])-1] == -1:
+                arr.append(combinedHM[len(heightmap)-1-i][len(heightmap[len(heightmap)-1])-1])
+            else: 
+                arr.append(heightmap[len(heightmap)-1-i][len(heightmap[len(heightmap)-1])-1])
+        for i in range(zma + 8):
+            if heightmap[len(heightmap)-1][len(heightmap[len(heightmap)-1])-1-i] == -1:
+                arr.append(combinedHM[len(heightmap)-1][len(heightmap[len(heightmap)-1])-1-i])
+            else:
+                arr.append(heightmap[len(heightmap)-1][len(heightmap[len(heightmap)-1])-1-i])
+        ground = average(arr)
         level.copyBlocksFrom(wall_corner, wall_corner.bounds, Vector(box.maxx-8, ground, box.maxz-8))
         progress += 1
         logger.info('Placing {}s... ({}/4)'.format(building, progress))
@@ -147,41 +205,48 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
         filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'water_{}.schematic'.format(wall_type))
         water_right = MCSchematic(shape=(1,9,8), filename=filename)
 
+        xma, zma = calc_ma(box)
+
         # -z:
         # left: 
         i = 1
         for sections in range(x_left):
             for wt in range(4): # wall type
+                arr = []
+                for index in range(xma):
+                    if heightmap[len(heightmap)-8-i-index][1] == -1:
+                        arr.append(combinedHM[len(heightmap)-8-i-index][1])
+                    else: 
+                        arr.append(heightmap[len(heightmap)-8-i-index][1])
+                for index in range(8):
+                    if heightmap[len(heightmap)-8-i+index][1] == -1:
+                        arr.append(combinedHM[len(heightmap)-8-i+index][1])
+                    else: 
+                        arr.append(heightmap[len(heightmap)-8-i+index][1])
+                ground = average(arr)
+
                 if wt == 0: #left
-                    ground = heightmap[len(heightmap)-8-i][1]
-                    if ground == -1:
-                        ground = combinedHM[len(heightmap)-8-i][1]
+                    if heightmap[len(heightmap)-8-i][1] == -1:
                         level.copyBlocksFrom(water_left, water_left.bounds, Vector(box.maxx-8-i, ground+2, box.minz+1))
                     else: 
                         level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.maxx-8-i, ground, box.minz+1))
                     i += 1
                 elif wt == 1: # middle
-                    ground = heightmap[len(heightmap)-8-i][1]
-                    if ground == -1:
-                        ground = combinedHM[len(heightmap)-8-i][1]
+                    if heightmap[len(heightmap)-8-i][1] == -1:
                         level.copyBlocksFrom(water_middle, water_middle.bounds, Vector(box.maxx-8-i, ground+2, box.minz+1))
                     else: 
                         level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.maxx-8-i, ground, box.minz+1))
                     i += 1
                 elif wt == 2: # right
                     if sections is not x_left - 1:
-                        ground = heightmap[len(heightmap)-8-i][1]
-                        if ground == -1:
-                            ground = combinedHM[len(heightmap)-8-i][1]
+                        if heightmap[len(heightmap)-8-i][1] == -1:
                             level.copyBlocksFrom(water_right, water_right.bounds, Vector(box.maxx-8-i, ground+2, box.minz+1))
                         else: 
                             level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.maxx-8-i, ground, box.minz+1))
                         i += 1
                 elif wt == 3: # pillar
                     if sections is not x_left - 1:
-                        ground = heightmap[len(heightmap)-8-i][1]
-                        if ground == -1:
-                            ground = combinedHM[len(heightmap)-8-i][1]
+                        if heightmap[len(heightmap)-8-i][1] == -1:
                             level.copyBlocksFrom(water_pillar, water_pillar.bounds, Vector(box.maxx-8-i, ground+2, box.minz+1))
                         else: 
                             level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.maxx-8-i, ground, box.minz))
@@ -191,27 +256,34 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
         i = 1
         for sections in range(x_right):
             for wt in range(4): # wall type
+                arr = []
+                for index in range(xma):
+                    if heightmap[8+i+index][1] == -1:
+                        arr.append(combinedHM[8+i+index][1])
+                    else: 
+                        arr.append(heightmap[8+i+index][1])
+                for index in range(8):
+                    if heightmap[8+i-index][1] == -1:
+                        arr.append(combinedHM[8+i-index][1])
+                    else: 
+                        arr.append(heightmap[8+i-index][1])
+                ground = average(arr)
+
                 if wt == 0: # right
-                    ground = heightmap[8+i][1]
-                    if ground == -1:
-                        ground = combinedHM[8+i][1]
+                    if heightmap[8+i][1] == -1:
                         level.copyBlocksFrom(water_right, water_right.bounds, Vector(box.minx+7+i, ground+2, box.minz+1))
                     else: 
                         level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.minx+7+i, ground, box.minz+1))
                     i += 1
                 elif wt == 1: # middle
-                    ground = heightmap[8+i][1]
-                    if ground == -1:
-                        ground = combinedHM[8+i][1]
+                    if heightmap[8+i][1] == -1:
                         level.copyBlocksFrom(water_middle, water_middle.bounds, Vector(box.minx+7+i, ground+2, box.minz+1))
                     else: 
                         level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.minx+7+i, ground, box.minz+1))
                     i += 1
                 elif wt == 2: #left
                     if sections is not x_right - 1:
-                        ground = heightmap[8+i][1]
-                        if ground == -1:
-                            ground = combinedHM[8+i][1]
+                        if heightmap[8+i][1] == -1:
                             level.copyBlocksFrom(water_left, water_left.bounds, Vector(box.minx+7+i, ground+2, box.minz+1))
                         else: 
                             level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.minx+7+i, ground, box.minz+1))
@@ -220,9 +292,7 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
                         gate_pos_1 = [box.minx+7+i, ground, box.minz]
                 elif wt == 3: # pillar
                     if sections is not x_right - 1:
-                        ground = heightmap[8+i][1]
-                        if ground == -1:
-                            ground = combinedHM[8+i][1]
+                        if heightmap[8+i][1] == -1:
                             level.copyBlocksFrom(water_pillar, water_pillar.bounds, Vector(box.minx+7+i, ground+2, box.minz+1))
                         else: 
                             level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.minx+7+i, ground, box.minz))
@@ -245,27 +315,33 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
         i = 1
         for sections in range(z_left):
             for wt in range(4): # wall type
+                arr = []
+                for index in range(zma):
+                    if heightmap[1][8+i+index] == -1:
+                        arr.append(combinedHM[1][8+i+index])
+                    else: 
+                        arr.append(heightmap[1][8+i+index])
+                for index in range(8):
+                    if heightmap[1][8+i-index] == -1:
+                        arr.append(combinedHM[1][8+i-index])
+                    else: 
+                        arr.append(heightmap[1][8+i-index])
+                ground = average(arr)
                 if wt == 0: #left
-                    ground = heightmap[1][8+i]
-                    if ground == -1:
-                        ground = combinedHM[1][8+i]
+                    if heightmap[1][8+i] == -1:
                         level.copyBlocksFrom(water_left, water_left.bounds, Vector(box.minx+1, ground+2, box.minz+7+i))
                     else: 
                         level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.minx+1, ground, box.minz+7+i))
                     i += 1
                 elif wt == 1: # middle
-                    ground = heightmap[1][8+i]
-                    if ground == -1:
-                        ground = combinedHM[1][8+i]
+                    if heightmap[1][8+i] == -1:
                         level.copyBlocksFrom(water_middle, water_middle.bounds, Vector(box.minx+1, ground+2, box.minz+7+i))
                     else: 
                         level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.minx+1, ground, box.minz+7+i))
                     i += 1
                 elif wt == 2: # right
                     if sections is not z_left - 1:
-                        ground = heightmap[1][8+i]
-                        if ground == -1:
-                            ground = combinedHM[1][8+i]
+                        if heightmap[1][8+i] == -1:
                             level.copyBlocksFrom(water_right, water_right.bounds, Vector(box.minx+1, ground+2, box.minz+7+i))
                         else: 
                             level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.minx+1, ground, box.minz+7+i))
@@ -274,9 +350,7 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
                         gate_pos_2 = [box.minx, ground, box.minz+7+i]
                 elif wt == 3: # pillar
                     if sections is not z_left - 1:
-                        ground = heightmap[1][8+i]
-                        if ground == -1:
-                            ground = combinedHM[1][8+i]
+                        if heightmap[1][8+i] == -1:
                             level.copyBlocksFrom(water_pillar, water_pillar.bounds, Vector(box.minx+1, ground+2, box.minz+7+i))
                         else: 
                             level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.minx, ground, box.minz+7+i))
@@ -286,36 +360,40 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
         i = 1
         for sections in range(z_right):
             for wt in range(4): # wall type
+                arr = []
+                for index in range(zma):
+                    if heightmap[1][len(heightmap[1])-8-i-index] == -1:
+                        arr.append(combinedHM[1][len(heightmap[1])-8-i-index])
+                    else: 
+                        arr.append(heightmap[1][len(heightmap[1])-8-i-index])
+                for index in range(8):
+                    if heightmap[1][len(heightmap[1])-8-i+index] == -1:
+                        arr.append(combinedHM[1][len(heightmap[1])-8-i+index])
+                    else: 
+                        arr.append(heightmap[1][len(heightmap[1])-8-i+index])
+                ground = average(arr)
                 if wt == 0: # right
-                    ground = heightmap[1][len(heightmap[1])-8-i]
-                    if ground == -1:
-                        ground = combinedHM[1][len(heightmap[1])-8-i]
+                    if heightmap[1][len(heightmap[1])-8-i] == -1:
                         level.copyBlocksFrom(water_right, water_right.bounds, Vector(box.minx+1, ground+2, box.maxz-8-i))
                     else: 
                         level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.minx+1, ground, box.maxz-8-i))
                     i += 1
                 elif wt == 1: # middle
-                    ground = heightmap[1][len(heightmap[1])-8-i]
-                    if ground == -1:
-                        ground = combinedHM[1][len(heightmap[1])-8-i]
+                    if heightmap[1][len(heightmap[1])-8-i] == -1:
                         level.copyBlocksFrom(water_middle, water_middle.bounds, Vector(box.minx+1, ground+2, box.maxz-8-i))
                     else: 
                         level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.minx+1, ground, box.maxz-8-i))
                     i += 1
                 elif wt == 2: #left
                     if sections is not z_right - 1:
-                        ground = heightmap[1][len(heightmap[1])-8-i]
-                        if ground == -1:
-                            ground = combinedHM[1][len(heightmap[1])-8-i]
+                        if heightmap[1][len(heightmap[1])-8-i] == -1:
                             level.copyBlocksFrom(water_left, water_left.bounds, Vector(box.minx+1, ground+2, box.maxz-8-i))
                         else: 
                             level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.minx+1, ground, box.maxz-8-i))
                         i += 1
                 elif wt == 3: # pillar
                     if sections is not z_right - 1:
-                        ground = heightmap[1][len(heightmap[1])-8-i]
-                        if ground == -1:
-                            ground = combinedHM[1][len(heightmap[1])-8-i]
+                        if heightmap[1][len(heightmap[1])-8-i] == -1:
                             level.copyBlocksFrom(water_pillar, water_pillar.bounds, Vector(box.minx+1, ground+2, box.maxz-8-i))
                         else: 
                             level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.minx, ground, box.maxz-8-i))
@@ -338,36 +416,40 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
         i = 1
         for sections in range(x_left):
             for wt in range(4): # wall type
+                arr = []
+                for index in range(xma):
+                    if heightmap[len(heightmap)-8-i-index][len(heightmap[len(heightmap)-8-i-index])-2] == -1:
+                        arr.append(combinedHM[len(heightmap)-8-i-index][len(heightmap[len(heightmap)-8-i-index])-2])
+                    else: 
+                        arr.append(heightmap[len(heightmap)-8-i-index][len(heightmap[len(heightmap)-8-i-index])-2])
+                for index in range(8):
+                    if heightmap[len(heightmap)-8-i+index][len(heightmap[len(heightmap)-8-i+index])-2] == -1:
+                        arr.append(combinedHM[len(heightmap)-8-i+index][len(heightmap[len(heightmap)-8-i+index])-2])
+                    else: 
+                        arr.append(heightmap[len(heightmap)-8-i+index][len(heightmap[len(heightmap)-8-i+index])-2])
+                ground = average(arr)
                 if wt == 0: #left
-                    ground = heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2]
-                    if ground == -1:
-                        ground = combinedHM[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2]
+                    if heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2] == -1:
                         level.copyBlocksFrom(water_right, water_right.bounds, Vector(box.maxx-8-i, ground+2, box.maxz-9))
                     else: 
                         level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.maxx-8-i, ground, box.maxz-9))
                     i += 1
                 elif wt == 1: # middle
-                    ground = heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2]
-                    if ground == -1:
-                        ground = combinedHM[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2]
+                    if heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2] == -1:
                         level.copyBlocksFrom(water_middle, water_middle.bounds, Vector(box.maxx-8-i, ground+2, box.maxz-9))
                     else: 
                         level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.maxx-8-i, ground, box.maxz-9))
                     i += 1
                 elif wt == 2: # right
                     if sections is not x_left - 1:
-                        ground = heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2]
-                        if ground == -1:
-                            ground = combinedHM[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2]
+                        if heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2] == -1:
                             level.copyBlocksFrom(water_left, water_left.bounds, Vector(box.maxx-8-i, ground+2, box.maxz-9))
                         else: 
                             level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.maxx-8-i, ground, box.maxz-9))
                         i += 1
                 elif wt == 3: # pillar
                     if sections is not x_left - 1:
-                        ground = heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2]
-                        if ground == -1:
-                            ground = combinedHM[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2]
+                        if heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2] == -1:
                             level.copyBlocksFrom(water_pillar, water_pillar.bounds, Vector(box.maxx-8-i, ground+2, box.maxz-9))
                         else: 
                             level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.maxx-8-i, ground, box.maxz-9))
@@ -377,27 +459,33 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
         i = 1
         for sections in range(x_right):
             for wt in range(4): # wall type
+                arr = []
+                for index in range(xma):
+                    if heightmap[8+i+index][len(heightmap[8+i+index])-2] == -1:
+                        arr.append(combinedHM[8+i+index][len(heightmap[8+i+index])-2])
+                    else: 
+                        arr.append(heightmap[8+i+index][len(heightmap[8+i+index])-2])
+                for index in range(8):
+                    if heightmap[8+i-index][len(heightmap[8+i-index])-2] == -1:
+                        arr.append(combinedHM[8+i-index][len(heightmap[8+i-index])-2])
+                    else: 
+                        arr.append(heightmap[8+i-index][len(heightmap[8+i-index])-2])
+                ground = average(arr)
                 if wt == 0: # right
-                    ground = heightmap[8+i][len(heightmap[8+i])-2]
-                    if ground == -1:
-                        ground = combinedHM[8+i][len(heightmap[8+i])-2]
+                    if heightmap[8+i][len(heightmap[8+i])-2] == -1:
                         level.copyBlocksFrom(water_left, water_left.bounds, Vector(box.minx+7+i, ground+2, box.maxz-9))
                     else: 
                         level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.minx+7+i, ground, box.maxz-9))
                     i += 1
                 elif wt == 1: # middle
-                    ground = heightmap[8+i][len(heightmap[8+i])-2]
-                    if ground == -1:
-                        ground = combinedHM[8+i][len(heightmap[8+i])-2]
+                    if heightmap[8+i][len(heightmap[8+i])-2] == -1:
                         level.copyBlocksFrom(water_middle, water_middle.bounds, Vector(box.minx+7+i, ground+2, box.maxz-9))
                     else: 
                         level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.minx+7+i, ground, box.maxz-9))
                     i += 1
                 elif wt == 2: #left
                     if sections is not x_right - 1:
-                        ground = heightmap[8+i][len(heightmap[8+i])-2]
-                        if ground == -1:
-                            ground = combinedHM[8+i][len(heightmap[8+i])-2]
+                        if heightmap[8+i][len(heightmap[8+i])-2] == -1:
                             level.copyBlocksFrom(water_right, water_right.bounds, Vector(box.minx+7+i, ground+2, box.maxz-9))
                         else: 
                             level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.minx+7+i, ground, box.maxz-9))
@@ -406,9 +494,7 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
                         gate_pos_3 = [box.minx+7+i, ground, box.maxz-9]
                 elif wt == 3: # pillar
                     if sections is not x_right - 1:
-                        ground = heightmap[8+i][len(heightmap[8+i])-2]
-                        if ground == -1:
-                            ground = combinedHM[8+i][len(heightmap[8+i])-2]
+                        if heightmap[8+i][len(heightmap[8+i])-2] == -1:
                             level.copyBlocksFrom(water_pillar, water_pillar.bounds, Vector(box.minx+7+i, ground+2, box.maxz-9))
                         else: 
                             level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.minx+7+i, ground, box.maxz-9))
@@ -431,27 +517,33 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
         i = 1
         for sections in range(z_left):
             for wt in range(4): # wall type
+                arr = []
+                for index in range(zma):
+                    if heightmap[len(heightmap)-2][8+i+index] == -1:
+                        arr.append(combinedHM[len(heightmap)-2][8+i+index])
+                    else: 
+                        arr.append(heightmap[len(heightmap)-2][8+i+index])
+                for index in range(8):
+                    if heightmap[len(heightmap)-2][8+i-index] == -1:
+                        arr.append(combinedHM[len(heightmap)-2][8+i-index])
+                    else: 
+                        arr.append(heightmap[len(heightmap)-2][8+i-index])
+                ground = average(arr)
                 if wt == 0: #left
-                    ground = heightmap[len(heightmap)-2][8+i]
-                    if ground == -1:
-                        ground = combinedHM[len(heightmap)-2][8+i]
+                    if heightmap[len(heightmap)-2][8+i] == -1:
                         level.copyBlocksFrom(water_right, water_right.bounds, Vector(box.maxx-9, ground+2, box.minz+7+i))
                     else: 
                         level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.maxx-9, ground, box.minz+7+i))
                     i += 1
                 elif wt == 1: # middle
-                    ground = heightmap[len(heightmap)-2][8+i]
-                    if ground == -1:
-                        ground = combinedHM[len(heightmap)-2][8+i]
+                    if heightmap[len(heightmap)-2][8+i] == -1:
                         level.copyBlocksFrom(water_middle, water_middle.bounds, Vector(box.maxx-9, ground+2, box.minz+7+i))
                     else: 
                         level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.maxx-9, ground, box.minz+7+i))
                     i += 1
                 elif wt == 2: # right
                     if sections is not z_left - 1:
-                        ground = heightmap[len(heightmap)-2][8+i]
-                        if ground == -1:
-                            ground = combinedHM[len(heightmap)-2][8+i]
+                        if heightmap[len(heightmap)-2][8+i] == -1:
                             level.copyBlocksFrom(water_left, water_left.bounds, Vector(box.maxx-9, ground+2, box.minz+7+i))
                         else: 
                             level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.maxx-9, ground, box.minz+7+i))
@@ -460,9 +552,7 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
                         gate_pos_4 = [box.maxx-9, ground, box.minz+7+i]
                 elif wt == 3: # pillar
                     if sections is not z_left - 1:
-                        ground = heightmap[len(heightmap)-2][8+i]
-                        if ground == -1:
-                            ground = combinedHM[len(heightmap)-2][8+i]
+                        if heightmap[len(heightmap)-2][8+i] == -1:
                             level.copyBlocksFrom(water_pillar, water_pillar.bounds, Vector(box.maxx-9, ground+2, box.minz+7+i))
                         else: 
                             level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.maxx-9, ground, box.minz+7+i))
@@ -472,36 +562,40 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
         i = 1
         for sections in range(z_right):
             for wt in range(4): # wall type
+                arr = []
+                for index in range(zma):
+                    if heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i-index] == -1:
+                        arr.append(combinedHMheightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i-index])
+                    else: 
+                        arr.append(heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i-index])
+                for index in range(8):
+                    if heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i+index] == -1:
+                        arr.append(combinedHM[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i+index])
+                    else: 
+                        arr.append(heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i+index])
+                ground = average(arr)
                 if wt == 0: # right
-                    ground = heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i]
-                    if ground == -1:
-                        ground = combinedHM[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i]
+                    if heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i] == -1:
                         level.copyBlocksFrom(water_left, water_left.bounds, Vector(box.maxx-9, ground+2, box.maxz-8-i))
                     else: 
                         level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.maxx-9, ground, box.maxz-8-i))
                     i += 1
                 elif wt == 1: # middle
-                    ground = heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i]
-                    if ground == -1:
-                        ground = combinedHM[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i]
+                    if heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i] == -1:
                         level.copyBlocksFrom(water_middle, water_middle.bounds, Vector(box.maxx-9, ground+2, box.maxz-8-i))
                     else: 
                         level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.maxx-9, ground, box.maxz-8-i))
                     i += 1
                 elif wt == 2: #left
                     if sections is not z_right - 1:
-                        ground = heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i]
-                        if ground == -1:
-                            ground = combinedHM[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i]
+                        if heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i] == -1:
                             level.copyBlocksFrom(water_right, water_right.bounds, Vector(box.maxx-9, ground+2, box.maxz-8-i))
                         else: 
                             level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.maxx-9, ground, box.maxz-8-i))
                         i += 1
                 elif wt == 3: # pillar
                     if sections is not z_right - 1:
-                        ground = heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i]
-                        if ground == -1:
-                            ground = combinedHM[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i]
+                        if heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i] == -1:
                             level.copyBlocksFrom(water_pillar, water_pillar.bounds, Vector(box.maxx-9, ground+2, box.maxz-8-i))
                         else: 
                             level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.maxx-9, ground, box.maxz-8-i))
