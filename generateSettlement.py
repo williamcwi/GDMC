@@ -11,6 +11,7 @@ import deforestation
 import terrains
 import cityPlanning
 import biomes
+import time 
 
 inputs = [
     (
@@ -29,7 +30,7 @@ name = 'generateSettlement'
 logger = Logger(name)
 
 def perform(level, box, options):
-
+    start = time.time()
     try:
         # Expand box to include entire y-axis
         box = common.expandBoundingBox(box)
@@ -71,3 +72,6 @@ def perform(level, box, options):
 
     except Exception as e:
         logger.error(e)
+    
+    end = time.time()
+    logger.debug(u'{} sec used'.format(round(end - start, 2)))
