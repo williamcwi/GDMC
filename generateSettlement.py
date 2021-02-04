@@ -41,6 +41,8 @@ def perform(level, box, options):
         # Create Height Map
         hm = heightmap.heightMap(level, box)
         whm = heightmap.waterHeightMap(level, box)
+        lhm = heightmap.lavaHeightMap(level, box)
+        ghm = heightmap.createHeightMap(level, box)
 
         # Select biome
         biome = biomes.selectBiome(level, box, hm)
@@ -58,6 +60,9 @@ def perform(level, box, options):
         # Return combinedHM (water and processed heightmap)
         combinedHM = terrains.findWaterSurface(whm, afterHM)
 
+        # Remove lava pools
+        terrains.removeLava(level, box, lhm, ghm, afterHM)
+
         # Creating Pavement for the gates
         terrains.pavingGate(level, box, combinedHM)
 
@@ -68,7 +73,7 @@ def perform(level, box, options):
         startingPoint = cityPlanning.bestStartingPoint(box, afterHM)
 
         # # Generate simple house
-        generateStructure.generateSimpleHouse(level, box)
+        # generateStructure.generateSimpleHouse(level, box)
 
     except Exception as e:
         logger.error(e)
