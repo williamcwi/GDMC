@@ -11,6 +11,7 @@ import deforestation
 import terrains
 import cityPlanning
 import biomes
+import time 
 
 inputs = [
     (
@@ -29,7 +30,7 @@ name = 'generateSettlement'
 logger = Logger(name)
 
 def perform(level, box, options):
-
+    start = time.time()
     try:
         # Expand box to include entire y-axis
         box = common.expandBoundingBox(box)
@@ -62,9 +63,6 @@ def perform(level, box, options):
         # Remove lava pools
         terrains.removeLava(level, box, lhm, ghm, afterHM)
 
-        # Creating Pavement for the gates
-        terrains.pavingGate(level, box, combinedHM)
-
         # Generate walls
         generateWalls.place_walls(level, box, afterHM, combinedHM)
 
@@ -76,3 +74,6 @@ def perform(level, box, options):
 
     except Exception as e:
         logger.error(e)
+    
+    end = time.time()
+    logger.debug(u'{} sec used'.format(round(end - start, 2)))

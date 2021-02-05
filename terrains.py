@@ -146,35 +146,7 @@ def editTerrainFF(level, box, alterDict, alterHeightdict):
     except Exception as e:
         logger.error(e)
 
-def editTerrain (level, box, oldHeightMap, heightMapDiff):
-    try:
-        zpos = 0
-        for z in xrange(box.minz, box.maxz):
-            xpos = 0
-            for x in xrange(box.minx, box.maxx):
-                ydiff = heightMapDiff[zpos][xpos]
-                if ydiff < 0:
-                    oldy = oldHeightMap[zpos][xpos]
-                    newy = oldy + ydiff
-                    block = level.blockAt(x, oldy, z)
-                    while oldy > newy:
-                        level.setBlockAt(x, oldy, z, 0)
-                        oldy -= 1
-                    level.setBlockAt(x, oldy, z, block)
-                if ydiff > 0:
-                    oldy = oldHeightMap[zpos][xpos]
-                    newy = oldy + ydiff
-                    block = level.blockAt(x, oldy, z)
-                    while oldy == newy:
-                        oldy += 1
-                        level.setBlockAt(x, oldy, z, block)
-                xpos += 1
-            zpos += 1
-    except Exception as e:
-        logger.error(e)
-
 def pavingGate(level, box, heightMap):
-    alterDict = dict()
 
     def getGatePostion(boxwidth):
         left = 0
@@ -194,33 +166,97 @@ def pavingGate(level, box, heightMap):
         return left, right, gate
 
     left, right, gate = getGatePostion(box.maxx - box.minx)
+    plat_pos_1 = heightMap[(right * 4) + 7][1] - 1
+    plat_pos_3 = heightMap[((right * 4) + 7)][(len(heightMap[(((right) * 4) + 8)]) - 2)] - 1
+    g1area=[]
+    g3area=[]
 
-    for i in range(((right * 4) + 6), ((right * 4) + 10 + gate)): 
-        target = heightMap[(right * 4) + 7][1] - 1 # gate_pos_1
-        for x in range(0,14):
-            alterDict[i, x] = target
+    for z in range(((right * 4) + 6 - 20), ((right * 4) + 10 + gate + 20)): # Getting area to test bottom section
+        for x in range(0,33):
+            g1area.append(heightMap[z][x])
+        for x in range(len(heightMap[0]) - 14 - 20,len(heightMap[0])):
+            g3area.append(heightMap[z][x])
 
-        target = heightMap[((right * 4) + 7)][(len(heightMap[((right * 4) + 8)]) - 2)] - 1 # gate_pos_3
-        for y in range(len(heightMap[0]) - 15,len(heightMap[0])):
-            alterDict[i, y] = target
+    for z in range(((right * 4) + 6), ((right * 4) + 10 + gate)):
+        for x in range(0, 14):
+            level.setBlockAt((box.minx + z), plat_pos_1, (box.minz + x), 43) # Making the base of plaza
+            level.setBlockDataAt((box.minx + z), plat_pos_1, (box.minz + x), 0)
+            if heightMap[z][x] > (plat_pos_1 + 20):
+                for d in range((plat_pos_1 + 20), heightMap[z][x]): # Remove blocks above the plaza and wall
+                    level.setBlockAt((box.minx + z), d, (box.minz + x), 0)
+
+        for x in range(len(heightMap[0]) - 14, len(heightMap[0])):
+            level.setBlockAt((box.minx + z), plat_pos_3, (box.minz + x), 43) # Making the base of plaza
+            level.setBlockDataAt((box.minx + z), plat_pos_3, (box.minz + x), 0)
+            if heightMap[z][x] > (plat_pos_3 + 20):
+                for d in range((plat_pos_3 + 20), heightMap[z][x]): # Remove blocks above the plaza and wall
+                    level.setBlockAt((box.minx + z), d, (box.minz + x), 0)
+
+    mean_g1 = sum(g1area) / len(g1area) # calc stats
+    mode_g1 = max(set(g1area), key=g1area.count)
+    mean_g3 = sum(g3area) / len(g3area)
+    mode_g3 = max(set(g3area), key=g3area.count)
+
+    for y in range(1,20):
+        for z in range(((right * 4) + 6 - y), ((right * 4) + 10 + gate + y)):
+            for x in range(0, 14 + y):
+                level.setBlockAt((box.minx + z), plat_pos_1 + y, (box.minz + x), 0) # clearing top section in stair shape
+                if (plat_pos_1 - mean_g1 < 20) and (plat_pos_1 - mode_g1 < 20): # if the can reach the bottom
+                    level.setBlockAt((box.minx + z), plat_pos_1 - y, (box.minz + x), 43) # create stair to bottom
+                    level.setBlockDataAt((box.minx + z), plat_pos_1 - y, (box.minz + x), 0)
+
+            for x in range(len(heightMap[0]) - 14 - y,len(heightMap[0])):
+                level.setBlockAt((box.minx + z), plat_pos_3 + y, (box.minz + x), 0) # clearing top section in stair shape
+                if (plat_pos_3 - mean_g3 < 20) and (plat_pos_3 - mode_g3 < 20): # if the can reach the bottom
+                    level.setBlockAt((box.minx + z), plat_pos_3 - y, (box.minz + x), 43) # create stair to bottom
+                    level.setBlockDataAt((box.minx + z), plat_pos_3 - y, (box.minz + x), 0)
 
     left, right, gate = getGatePostion(box.maxz - box.minz)
+    plat_pos_2 = heightMap[1][(left * 4) + 7] - 1
+    plat_pos_4 = heightMap[(len(heightMap) - 2)][(left * 4) + 7] - 1
+    g2area=[]
+    g4area=[]
 
-    for i in range(((left * 4) + 6), ((left * 4) + 10 + gate)):
-        target = heightMap[1][(left * 4) + 7] - 1 # gate_pos_2
+    for i in range(((left * 4) + 6 - 20), ((left * 4) + 10 + gate + 20)):
+        for x in range(0, 33):
+            g2area.append(heightMap[x][i])
+        for x in range(len(heightMap) - 34,len(heightMap)):
+            g4area.append(heightMap[x][i])
+
+    for z in range(((left * 4) + 6), ((left * 4) + 10 + gate)):
         for x in range(0, 14):
-            alterDict[x, i] = target
+            level.setBlockAt((box.minx + x), plat_pos_2, (box.minz + z), 43) # Making the base of plaza
+            level.setBlockDataAt((box.minx + x), plat_pos_2, (box.minz + z), 0)
+            if heightMap[x][z] > (plat_pos_2 + 20):
+                for d in range((plat_pos_2 + 20), heightMap[x][z]): # Remove blocks above the plaza and wall
+                    level.setBlockAt((box.minx + x), d, (box.minz + z), 0)
 
-        target = heightMap[(len(heightMap) - 2)][(left * 4) + 7] - 1 # gate_pos_4
-        for y in range(len(heightMap) - 15,len(heightMap)):
-            alterDict[y, i] = target
+        for x in range(len(heightMap) - 14, len(heightMap)):
+            level.setBlockAt((box.minx + x), plat_pos_4, (box.minz + z), 43) # Making the base of plaza
+            level.setBlockDataAt((box.minx + x), plat_pos_4, (box.minz + z), 0)
+            if heightMap[x][z] > (plat_pos_4 + 20):
+                    for d in range((plat_pos_4 + 20), heightMap[x][z]): # Remove blocks above the plaza and wall
+                        level.setBlockAt((box.minx + x), d, (box.minz + z), 0)
 
-    for key, value in alterDict:
-        mappedx = box.minx + key
-        mappedz = box.minz + value
-        y = alterDict[key,value]
-        level.setBlockAt(mappedx, y, mappedz, 43)
-        level.setBlockDataAt(mappedx, y, mappedz, 0)
+    mean_g2 = sum(g2area) / len(g2area)
+    mode_g2 = max(set(g2area), key=g2area.count)
+    mean_g4 = sum(g4area) / len(g4area)
+    mode_g4 = max(set(g4area), key=g4area.count)
+
+    for y in range(1,20):
+        for z in range(((left * 4) + 6 - y), ((left * 4) + 10 + gate) + y):
+            for x in range(0, 14 + y): #West
+                level.setBlockAt((box.minx + x), plat_pos_2 + y, (box.minz + z), 0) # clearing top section in stair shape
+                if (plat_pos_2 - mean_g2 < 20) and (plat_pos_2 - mode_g2 < 20): # if the can reach the bottom
+                    level.setBlockAt((box.minx + x), plat_pos_2 - y, (box.minz + z), 43) # create stair to bottom
+                    level.setBlockDataAt((box.minx + x), plat_pos_2 - y, (box.minz + z), 0)
+                
+            for x in range(len(heightMap) - 14 - y,len(heightMap)): #East
+                level.setBlockAt((box.minx + x), plat_pos_4 + y, (box.minz + z), 0) # clearing top section in stair shape
+                if (plat_pos_4 - mean_g4 < 20) and (plat_pos_4 - mode_g4 < 20): # if the can reach the bottom
+                    level.setBlockAt((box.minx + x), plat_pos_4 - y, (box.minz + z), 43) # create stair to bottom
+                    level.setBlockDataAt((box.minx + x), plat_pos_4 - y, (box.minz + z), 0)
+
 
 def findWaterSurface(waterHeightmap, processedHeightmap):
     try:

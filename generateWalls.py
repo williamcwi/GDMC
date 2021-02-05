@@ -613,7 +613,7 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
                 arr = []
                 for index in range(zma):
                     if heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i-index] == -1:
-                        arr.append(combinedHMheightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i-index])
+                        arr.append(combinedHM[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i-index])
                     else: 
                         arr.append(heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i-index])
                 for index in range(8):
@@ -659,18 +659,10 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
 
 def get_gate_schem(width):
     try:
-        if width == 6:
-            filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'gate', 'gate_6.schematic')
-            return MCSchematic(shape=(10,12,9), filename=filename)
-        elif width == 7:
-            filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'gate', 'gate_7.schematic')
-            return MCSchematic(shape=(11,12,9), filename=filename)
-        elif width == 8:
-            filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'gate', 'gate_8.schematic')
-            return MCSchematic(shape=(12,12,9), filename=filename)
-        elif width == 9:
-            filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'gate', 'gate_9.schematic')
-            return MCSchematic(shape=(13,12,9), filename=filename)
+        if width >= 6 and width <= 9:
+            filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'gate', 'gate_'+ str(width) +'.schematic')
+            return MCSchematic(shape=((width + 4),12,9), filename=filename)
+        
     except Exception as e:
         logger.error(e)
 
@@ -1061,6 +1053,91 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
     except Exception as e:
         logger.error(e)
 
+def pave_gates(level, box, combinedHM, gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4, x_gate, z_gate):
+    gate_1_minh = gate_pos_1[1] - 5
+    gate_2_minh = gate_pos_2[1] - 5
+    gate_3_minh = gate_pos_3[1] - 5
+    gate_4_minh = gate_pos_4[1] - 5
+    for x in xrange(gate_pos_1[0], (gate_pos_1[0] + x_gate + 4)): # x_gate
+        for z in xrange(gate_pos_1[2], (gate_pos_1[2] + 14)):
+            if combinedHM[x - box.minx][z - box.minz] > (gate_pos_1[1]):
+                for d in range((gate_pos_1[1]), combinedHM[x - box.minx][z - box.minz]): # Remove blocks above the plaza and wall
+                    level.setBlockAt(x, d, z, 0)
+            else:
+                if combinedHM[x - box.minx][z - box.minz] < (gate_pos_1[1]) and combinedHM[x - box.minx][z - box.minz] < gate_1_minh:
+                    gate_1_minh = combinedHM[x - box.minx][z - box.minz]
+
+        
+        for z in xrange(gate_pos_3[2] - 5, (gate_pos_3[2]) + 9):
+            if combinedHM[x - box.minx][z - box.minz] > (gate_pos_3[1]):
+                for d in range((gate_pos_3[1]), combinedHM[x - box.minx][z - box.minz]): # Remove blocks above the plaza and wall
+                    level.setBlockAt(x, d, z, 0)
+            else:
+                if combinedHM[x - box.minx][z - box.minz] < (gate_pos_3[1]) and combinedHM[x - box.minx][z - box.minz] < gate_3_minh:
+                    gate_3_minh = combinedHM[x - box.minx][z - box.minz]
+
+    for z in xrange(gate_pos_2[2], (gate_pos_2[2] + z_gate + 4)): # z_gate
+        for x in xrange(gate_pos_2[0], (gate_pos_2[0] + 14)):
+            if combinedHM[x - box.minx][z - box.minz] > (gate_pos_2[1]):
+                for d in range((gate_pos_2[1]), combinedHM[x - box.minx][z - box.minz]): # Remove blocks above the plaza and wall
+                    level.setBlockAt(x, d, z, 0)
+            else:
+                if combinedHM[x - box.minx][z - box.minz] < (gate_pos_2[1]) and combinedHM[x - box.minx][z - box.minz] < gate_2_minh:
+                    gate_2_minh = combinedHM[x - box.minx][z - box.minz]
+
+        
+        for x in xrange(gate_pos_4[0] - 5, (gate_pos_4[0]) + 9):
+            if combinedHM[x - box.minx][z - box.minz] > (gate_pos_4[1]):
+                for d in range((gate_pos_4[1]), combinedHM[x - box.minx][z - box.minz]): # Remove blocks above the plaza and wall
+                    level.setBlockAt(x, d, z, 0)
+            else:
+                if combinedHM[x - box.minx][z - box.minz] < (gate_pos_4[1]) and combinedHM[x - box.minx][z - box.minz] < gate_4_minh:
+                    gate_4_minh = combinedHM[x - box.minx][z - box.minz]
+
+    for x in xrange(gate_pos_1[0], (gate_pos_1[0] + x_gate + 4)): # x_gate
+        for z in xrange(gate_pos_1[2], (gate_pos_1[2] + 14)):
+            for y in xrange(gate_1_minh, gate_pos_1[1]):
+                level.setBlockAt(x, y, z, 43) # Making the base of plaza
+                level.setBlockDataAt(x, y, z, 0)
+        
+        for z in xrange(gate_pos_3[2] - 5, (gate_pos_3[2]) + 9):
+            for y in xrange(gate_3_minh, gate_pos_3[1]):
+                level.setBlockAt(x, y, z, 43) # Making the base of plaza
+                level.setBlockDataAt(x, y, z, 0)
+
+    for z in xrange(gate_pos_2[2], (gate_pos_2[2] + z_gate + 4)): # z_gate
+        for x in xrange(gate_pos_2[0], (gate_pos_2[0] + 14)):
+            for y in xrange(gate_2_minh, gate_pos_2[1]):
+                level.setBlockAt(x, y, z, 43) # Making the base of plaza
+                level.setBlockDataAt(x, y, z, 0)
+        
+        for x in xrange(gate_pos_4[0] - 5, (gate_pos_4[0]) + 9):
+            for y in xrange(gate_4_minh, gate_pos_4[1]):
+                level.setBlockAt(x, y, z, 43) # Making the base of plaza
+                level.setBlockDataAt(x, y, z, 0)
+
+
+    for y in xrange(0, 11):
+        for x in xrange(gate_pos_1[0] - y, (gate_pos_1[0] + x_gate + y + 4)): # x_gate
+            for z in xrange(gate_pos_1[2] + 9, (gate_pos_1[2] + y + 14)):
+                if x <= gate_pos_1[0] - 1 or x >= gate_pos_1[0] + x_gate + 4 or z >= gate_pos_1[2] + 14:
+                    if not((x <= gate_pos_1[0] - 6 or x >= gate_pos_1[0] + x_gate + 9) and combinedHM[x - box.minx][z - box.minz] > (gate_pos_1[1] + y)):
+                        level.setBlockAt((x), gate_pos_1[1] - 1 + y, (z), 0)
+            
+            for z in xrange(gate_pos_3[2] - 5 - y, (gate_pos_3[2])):
+                if x <= gate_pos_3[0] - 1 or x >= gate_pos_3[0] + x_gate + 4 or z <= gate_pos_3[2] - 6:
+                    if not((x <= gate_pos_3[0] - 6 or x >= gate_pos_3[0] + x_gate + 9) and combinedHM[x - box.minx][z - box.minz] > (gate_pos_3[1] + y)):
+                        level.setBlockAt((x), gate_pos_3[1] - 1 + y, (z), 0)
+
+        for z in xrange(gate_pos_2[2] - y, (gate_pos_2[2] + z_gate + y + 4)): # z_gate
+            for x in xrange(gate_pos_2[0] + 9, (gate_pos_2[0] + y + 14)):
+                if z <= gate_pos_2[2] - 1 or z >= gate_pos_2[2] + x_gate + 4 or x >= gate_pos_2[0] + 14:
+                    level.setBlockAt((x), gate_pos_2[1] - 1 + y, (z), 0)
+
+            for x in xrange(gate_pos_4[0] - 5 - y, (gate_pos_4[0])):
+                if z <= gate_pos_4[2] - 1 or z >= gate_pos_4[2] + x_gate + 4 or x <= gate_pos_4[0] - 6:
+                    level.setBlockAt((x), gate_pos_4[1] - 1 + y, (z), 0)           
+            
 def place_walls(level, box, heightmap, combinedHM):
     try:
         
@@ -1068,9 +1145,10 @@ def place_walls(level, box, heightmap, combinedHM):
         
         place_wall_corners(level, box, heightmap, combinedHM)
         gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4 = place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_left, z_right, x_gate, z_gate)
+        pave_gates(level, box, combinedHM, gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4, x_gate, z_gate)
         place_gates(level, box, heightmap, gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4, x_gate, z_gate)
         place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, z_right)
-
+        
         logger.info('Wall generation completed.')
 
     except Exception as e:
