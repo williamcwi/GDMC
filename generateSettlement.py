@@ -11,7 +11,8 @@ import deforestation
 import terrains
 import cityPlanning
 import biomes
-import time 
+import time
+import numpy as np
 
 inputs = [
     (
@@ -66,8 +67,8 @@ def perform(level, box, options):
         # Generate walls
         generateWalls.place_walls(level, box, afterHM, combinedHM)
 
-        # Calculate best starting point
-        startingPoint = cityPlanning.bestStartingPoint(box, afterHM)
+        # Calculate best starting point and array of buildable 4x4 areas
+        startingPoint, gridArray = cityPlanning.bestStartingPoint(box, afterHM)
 
         # # Generate simple house
         # generateStructure.generateSimpleHouse(level, box)
