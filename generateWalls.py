@@ -565,7 +565,7 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
                 arr = []
                 for index in range(zma):
                     if heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i-index] == -1:
-                        arr.append(combinedHMheightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i-index])
+                        arr.append(combinedHM[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i-index])
                     else: 
                         arr.append(heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i-index])
                 for index in range(8):
