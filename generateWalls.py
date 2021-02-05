@@ -611,18 +611,10 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
 
 def get_gate_schem(width):
     try:
-        if width == 6:
-            filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'gate', 'gate_6.schematic')
-            return MCSchematic(shape=(10,12,9), filename=filename)
-        elif width == 7:
-            filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'gate', 'gate_7.schematic')
-            return MCSchematic(shape=(11,12,9), filename=filename)
-        elif width == 8:
-            filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'gate', 'gate_8.schematic')
-            return MCSchematic(shape=(12,12,9), filename=filename)
-        elif width == 9:
-            filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'gate', 'gate_9.schematic')
-            return MCSchematic(shape=(13,12,9), filename=filename)
+        if width >= 6 and width <= 9:
+            filename = os.path.join(os.path.dirname(__file__), 'schematics', 'wall', 'gate', 'gate_'+ str(width) +'.schematic')
+            return MCSchematic(shape=((width + 4),12,9), filename=filename)
+        
     except Exception as e:
         logger.error(e)
 
@@ -1105,9 +1097,10 @@ def place_walls(level, box, heightmap, combinedHM):
         
         place_wall_corners(level, box, heightmap, combinedHM)
         gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4 = place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_left, z_right)
+        pave_gates(level, box, combinedHM, gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4, x_gate, z_gate)
         place_gates(level, box, heightmap, gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4, x_gate, z_gate)
         place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, z_right)
-
+        
         logger.info('Wall generation completed.')
 
     except Exception as e:
