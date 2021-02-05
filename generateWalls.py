@@ -1116,27 +1116,46 @@ def pave_gates(level, box, combinedHM, gate_pos_1, gate_pos_2, gate_pos_3, gate_
                 level.setBlockAt(x, y, z, 43) # Making the base of plaza
                 level.setBlockDataAt(x, y, z, 0)
 
+    for y in xrange(0, 6):
+        x_width = z_length = x_length = z_width = y
 
-    for y in xrange(0, 11):
-        for x in xrange(gate_pos_1[0] - y, (gate_pos_1[0] + x_gate + y + 4)): # x_gate
-            for z in xrange(gate_pos_1[2] + 9, (gate_pos_1[2] + y + 14)):
+        if (box.width < 50):
+            x_width = 0
+            z_length = 0
+
+        if (box.length < 50):
+            x_length = 0
+            z_width = 0
+
+        for x in xrange(gate_pos_1[0] - x_width, (gate_pos_1[0] + x_gate + x_width + 4)): # x_gate
+            for z in xrange(gate_pos_1[2] + 9, (gate_pos_1[2] + x_length + 14)):
                 if x <= gate_pos_1[0] - 1 or x >= gate_pos_1[0] + x_gate + 4 or z >= gate_pos_1[2] + 14:
-                    if not((x <= gate_pos_1[0] - 6 or x >= gate_pos_1[0] + x_gate + 9) and combinedHM[x - box.minx][z - box.minz] > (gate_pos_1[1] + y)):
-                        level.setBlockAt((x), gate_pos_1[1] - 1 + y, (z), 0)
+                    level.setBlockAt((x), gate_pos_1[1] - 1 + y, (z), 0)
+                    if combinedHM[x - box.minx][z - box.minz] > gate_pos_1[1] - 1 + y:
+                        for d in range(gate_pos_1[1] - 1 + y, combinedHM[x - box.minx][z - box.minz]): # Remove blocks above the plaza and wall
+                            level.setBlockAt(x, d, z, 0)
             
-            for z in xrange(gate_pos_3[2] - 5 - y, (gate_pos_3[2])):
+            for z in xrange(gate_pos_3[2] - 5 - x_length, (gate_pos_3[2])):
                 if x <= gate_pos_3[0] - 1 or x >= gate_pos_3[0] + x_gate + 4 or z <= gate_pos_3[2] - 6:
-                    if not((x <= gate_pos_3[0] - 6 or x >= gate_pos_3[0] + x_gate + 9) and combinedHM[x - box.minx][z - box.minz] > (gate_pos_3[1] + y)):
-                        level.setBlockAt((x), gate_pos_3[1] - 1 + y, (z), 0)
+                    level.setBlockAt((x), gate_pos_3[1] - 1 + y, (z), 0)
+                    if combinedHM[x - box.minx][z - box.minz] > gate_pos_3[1] - 1 + y:
+                        for d in range(gate_pos_3[1] - 1 + y, combinedHM[x - box.minx][z - box.minz]): # Remove blocks above the plaza and wall
+                            level.setBlockAt(x, d, z, 0)
 
-        for z in xrange(gate_pos_2[2] - y, (gate_pos_2[2] + z_gate + y + 4)): # z_gate
-            for x in xrange(gate_pos_2[0] + 9, (gate_pos_2[0] + y + 14)):
-                if z <= gate_pos_2[2] - 1 or z >= gate_pos_2[2] + x_gate + 4 or x >= gate_pos_2[0] + 14:
+        for z in xrange(gate_pos_2[2] - z_width, (gate_pos_2[2] + z_gate + z_width + 4)): # z_gate
+            for x in xrange(gate_pos_2[0] + 9, (gate_pos_2[0] + z_length + 14)):
+                if z <= gate_pos_2[2] - 1 or z >= gate_pos_2[2] + z_gate + 4 or x >= gate_pos_2[0] + 14:
                     level.setBlockAt((x), gate_pos_2[1] - 1 + y, (z), 0)
+                    if combinedHM[x - box.minx][z - box.minz] > gate_pos_2[1] - 1 + y:
+                        for d in range(gate_pos_2[1] - 1 + y, combinedHM[x - box.minx][z - box.minz]): # Remove blocks above the plaza and wall
+                            level.setBlockAt(x, d, z, 0)
 
-            for x in xrange(gate_pos_4[0] - 5 - y, (gate_pos_4[0])):
-                if z <= gate_pos_4[2] - 1 or z >= gate_pos_4[2] + x_gate + 4 or x <= gate_pos_4[0] - 6:
-                    level.setBlockAt((x), gate_pos_4[1] - 1 + y, (z), 0)           
+            for x in xrange(gate_pos_4[0] - 5 - z_length, (gate_pos_4[0])):
+                if z <= gate_pos_4[2] - 1 or z >= gate_pos_4[2] + z_gate + 4 or x <= gate_pos_4[0] - 6:
+                    level.setBlockAt((x), gate_pos_4[1] - 1 + y, (z), 0)
+                    if combinedHM[x - box.minx][z - box.minz] > gate_pos_4[1] - 1 + y:
+                        for d in range(gate_pos_4[1] - 1 + y, combinedHM[x - box.minx][z - box.minz]): # Remove blocks above the plaza and wall
+                            level.setBlockAt(x, d, z, 0)         
             
 def place_walls(level, box, heightmap, combinedHM):
     try:
