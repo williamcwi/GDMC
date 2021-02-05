@@ -63,9 +63,6 @@ def perform(level, box, options):
         # Remove lava pools
         terrains.removeLava(level, box, lhm, ghm, afterHM)
 
-        # Creating Pavement for the gates
-        terrains.pavingGate(level, box, combinedHM)
-
         # Generate walls
         generateWalls.place_walls(level, box, afterHM, combinedHM)
 
