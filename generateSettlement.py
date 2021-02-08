@@ -46,8 +46,7 @@ def perform(level, box, options):
         ghm = heightmap.createHeightMap(level, box)
 
         # Select biome
-        biome = biomes.selectBiome(level, box, hm)
-        # print(biome)
+        biome, isIsland = biomes.selectBiome(level, box, hm)
 
         # TODO: Add test of selected area size for wall generation
         alterDict, alterHeightDict = terrains.floodFill(hm, 169, 7)
