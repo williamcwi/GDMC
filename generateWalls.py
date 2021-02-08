@@ -842,7 +842,7 @@ def place_gates_controls(level, box, pos, gate_size, direction):
     except Exception as e:
         logger.error(e)
 
-def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, z_right):
+def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, z_right, gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4):
     try:
         building = 'inner wall'
         progress = 0
@@ -884,7 +884,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
                         if sections is not x_left - 1:
                             level.copyBlocksFrom(wall_base, wall_base.bounds, Vector(box.maxx-9-i, ground-3, box.minz+2))
                         else: 
-                            level.copyBlocksFrom(wall_base_gate, wall_base_gate.bounds, Vector(box.maxx-9-i, ground-3, box.minz+7))
+                            level.copyBlocksFrom(wall_base_gate, wall_base_gate.bounds, Vector(box.maxx-9-i, gate_pos_1[1]-3, box.minz+7))
 
                     i += 4
 
@@ -901,7 +901,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
                         if sections is not x_right - 1:
                             level.copyBlocksFrom(wall_base, wall_base.bounds, Vector(box.minx+6+i, ground-3, box.minz+2))
                         else: 
-                            level.copyBlocksFrom(wall_base_gate, wall_base_gate.bounds, Vector(box.minx+6+i, ground-3, box.minz+7))
+                            level.copyBlocksFrom(wall_base_gate, wall_base_gate.bounds, Vector(box.minx+6+i, gate_pos_1[1]-3, box.minz+7))
 
                     i += 4
 
@@ -933,7 +933,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
                         if sections is not z_left - 1:
                             level.copyBlocksFrom(wall_base, wall_base.bounds, Vector(box.minx+2, ground-3, box.minz+6+i))
                         else: 
-                            level.copyBlocksFrom(wall_base_gate, wall_base_gate.bounds, Vector(box.minx+7, ground-3, box.minz+6+i))
+                            level.copyBlocksFrom(wall_base_gate, wall_base_gate.bounds, Vector(box.minx+7, gate_pos_2[1]-3, box.minz+6+i))
 
                     i += 4
 
@@ -949,7 +949,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
                         if sections is not z_right - 1:
                             level.copyBlocksFrom(wall_base, wall_base.bounds, Vector(box.minx+2, ground-3, box.maxz-9-i))
                         else: 
-                            level.copyBlocksFrom(wall_base_gate, wall_base_gate.bounds, Vector(box.minx+7, ground-3, box.maxz-9-i))
+                            level.copyBlocksFrom(wall_base_gate, wall_base_gate.bounds, Vector(box.minx+7, gate_pos_2[1]-3, box.maxz-9-i))
                     
                     i += 4
         progress += 1
@@ -980,7 +980,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
                         if sections is not x_left - 1:
                             level.copyBlocksFrom(wall_base, wall_base.bounds, Vector(box.maxx-9-i, ground-3, box.maxz-9))
                         else: 
-                            level.copyBlocksFrom(wall_base_gate, wall_base_gate.bounds, Vector(box.maxx-9-i, ground-3, box.maxz-9))
+                            level.copyBlocksFrom(wall_base_gate, wall_base_gate.bounds, Vector(box.maxx-9-i, gate_pos_3[1]-3, box.maxz-9))
                     
                     i += 4
 
@@ -996,7 +996,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
                         if sections is not x_right - 1:
                             level.copyBlocksFrom(wall_base, wall_base.bounds, Vector(box.minx+6+i, ground-3, box.maxz-9))
                         else: 
-                            level.copyBlocksFrom(wall_base_gate, wall_base_gate.bounds, Vector(box.minx+6+i, ground-3, box.maxz-9))
+                            level.copyBlocksFrom(wall_base_gate, wall_base_gate.bounds, Vector(box.minx+6+i, gate_pos_3[1]-3, box.maxz-9))
 
                     i += 4
         progress += 1
@@ -1027,7 +1027,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
                         if sections is not z_left - 1:
                             level.copyBlocksFrom(wall_base, wall_base.bounds, Vector(box.maxx-9, ground-3, box.minz+6+i))
                         else: 
-                            level.copyBlocksFrom(wall_base_gate, wall_base_gate.bounds, Vector(box.maxx-9, ground-3, box.minz+6+i))
+                            level.copyBlocksFrom(wall_base_gate, wall_base_gate.bounds, Vector(box.maxx-9, gate_pos_4[1]-3, box.minz+6+i))
 
                     i += 4
 
@@ -1043,7 +1043,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
                         if sections is not z_right - 1:
                             level.copyBlocksFrom(wall_base, wall_base.bounds, Vector(box.maxx-9, ground-3, box.maxz-9-i))
                         else: 
-                            level.copyBlocksFrom(wall_base_gate, wall_base_gate.bounds, Vector(box.maxx-9, ground-3, box.maxz-9-i))
+                            level.copyBlocksFrom(wall_base_gate, wall_base_gate.bounds, Vector(box.maxx-9, gate_pos_4[1]-3, box.maxz-9-i))
                     
                     i += 4
         progress += 1
@@ -1156,17 +1156,17 @@ def pave_gates(level, box, combinedHM, gate_pos_1, gate_pos_2, gate_pos_3, gate_
                     if combinedHM[x - box.minx][z - box.minz] > gate_pos_4[1] - 1 + y:
                         for d in range(gate_pos_4[1] - 1 + y, combinedHM[x - box.minx][z - box.minz]): # Remove blocks above the plaza and wall
                             level.setBlockAt(x, d, z, 0)         
-            
-def place_walls(level, box, heightmap, combinedHM):
+
+def place_walls(level, box, afterHM, combinedHM):
     try:
         
         x_left, x_right, x_gate, z_left, z_right, z_gate = calc_wall_sections(box) # calculate wall sections and gate sizes
         
-        place_wall_corners(level, box, heightmap, combinedHM)
-        gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4 = place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_left, z_right, x_gate, z_gate)
+        place_wall_corners(level, box, afterHM, combinedHM)
+        gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4 = place_wall_sections(level, box, afterHM, combinedHM, x_left, x_right, z_left, z_right, x_gate, z_gate)
         pave_gates(level, box, combinedHM, gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4, x_gate, z_gate)
-        place_gates(level, box, heightmap, gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4, x_gate, z_gate)
-        place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, z_right)
+        place_gates(level, box, afterHM, gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4, x_gate, z_gate)
+        place_wall_base(level, box, afterHM, combinedHM, x_left, x_right, z_left, z_right, gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4)
         
         logger.info('Wall generation completed.')
 
