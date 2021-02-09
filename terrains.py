@@ -39,48 +39,50 @@ def floodFill(heightMap, minimumArea, exclusion = 0): # Flood Fill RECURSIVE
         def FF(x, y, area):
             tempHM[x][y] = 999
             area.append([x,y])
-            if ((y - 1) >= (0 + exclusion)):  # go to west
-                if tempHM[x][y - 1] == currentLevel:
-                    area = FF(x, y - 1, area)
-            if ((y + 1) < (len(tempHM[x]) - exclusion)): # go to east
-                if tempHM[x][y + 1] == currentLevel:
-                    area = FF(x, y + 1, area)
-            if ((x + 1) < (len(tempHM) - exclusion)): # go to south
-                if tempHM[x + 1][y] == currentLevel:
-                    area = FF(x + 1, y, area)
-            if ((x - 1) >= (0 + exclusion)): # go to north
-                if tempHM[x - 1][y] == currentLevel:
-                    area = FF(x - 1, y, area)
+            if len(area) <= 10000:
+                if ((y - 1) >= (0 + exclusion)):  # go to west
+                    if tempHM[x][y - 1] == currentLevel:
+                        area = FF(x, y - 1, area)
+                if ((y + 1) < (len(tempHM[x]) - exclusion)): # go to east
+                    if tempHM[x][y + 1] == currentLevel:
+                        area = FF(x, y + 1, area)
+                if ((x + 1) < (len(tempHM) - exclusion)): # go to south
+                    if tempHM[x + 1][y] == currentLevel:
+                        area = FF(x + 1, y, area)
+                if ((x - 1) >= (0 + exclusion)): # go to north
+                    if tempHM[x - 1][y] == currentLevel:
+                        area = FF(x - 1, y, area)
             return area
 
         def FFZero(x, y, area, surroundingRegion):
             maskedHM[x][y] = 999
             area.append([x,y])
-            if ((x + 1) < (len(maskedHM) - exclusion)): # go to south
-                if maskedHM[x + 1][y] == "0000":
-                    area, surroundingRegion = FFZero(x + 1, y, area, surroundingRegion)
-            if ((y - 1) >= (0 + exclusion)):  # go to west
-                if maskedHM[x][y - 1] == "0000":
-                    area, surroundingRegion = FFZero(x, y - 1, area, surroundingRegion)
-            if ((x - 1) >= (0 + exclusion)): # go to north
-                if maskedHM[x - 1][y] == "0000":
-                    area, surroundingRegion = FFZero(x - 1, y, area, surroundingRegion)
-            if ((y + 1) < (len(maskedHM[x]) - exclusion)): # go to east
-                if maskedHM[x][y + 1] == "0000":
-                    area, surroundingRegion = FFZero(x, y + 1, area, surroundingRegion)
-            
-            if ((x + 1) < (len(maskedHM) - exclusion)): # go to south
-                if maskedHM[x + 1][y] != "0000" and maskedHM[x + 1][y] != 999 and maskedHM[x + 1][y] not in excludedBlocks.values():
-                    surroundingRegion.append(maskedHM[x + 1][y])
-            if ((y - 1) >= (0 + exclusion)):  # go to west
-                if maskedHM[x][y - 1] != "0000" and maskedHM[x][y - 1] != 999 and maskedHM[x][y - 1] not in excludedBlocks.values():
-                    surroundingRegion.append(maskedHM[x][y - 1])
-            if ((x - 1) >= (0 + exclusion)): # go to north
-                if maskedHM[x - 1][y] != "0000" and maskedHM[x - 1][y] != 999 and maskedHM[x - 1][y] not in excludedBlocks.values():
-                    surroundingRegion.append(maskedHM[x - 1][y])
-            if ((y + 1) < (len(maskedHM[x]) - exclusion)): # go to east
-                if maskedHM[x][y + 1] != "0000" and maskedHM[x][y + 1] != 999 and maskedHM[x][y + 1] not in excludedBlocks.values():
-                    surroundingRegion.append(maskedHM[x][y + 1])
+            if len(area) <= 10000:
+                if ((x + 1) < (len(maskedHM) - exclusion)): # go to south
+                    if maskedHM[x + 1][y] == "0000":
+                        area, surroundingRegion = FFZero(x + 1, y, area, surroundingRegion)
+                if ((y - 1) >= (0 + exclusion)):  # go to west
+                    if maskedHM[x][y - 1] == "0000":
+                        area, surroundingRegion = FFZero(x, y - 1, area, surroundingRegion)
+                if ((x - 1) >= (0 + exclusion)): # go to north
+                    if maskedHM[x - 1][y] == "0000":
+                        area, surroundingRegion = FFZero(x - 1, y, area, surroundingRegion)
+                if ((y + 1) < (len(maskedHM[x]) - exclusion)): # go to east
+                    if maskedHM[x][y + 1] == "0000":
+                        area, surroundingRegion = FFZero(x, y + 1, area, surroundingRegion)
+                
+                if ((x + 1) < (len(maskedHM) - exclusion)): # go to south
+                    if maskedHM[x + 1][y] != "0000" and maskedHM[x + 1][y] != 999 and maskedHM[x + 1][y] not in excludedBlocks.values():
+                        surroundingRegion.append(maskedHM[x + 1][y])
+                if ((y - 1) >= (0 + exclusion)):  # go to west
+                    if maskedHM[x][y - 1] != "0000" and maskedHM[x][y - 1] != 999 and maskedHM[x][y - 1] not in excludedBlocks.values():
+                        surroundingRegion.append(maskedHM[x][y - 1])
+                if ((x - 1) >= (0 + exclusion)): # go to north
+                    if maskedHM[x - 1][y] != "0000" and maskedHM[x - 1][y] != 999 and maskedHM[x - 1][y] not in excludedBlocks.values():
+                        surroundingRegion.append(maskedHM[x - 1][y])
+                if ((y + 1) < (len(maskedHM[x]) - exclusion)): # go to east
+                    if maskedHM[x][y + 1] != "0000" and maskedHM[x][y + 1] != 999 and maskedHM[x][y + 1] not in excludedBlocks.values():
+                        surroundingRegion.append(maskedHM[x][y + 1])
             return area, surroundingRegion 
 
         for x in range(exclusion, (len(tempHM) - exclusion)):
@@ -101,7 +103,7 @@ def floodFill(heightMap, minimumArea, exclusion = 0): # Flood Fill RECURSIVE
             for y in range(exclusion, (len(maskedHM[0]) - exclusion)):
                 if maskedHM[x][y] == "0000":
                     area, surroundingRegion = FFZero(x, y, [], [])
-                    region =  None
+                    region = None
                     if len(surroundingRegion) > 0:
                         region = max(set(surroundingRegion), key=surroundingRegion.count)   
                     if region != None and len(area) <= (minimumArea*4):
