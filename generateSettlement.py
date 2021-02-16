@@ -70,7 +70,7 @@ def perform(level, box, options):
         cityPlanning.addBorder(level, box, afterHM, gridArray, heightArray, startingPoint[0], startingPoint[1])
         
         # Generate walls
-        # generateWalls.place_walls(level, box, afterHM, combinedHM)
+        generateWalls.place_walls(level, box, afterHM, combinedHM)
 
         # # Generate simple house
         # generateStructure.generateSimpleHouse(level, box)

@@ -22,8 +22,8 @@ def calculateGrids(box, afterHM, xoffset, zoffset):
     try:
         gridArray = np.full((math.ceil(box.length/4), math.ceil(box.width/4)), False)
         heightArray = np.full((math.ceil(box.length/4), math.ceil(box.width/4)), 0)
-        for z in range(zoffset + 9, box.length - 9, 4):
-            for x in range(xoffset + 9, box.width - 9, 4):
+        for z in range(zoffset + 12, box.length - 9, 4):
+            for x in range(xoffset + 12, box.width - 9, 4):
                 if(z - 1 >= 9 and z + 5 <= box.length - 9 and x - 1 >= 9 and x + 5 <= box.width - 9):
                     heights = []
                     for zgrid in range(-1, 5):
