@@ -63,11 +63,14 @@ def perform(level, box, options):
         # Remove lava pools
         terrains.removeLava(level, box, lhm, ghm, afterHM)
 
-        # Generate walls
-        generateWalls.place_walls(level, box, afterHM, combinedHM)
-
         # Calculate best starting point and array of buildable 4x4 areas
-        startingPoint, gridArray = cityPlanning.bestStartingPoint(box, afterHM)
+        startingPoint, gridArray, heightArray = cityPlanning.bestStartingPoint(box, afterHM)
+
+        # Add border around buildable areas
+        cityPlanning.addBorder(level, box, afterHM, gridArray, heightArray, startingPoint[0], startingPoint[1])
+        
+        # Generate walls
+        # generateWalls.place_walls(level, box, afterHM, combinedHM)
 
         # # Generate simple house
         # generateStructure.generateSimpleHouse(level, box)
