@@ -38,12 +38,14 @@ blocktypes = [b.ID for b in blocks]
 
 water = [
     am.Water,
+    am.WaterActive,
     am.Bedrock
 ]
 waterID = [w.ID for w in water]
 
 lava = [
     am.Lava,
+    am.LavaActive,
     am.Bedrock
 ]
 lavaID = [l.ID for l in lava]
