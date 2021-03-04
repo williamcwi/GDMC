@@ -72,8 +72,14 @@ def perform(level, box, options):
         # Generate walls
         generateWalls.place_walls(level, box, afterHM, combinedHM)
 
+        # # Determine plots
+        # plots.run(gridArray)
+
         # # Generate simple house
         # generateStructure.generateSimpleHouse(level, box)
+        
+        # # Path finding algorithm
+        # path.run()
 
     except Exception as e:
         logger.error(e)
