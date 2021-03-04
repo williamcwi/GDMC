@@ -78,6 +78,9 @@ def perform(level, box, options):
         # Add border around buildable areas
         cityPlanning.addBorder(level, box, gridArray, heightArray, startingPoint[0], startingPoint[1])
 
+        # Places trees down
+        treePlacement.treePlacement(level, box)
+
         # # Determine plots
         # plots.run(gridArray)
 
