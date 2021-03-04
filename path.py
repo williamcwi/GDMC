@@ -75,5 +75,3 @@ def run():
         print(pairsList)
     except Exception as e:
         logger.error(e)
-
-run()
