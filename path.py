@@ -59,26 +59,87 @@ def getAllPairs(startingPositions):
         logger.error(e)
 
 def toMatrix(pairsList, vertices):
-    INF = 999999
-    graph = []
-    for x in range(vertices):
-        row = []
-        for z in range(vertices):
-            row.append(INF)
-        graph.append(row)
+    try:
+        INF = 999999
+        graph = []
+        for x in range(vertices):
+            row = []
+            for z in range(vertices):
+                row.append(INF)
+            graph.append(row)
 
-    for i in range(len(pairsList)): # each links
-        start = pairsList[i][0]
-        end = pairsList[i][2]
-        dist = round(pairsList[i][4])
+        for i in range(len(pairsList)): # each links
+            start = pairsList[i][0]
+            end = pairsList[i][2]
+            dist = round(pairsList[i][4])
 
-        graph[start][end] = dist
-        graph[end][start] = dist
+            graph[start][end] = dist
+            graph[end][start] = dist
 
-    return graph
+        return graph
+
+    except Exception as e:
+        logger.error(e)
+
 
 # Minimum Spanning Tree
 # =============================================================================================
+def minDist(vertices, key, mstSet):
+    try:
+        INF = 999999
+        min = INF # initialise min value
+
+        for v in range(vertices):
+            
+            if key[v] < min and mstSet[v] == False:
+                min = key[v]
+                minIndex = v
+        
+        return minIndex
+    except Exception as e:
+        logger.error(e)
+
+def primMST(vertices, matrix):
+    try:
+        INF = 999999
+
+        # key values to pick minimum weight edge
+        key = []
+        for v in range(vertices):
+            key.append(INF)
+
+        # parent vertex linked to
+        parent = []
+        for v in range(vertices):
+            parent.append(None)
+
+        key[0] = 0 # vertex 0 picked as first vertex
+        parent[0] = -1 # first node does not have parent
+
+        mstSet = []
+        for v in range(vertices):
+            mstSet.append(False)
+
+
+        for edge in range(vertices):
+            minIndex = minDist(vertices, key, mstSet)
+            # print(minIndex)
+            mstSet[minIndex] = True
+
+            for v in range(vertices):
+                if matrix[minIndex][v] < key[v] and mstSet[v] == False:
+                    key[v] = matrix[minIndex][v]
+                    parent[v] = minIndex
+        
+        # print(parent)
+
+        links = []
+        for link in range(1, len(parent)):
+            links.append([link, parent[link]])
+        return links
+
+    except Exception as e:
+        logger.error(e)
 
 # A* Algorithm
 # =============================================================================================
@@ -86,6 +147,7 @@ def toMatrix(pairsList, vertices):
 # =============================================================================================
 def run():
     try:
+
         # testing
         startingPositions = [
             [
@@ -126,7 +188,10 @@ def run():
         pairsList = getAllPairs(startingPositions)
         # print(pairsList)
 
-        graph = toMatrix(pairsList, vertices)
+        matrix = toMatrix(pairsList, vertices)
+        # print(matrix)
 
+        links = primMST(vertices, matrix)
+        print(links)
     except Exception as e:
         logger.error(e)
