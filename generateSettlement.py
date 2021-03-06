@@ -78,6 +78,14 @@ def perform(level, box, options):
         # Add border around buildable areas
         cityPlanning.addBorder(level, box, gridArray, heightArray, startingPoint[0], startingPoint[1])
 
+        # afterHM = heightmap.heightMap(level, box)
+        # brush.run(gridArray, afterHM, level, box)
+        #---------->Experimential
+        # incstart = time.time()
+        # brush.CTPFF(afterHM, 9, 169, level, box)
+        # incend = time.time()
+        # logger.debug(u'{} sec used'.format(round(incend - incstart, 2)))
+
         # # Generate simple house
         # generateStructure.generateSimpleHouse(level, box)
 
