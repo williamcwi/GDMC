@@ -80,14 +80,22 @@ def perform(level, box, options):
 
         # afterHM = heightmap.heightMap(level, box)
         # brush.run(gridArray, afterHM, level, box)
+
         #---------->Experimential
         # incstart = time.time()
         # brush.CTPFF(afterHM, 9, 169, level, box)
         # incend = time.time()
         # logger.debug(u'{} sec used'.format(round(incend - incstart, 2)))
 
+        #---------->Genetic A
+        # # Determine plots
+        # plots.run(gridArray)
+
         # # Generate simple house
         # generateStructure.generateSimpleHouse(level, box)
+        
+        # # Path finding algorithm
+        # path.run()
 
     except Exception as e:
         logger.error(e)
