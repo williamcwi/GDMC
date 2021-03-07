@@ -81,7 +81,7 @@ def perform(level, box, options):
         cityPlanning.addBorder(level, box, gridArray, heightArray, startingPoint[0], startingPoint[1])
 
         # Places trees down
-        treePlacement.treePlacement(level, box)
+        treePlacement.treePlacement(level, box, mapArr, afterHM)
 
         afterHM = heightmap.heightMap(level, box)
         brush.run(gridArray, afterHM, startingPoint, level, box)
