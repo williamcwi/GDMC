@@ -11,6 +11,7 @@ import deforestation
 import terrains
 import cityPlanning
 import biomes
+import brush
 import time
 import numpy as np
 
@@ -78,8 +79,8 @@ def perform(level, box, options):
         # Add border around buildable areas
         cityPlanning.addBorder(level, box, gridArray, heightArray, startingPoint[0], startingPoint[1])
 
-        # afterHM = heightmap.heightMap(level, box)
-        # brush.run(gridArray, afterHM, level, box)
+        afterHM = heightmap.heightMap(level, box)
+        brush.run(gridArray, afterHM, startingPoint, level, box)
 
         #---------->Experimential
         # incstart = time.time()

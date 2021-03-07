@@ -5,12 +5,11 @@ from copy import deepcopy
 import os
 import datetime
 import time
+# import heightmap
 
 logger = Logger("Brush")
 
-def run(gridArray, heightMap, level, box):
-    plotDict = dict()
-    plotRDict = dict()
+def run(gridArray, heightMap, startingPoint, level, box):
     buildingDict = {
         "towncentre": [12,7],
         "simplehouse": [3,3],
@@ -29,69 +28,117 @@ def run(gridArray, heightMap, level, box):
         "complexhouse": 50
     }
 
-    builtDict = dict()
+    posFFDict = dict()
+    posFFRDict = dict()
+
     attemptBuildDict = dict()
     attemptOccDict = dict()
+    attemptScoringDict = dict()
 
     gridPos = getBuildableplot(gridArray)
-    logger.info(gridPos)
+
     for key in buildingDict:
-        plotDict, plotRDict = fitting(gridArray, gridPos, buildingDict[key][0], buildingDict[key][1], plotDict, plotRDict, key)
-    # logger.debug(plotDict)
-    # logger.debug(plotRDict)
-    idle = 0
-    occPlot = []
-    id = 0
-    scoring = 0
-    index = 1
-    while idle <= len(gridPos) / 2:
-        id += 1
-        plotName = getRandomPlot(plotWeightingDict)
-        plot = buildingDict[plotName]
-        rotat = True if random.randint(1, 3) % 2 == 0 else False
-        pDict = plotRDict if rotat else plotDict
+        posFFDict[key] = fitting(buildingDict[key], gridPos, gridArray)
+        posFFRDict[key] = fitting([buildingDict[key][1], buildingDict[key][0]], gridPos, gridArray)
 
-        if len(pDict[plotName]) >= 1: 
-            location = pDict[plotName][random.randint(0, len(pDict[plotName]) - 1)]
-            
-            tempPlot = []
-            valid = True
-            x = plot[1] if rotat else plot[0]
-            z = plot[0] if rotat else plot[1]
-            for k in range(x):
-                for m in range(z):
-                    if [location[0] + k, location[1] + m] not in occPlot:
-                        tempPlot.append([location[0] + k, location[1] + m])
-                    else:
-                        valid = False
-                        break
-                if not valid:
-                    break
+    # with open(os.path.join(os.path.expanduser("~/Desktop"),'posFF-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
+    #     f.write(str(posFFDict))
 
-            if valid:
-                idle = 0
-                builtDict[location[0], location[1]] = plotName+"R" if rotat else plotName
-                scoring += (buildingDict[plotName][0] * buildingDict[plotName][1])^2
-                for item in tempPlot:  
-                    occPlot.append(item)
-                plotNumDict[plotName] -=1
-                if plotNumDict[plotName] <=0:
-                    plotWeightingDict[plotName] = 0
+    # with open(os.path.join(os.path.expanduser("~/Desktop"),'posFFR-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
+    #     f.write(str(posFFRDict))
+
+    plotRemaining = 0
+    for key in posFFDict:
+        plotRemaining += (len(posFFDict[key]) + len(posFFRDict[key])) / 2
+    sumPlotAvilable = plotRemaining
+    prevPlotRemaining = plotRemaining
+    for index in range(10):
+        logger.info(plotRemaining)
+        build = True
+        localPlotWeightingDict = plotWeightingDict.copy()
+        localPlotNumDict = plotNumDict.copy()
+        localPosDict = posFFDict.copy()
+        localPosRDict = posFFRDict.copy()
+        occPlot = []
+        scoring = 0
+        builtDict = dict()
+        while build:
+            plotName = getRandomPlot(localPlotWeightingDict)
+            plot = buildingDict[plotName]
+            rotat = True if random.randint(1, 3) % 2 == 0 else False
+            pDict = localPosRDict if rotat else localPosDict
+            idle = 0
+            if len(pDict[plotName]) >= 1:
+                location = pDict[plotName][random.randint(0, len(pDict[plotName]) - 1)]
+                tempPlot = []
+                valid = True
+                x = plot[1] if rotat else plot[0]
+                z = plot[0] if rotat else plot[1]
+
+                tempPlot = list([[m, k] for k in range(location[0], location[0] + x) for m in range(location[1], location[1] + z)])
+
+                if [i for e in tempPlot for i in occPlot if e == i]:
+                    valid = False
+                # logger.info(u'{}, {} - {}'.format(location, plotName, valid))
+                if valid:
+                    idle = 0
+                    builtDict[location[1], location[0]] = (plotName+"R") if rotat else plotName
+                    scoring += (buildingDict[plotName][0] * buildingDict[plotName][1]) ^ 2
+                    occPlot += tempPlot
+                    for key in localPosDict:
+                        localPosDict[key] = [x for x in localPosDict[key] if x not in occPlot]
+                        localPosRDict[key] = [x for x in localPosRDict[key] if x not in occPlot]
+                    localPlotNumDict[plotName] -= 1
+                    if localPlotNumDict[plotName] <= 0:
+                        localPlotWeightingDict[plotName] = 0
+                else:
+                    idle += (sumPlotAvilable / 15)
+                    for key in localPosDict:
+                        if buildingDict[key][0] >= buildingDict[plotName][0] and buildingDict[key][1] >= buildingDict[plotName][1]:
+                            localPosDict[key] = [x for x in localPosDict[key] if x is not location]
+                            localPosRDict[key] = [x for x in localPosRDict[key] if x is not location]
             else:
-                idle += 1
-        else:
-            idle += 1
-    attemptBuildDict[index] = builtDict
-    attemptOccDict[index] = occPlot
+                localPlotWeightingDict[plotName] = 0
+                localPlotNumDict[plotName] = 0
+                idle += (sumPlotAvilable / 10)
+            
+            plotRemaining = 0
+            for key in localPosDict:
+                plotRemaining += len(localPosDict[key]) + len(localPosRDict[key])
+            if prevPlotRemaining == plotRemaining:
+                idle += (sumPlotAvilable / 4)
+            prevPlotRemaining = plotRemaining
+            if (idle >= (sumPlotAvilable)):
+                build = False
+                logger.info(u'{} - idleOut'.format(index))
+            if plotRemaining <= 0:
+                build = False
+                logger.info(u'{} - outOut'.format(index))
+        attemptBuildDict[index] = builtDict
+        attemptOccDict[index] = occPlot
+        attemptScoringDict[index] = round((scoring * (float(len(occPlot)) / float(sumPlotAvilable)))) if len(occPlot) > 1 else 0      
+    
+    best = max(attemptScoringDict, key=attemptScoringDict.get)
+    # logger.info(best)
+    # logger.info(u'{}, {}'.format(len(heightMap), len(heightMap[0])))
+    for cell in attemptOccDict[best]:
+        level.setBlockAt(box.minx + (cell[0]*4) + startingPoint[0], heightMap[cell[0]*4 + startingPoint[0]][cell[1]*4 + startingPoint[1]], box.minz + (cell[1]*4) + startingPoint[1], 57)
 
-    for cell in occPlot:
-        level.setBlockAt(box.minx + cell[0], heightMap[cell[0]][cell[1]], box.minz + cell[1], 57)
-    logger.info(occPlot)
-    logger.info(builtDict)
-    logger.info(len(gridPos))
-    logger.info(len(gridPos) - len(occPlot))
+    for cell in attemptBuildDict[best]:
+        level.setBlockAt(box.minx + (cell[0]*4 + startingPoint[0]), heightMap[cell[0]*4 + startingPoint[0]][cell[1]*4 + startingPoint[1]] + 1, box.minz + (cell[1]*4) + startingPoint[1], 133)
 
+    # with open(os.path.join(os.path.expanduser("~/Desktop"),'ABD-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
+    #     f.write(str(attemptBuildDict))
 
+    
+def fitting(size, posArray, gridArray):
+    avaPlot = []
+    for pos in posArray:
+        if pos[0] + size[0] < len(gridArray) and pos[1] + size[1] < len(gridArray[0]):
+            plotArea = list([gridArray[i][k] for i in range(pos[0], pos[0] + size[0]) for k in range(pos[1], pos[1] + size[1])])
+            if len(set(plotArea)) == 1 and sum(plotArea) == (size[0] * size[1]):
+                avaPlot.append(pos)
+    return avaPlot
 
 def getBuildableplot(gridArray):
     posArray = []
@@ -99,29 +146,6 @@ def getBuildableplot(gridArray):
     for x, z in zip(pos[0], pos[1]):
         posArray.append([x,z])
     return (posArray)
-
-def fitting(gridArray, posArray, x, z, plotDict, plotRDict, key):
-    posA = []
-    posRA = []
-    for pos in posArray:
-        def survey(x, z, gridArray, pos):
-            area = 0
-            for k in range(x):
-                for m in range(z):
-                    if gridArray[pos[0] + k][pos[1] + m] == 0:
-                        return False
-            return True
-        
-        if(pos[0] + x <= len(gridArray) and pos[1] + z <= len(gridArray[0])):
-            if survey(x, z, gridArray, pos):
-                posA.append([pos[0], pos[1]])
-        if(pos[0] + z <= len(gridArray) and pos[1] + x <= len(gridArray[0])):
-            if survey(z, x, gridArray, pos):
-                posRA.append([pos[0], pos[1]])
-                    
-    plotDict[key] = posA
-    plotRDict[key] = posRA
-    return plotDict, plotRDict
 
 def getRandomPlot(plotWeightingDict):
     randomWeighting = random.randint(0, sum(plotWeightingDict.values()))
@@ -131,12 +155,8 @@ def getRandomPlot(plotWeightingDict):
             return key
 
 
-
-
-
 def CTPFF(heightMap, exclusion, size, level, box):
-
-
+    
     buildingDict = {
         "towncentre": [44,20],
         "simplehouse": [12,12],
@@ -155,23 +175,23 @@ def CTPFF(heightMap, exclusion, size, level, box):
         "complexhouse": 50
     }
 
-    posDict = dict()
-    posRDict = dict()
+    # posDict = dict()
+    # posRDict = dict()
     posFFDict = dict()
     posFFRDict = dict()
     attemptBuildDict = dict()
     attemptOccDict = dict()
     attemptScoringDict = dict()
 
-    def getPlot(heightmap, size):
-        avaPlot = []
-        for x in range(0 + exclusion, len(heightmap) - (exclusion) - size[0]):
-            for y in range(0 + exclusion, len(heightmap[0]) - (exclusion) - size[1]):
-                level = heightmap[x][y]
-                plotArea = list([heightmap[i][k] for i in range(x, x + size[0]) for k in range(y, y + size[1])])
-                if len(set(plotArea)) == 1 and list(set(plotArea))[0] == level and plotArea.count(level) == (size[0] * size[1]) and sum(plotArea) / len(plotArea) == level:
-                    avaPlot.append([x,y])
-        return avaPlot
+    # def getPlot(heightmap, size):
+    #     avaPlot = []
+    #     for x in range(0 + exclusion, len(heightmap) - (exclusion) - size[0]):
+    #         for y in range(0 + exclusion, len(heightmap[0]) - (exclusion) - size[1]):
+    #             level = heightmap[x][y]
+    #             plotArea = list([heightmap[i][k] for i in range(x, x + size[0]) for k in range(y, y + size[1])])
+    #             if len(set(plotArea)) == 1 and list(set(plotArea))[0] == level and plotArea.count(level) == (size[0] * size[1]) and sum(plotArea) / len(plotArea) == level:
+    #                 avaPlot.append([x,y])
+    #     return avaPlot
 
     def getFFPlot(heightmap, size):
         avaPlot = []
@@ -270,12 +290,12 @@ def CTPFF(heightMap, exclusion, size, level, box):
         np.savetxt(f, np.column_stack(heightMap), fmt='%s')
         f.close()
 
-    incstart = time.time()
-    for key in buildingDict:
-        posDict[key] = getPlot(heightMap, buildingDict[key])
-        posRDict[key] = getPlot(heightMap, [buildingDict[key][1], buildingDict[key][0]])
-    incend = time.time()
-    logger.debug(u'{} sec used'.format(round(incend - incstart, 2)))
+    # incstart = time.time()
+    # for key in buildingDict:
+    #     posDict[key] = getPlot(heightMap, buildingDict[key])
+    #     posRDict[key] = getPlot(heightMap, [buildingDict[key][1], buildingDict[key][0]])
+    # incend = time.time()
+    # logger.debug(u'{} sec used'.format(round(incend - incstart, 2)))
 
     incstart = time.time()
     for key in buildingDict:
@@ -283,40 +303,19 @@ def CTPFF(heightMap, exclusion, size, level, box):
         posFFRDict[key] = getFFPlot(heightMap, [buildingDict[key][1], buildingDict[key][0]])
     incend = time.time()
     logger.debug(u'{} sec used'.format(round(incend - incstart, 2)))
-    # with open(os.path.join(os.path.expanduser("~/Desktop"),'area-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
-    #     f.write(str(areaDict))
-
-    # with open(os.path.join(os.path.expanduser("~/Desktop"),'size-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
-    #     f.write(str(sizeDict))
-
-    # with open(os.path.join(os.path.expanduser("~/Desktop"),'plot-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
-    #     f.write(str(plotDict))
-
-    with open(os.path.join(os.path.expanduser("~/Desktop"),'pos-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
-        f.write(str(posDict))
-
-    with open(os.path.join(os.path.expanduser("~/Desktop"),'posR-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
-        f.write(str(posRDict))
-
-    with open(os.path.join(os.path.expanduser("~/Desktop"),'posFF-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
-        f.write(str(posFFDict))
-
-    with open(os.path.join(os.path.expanduser("~/Desktop"),'posFFR-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
-        f.write(str(posFFRDict))
 
     for index in range(10):
         build = True
         scoring = 0
         idle = 0
         plotRemaining = 0
-        for key in posDict:
-            plotRemaining += (len(posDict[key]) + len(posRDict[key])) / 2
+        for key in posFFDict:
+            plotRemaining += (len(posFFDict[key]) + len(posFFRDict[key])) / 2
         sumPlotAvilable = plotRemaining
-        logger.info(plotRemaining)
         localPlotWeightingDict = plotWeightingDict.copy()
         localPlotNumDict = plotNumDict.copy()
-        localPosDict = posDict.copy()
-        localPosRDict = posRDict.copy()
+        localPosDict = posFFDict.copy()
+        localPosRDict = posFFRDict.copy()
         occPlot = []
         builtDict = dict()
         while build:
@@ -331,17 +330,6 @@ def CTPFF(heightMap, exclusion, size, level, box):
                 valid = True
                 x = plot[1] if rotat else plot[0]
                 z = plot[0] if rotat else plot[1]
-
-                # for k in range(x):
-                #     for m in range(z):
-                #         if [location[0] + m, location[1] + k] not in occPlot:
-                #             tempPlot.append([location[0] + m, location[1] + m])
-                #         else:
-                #             valid = False
-                #             tempPlot = []
-                #             break
-                #     if not valid:
-                #         break
 
                 tempPlot = list([[k, m] for k in range(location[0], location[0] + x) for m in range(location[1], location[1] + z)])
 
@@ -362,15 +350,17 @@ def CTPFF(heightMap, exclusion, size, level, box):
                 else:
                     idle += (sumPlotAvilable / 15)
                     for key in localPosDict:
-                        localPosDict[key] = [x for x in localPosDict[key] if x is not location]
-                        localPosRDict[key] = [x for x in localPosRDict[key] if x is not location]
+                        if buildingDict[key][0] >= buildingDict[plotName][0] and buildingDict[key][1] >= buildingDict[plotName][1]:
+                            localPosDict[key] = [x for x in localPosDict[key] if x is not location]
+                            localPosRDict[key] = [x for x in localPosRDict[key] if x is not location]
             else:
                 localPlotWeightingDict[plotName] = 0
                 localPlotNumDict[plotName] = 0
                 idle += (sumPlotAvilable / 10)
             prevPlotRemaining = plotRemaining
+            plotRemaining = 0
             for key in localPosDict:
-                plotRemaining += len(localPosDict[key]) +len(localPosRDict[key])
+                plotRemaining += len(localPosDict[key]) + len(localPosRDict[key])
             if prevPlotRemaining == plotRemaining:
                 idle += (sumPlotAvilable / 3)
             if (idle >= (sumPlotAvilable / 2)):
@@ -398,9 +388,6 @@ def CTPFF(heightMap, exclusion, size, level, box):
 
     for key in attemptBuildDict[best]:
         level.setBlockAt(box.minx + key[0], heightMap[key[0]][key[1]] + 1, box.minz + key[1], 133)
-
-
-    level.setBlockAt(box.minx + 20, 80, box.minz + 10, 22)
 
     logger.info(u'<<<<<<<<{}'.format(best))
 
