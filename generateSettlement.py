@@ -11,6 +11,7 @@ import deforestation
 import terrains
 import cityPlanning
 import biomes
+import brush
 import time
 import numpy as np
 
@@ -49,7 +50,7 @@ def perform(level, box, options):
         biome, isIsland = biomes.selectBiome(level, box, hm)
 
         # TODO: Add test of selected area size for wall generation
-        alterDict, alterHeightDict = terrains.floodFill(hm, 169, 7)
+        alterDict, alterHeightDict = terrains.floodFill(hm, 256, 7)
 
         # Edit terrain based on height map
         terrains.editTerrainFF(level, box, alterDict, alterHeightDict)
@@ -59,7 +60,8 @@ def perform(level, box, options):
 
         # Return combinedHM (water and processed heightmap)
         combinedHM = terrains.findWaterSurface(whm, afterHM)
-
+        terrains.removeSurfaceWater(level, box, 9, afterHM, combinedHM)
+        
         # Remove lava pools
         terrains.removeLava(level, box, lhm, ghm, afterHM)
         
@@ -81,6 +83,16 @@ def perform(level, box, options):
         # Places trees down
         treePlacement.treePlacement(level, box)
 
+        afterHM = heightmap.heightMap(level, box)
+        brush.run(gridArray, afterHM, startingPoint, level, box)
+
+        #---------->Experimential
+        # incstart = time.time()
+        # brush.CTPFF(afterHM, 9, 169, level, box)
+        # incend = time.time()
+        # logger.debug(u'{} sec used'.format(round(incend - incstart, 2)))
+
+        #---------->Genetic A
         # # Determine plots
         # plots.run(gridArray)
 
