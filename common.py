@@ -14,3 +14,16 @@ def expandBoundingBox(box):
         return BoundingBox(origin, size)
     except Exception as e:
         logger.error(e)
+
+def mapArray(gridArray):
+    try:
+        mapArr = []
+        for z in range(gridArray):
+            row = []
+            for x in range(gridArray[z]):
+                block = [x] * 4
+                row.extend(block)
+            mapArr.append(row)
+        return mapArr
+    except Exception as e:
+        logger.error(e)
