@@ -18,9 +18,9 @@ def expandBoundingBox(box):
 def mapArray(gridArray):
     try:
         mapArr = []
-        for z in range(gridArray):
+        for z in gridArray:
             row = []
-            for x in range(gridArray[z]):
+            for x in z:
                 block = [x] * 4
                 row.extend(block)
             mapArr.append(row)
