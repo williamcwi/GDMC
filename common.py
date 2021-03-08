@@ -15,10 +15,10 @@ def expandBoundingBox(box):
     except Exception as e:
         logger.error(e)
 
-def mapArray(gridArray):
+def mapArray(arr):
     try:
         mapArr = []
-        for z in gridArray:
+        for z in arr:
             row = []
             for x in z:
                 block = [x] * 4

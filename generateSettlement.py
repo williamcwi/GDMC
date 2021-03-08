@@ -80,6 +80,19 @@ def perform(level, box, options):
         # Add border around buildable areas
         cityPlanning.addBorder(level, box, gridArray, heightArray, startingPoint[0], startingPoint[1])
 
+        # Convert grid and height array to 1x1
+        gridArray = common.mapArray(gridArray)
+        heightArray = common.mapArray(gridArray)
+
+        # Create buildable area array
+        buildableAreaArray = cityPlanning.createBuildableAreaArray(level, box, gridArray, heightArray, startingPoint[0], startingPoint[1])
+
+        for z in range(buildableAreaArray.shape[0]):
+            row = []
+            for x in range(buildableAreaArray.shape[1]):
+                print(buildableAreaArray[z][x]),
+            print("")
+
         # Places trees down
         treePlacement.treePlacement(level, box, mapArr, afterHM)
 

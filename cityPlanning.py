@@ -148,10 +148,6 @@ def addBorder(level, box, gridArray, heightArray, xoffset, zoffset):
     try:
         for z in range(gridArray.shape[0]):
             for x in range(gridArray.shape[1]):
-                print(level.blockAt(box.minx + (x * 4) + xoffset, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset))
-                print(level.blockAt(box.minx + (x * 4) + xoffset + 3, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset))
-                print(level.blockAt(box.minx + (x * 4) + xoffset, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset + 3))
-                print(level.blockAt(box.minx + (x * 4) + xoffset + 3, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset + 3))
                 if(level.blockAt(box.minx + (x * 4) + xoffset, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset) != 44 and
                    level.blockAt(box.minx + (x * 4) + xoffset + 3, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset) != 44 and
                    level.blockAt(box.minx + (x * 4) + xoffset, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset + 3) != 44 and
@@ -244,5 +240,50 @@ def southBorder(gridArray, heightArray, x, z):
                 if gridArray[z + 1][x] and heightArray[z][x] != heightArray[z + 1][x]:
                     return True
             return False
+    except Exception as e:
+        logger.error(e)
+
+def createBuildableAreaArray(level, box, gridArray, heightArray, xoffset, zoffset):
+    try:
+        gridArray = np.array(gridArray)
+        heightArray = np.array(heightArray)
+        buildableAreaArray = np.full((box.length, box.width), 0)
+        currentID = 1
+        buildableArea = False
+        for z in range(gridArray.shape[0]):
+            for x in range(gridArray.shape[1]):
+                numAdjacent = 0
+                if x > 0:
+                    if(gridArray[z][x - 1] and heightArray[z][x - 1] == heightArray[z][x] or
+                       level.blockAt(box.minx + x + xoffset, heightArray[z][x] - 1, box.minz + z + zoffset) == 44 and
+                       level.blockAt(box.minx + x + xoffset - 1, heightArray[z][x] - 1, box.minz + z + zoffset) == 44):
+                        buildableAreaArray[z][x] = currentID
+                        numAdjacent += 1
+                        buildableArea = True
+                if x < gridArray.shape[1] - 1:
+                    if(gridArray[z][x + 1] and heightArray[z][x + 1] == heightArray[z][x] or
+                       level.blockAt(box.minx + x + xoffset, heightArray[z][x] - 1, box.minz + z + zoffset) == 44 and
+                       level.blockAt(box.minx + x + xoffset + 1, heightArray[z][x] - 1, box.minz + z + zoffset) == 44):
+                        buildableAreaArray[z][x] = currentID
+                        numAdjacent += 1
+                        buildableArea = True
+                if z > 0:
+                    if(gridArray[z - 1][x] and heightArray[z - 1][x] == heightArray[z][x] or
+                       level.blockAt(box.minx + x + xoffset, heightArray[z][x] - 1, box.minz + z + zoffset) == 44 and
+                       level.blockAt(box.minx + x + xoffset, heightArray[z][x] - 1, box.minz + z + zoffset - 1) == 44):
+                        buildableAreaArray[z][x] = currentID
+                        numAdjacent += 1
+                        buildableArea = True
+                if z < gridArray.shape[0] - 1:
+                    if(gridArray[z + 1][x] and heightArray[z + 1][x] == heightArray[z][x] or
+                       level.blockAt(box.minx + x + xoffset, heightArray[z][x] - 1, box.minz + z + zoffset) == 44 and
+                       level.blockAt(box.minx + x + xoffset, heightArray[z][x] - 1, box.minz + z + zoffset + 1) == 44):
+                        buildableAreaArray[z][x] = currentID
+                        numAdjacent += 1
+                        buildableArea = True
+                if(numAdjacent == 0 and buildableArea):
+                    currentID += 1
+                    buildableArea = False
+        return buildableAreaArray
     except Exception as e:
         logger.error(e)
