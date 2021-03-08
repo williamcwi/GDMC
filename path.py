@@ -169,6 +169,15 @@ def primMST(vertices, matrix):
 
 # A* Algorithm
 # =============================================================================================
+def getAStarStarting(pairsList, links):
+    aStar = []
+    for link in links:
+        for pair in pairsList:
+            if (link[0] == pair[0] and link[1] == pair[2]) or (link[1] == pair[0] and link[0] == pair[2]):
+                coord = [pair[1], pair[3]]
+                aStar.append(coord)
+    return aStar
+
 
 # =============================================================================================
 def run():
@@ -247,12 +256,18 @@ def run():
         # area = [pos]
         # startingPositions = [area]
         pairsList = getAllPairs(startingPositions)
-        print(pairsList)
+        # print(pairsList)
 
         matrix = toMatrix(pairsList, vertices)
         # print(matrix)
 
         links = primMST(vertices, matrix)
-        print(links)
+        # print(links)
+
+        aStarStarting = getAStarStarting(pairsList, links)
+        print(aStarStarting)
+
+        aStar(aStarStarting, mapArr)
+
     except Exception as e:
         logger.error(e)
