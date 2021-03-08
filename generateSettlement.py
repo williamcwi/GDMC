@@ -50,7 +50,7 @@ def perform(level, box, options):
         biome, isIsland = biomes.selectBiome(level, box, hm)
 
         # TODO: Add test of selected area size for wall generation
-        alterDict, alterHeightDict = terrains.floodFill(hm, 256, 7)
+        alterDict, alterHeightDict = terrains.floodFill(hm, whm, 256, 7)
 
         # Edit terrain based on height map
         terrains.editTerrainFF(level, box, alterDict, alterHeightDict)
