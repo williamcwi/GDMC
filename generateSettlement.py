@@ -94,7 +94,7 @@ def perform(level, box, options):
             print("")
 
         # Places trees down
-        treePlacement.treePlacement(level, box)
+        treePlacement.treePlacement(level, box, mapArr, afterHM)
 
         afterHM = heightmap.heightMap(level, box)
         brush.run(gridArray, afterHM, startingPoint, level, box)
