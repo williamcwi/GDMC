@@ -243,47 +243,91 @@ def southBorder(gridArray, heightArray, x, z):
     except Exception as e:
         logger.error(e)
 
-def createBuildableAreaArray(level, box, gridArray, heightArray, xoffset, zoffset):
+def createBuildableAreaArray(level, box, afterHM, gridArray, heightArray, xoffset, zoffset):
     try:
         gridArray = np.array(gridArray)
         heightArray = np.array(heightArray)
         buildableAreaArray = np.full((box.length, box.width), 0)
-        currentID = 1
+        zgateWidth, xgateWidth, zgatePos, xgatePos = calculateGridPositions(gridArray)
+        for z in range(zgateWidth):
+            for x in range(5):
+                buildableAreaArray[zgatePos + z][9 + x] = 2
+                buildableAreaArray[zgatePos + z][(gridArray.shape[0] - 9) + x] = 3
+        for z in range(5):
+            for x in range(xgateWidth):
+                buildableAreaArray[9 + z][xgatePos + x] = 1
+                buildableAreaArray[(gridArray.shape[1] - 13) + z][xgatePos + x] = 4
+        currentID = 5
         buildableArea = False
         for z in range(gridArray.shape[0]):
             for x in range(gridArray.shape[1]):
                 numAdjacent = 0
-                if x > 0:
-                    if(gridArray[z][x - 1] and heightArray[z][x - 1] == heightArray[z][x] or
-                       level.blockAt(box.minx + x + xoffset, heightArray[z][x] - 1, box.minz + z + zoffset) == 44 and
-                       level.blockAt(box.minx + x + xoffset - 1, heightArray[z][x] - 1, box.minz + z + zoffset) == 44):
-                        buildableAreaArray[z][x] = currentID
-                        numAdjacent += 1
-                        buildableArea = True
                 if x < gridArray.shape[1] - 1:
-                    if(gridArray[z][x + 1] and heightArray[z][x + 1] == heightArray[z][x] or
-                       level.blockAt(box.minx + x + xoffset, heightArray[z][x] - 1, box.minz + z + zoffset) == 44 and
-                       level.blockAt(box.minx + x + xoffset + 1, heightArray[z][x] - 1, box.minz + z + zoffset) == 44):
-                        buildableAreaArray[z][x] = currentID
-                        numAdjacent += 1
-                        buildableArea = True
-                if z > 0:
-                    if(gridArray[z - 1][x] and heightArray[z - 1][x] == heightArray[z][x] or
-                       level.blockAt(box.minx + x + xoffset, heightArray[z][x] - 1, box.minz + z + zoffset) == 44 and
-                       level.blockAt(box.minx + x + xoffset, heightArray[z][x] - 1, box.minz + z + zoffset - 1) == 44):
-                        buildableAreaArray[z][x] = currentID
-                        numAdjacent += 1
-                        buildableArea = True
+                    if z > 0 and buildableAreaArray[z][x] == 0:
+                        xtemp = x
+                        while gridArray[z][xtemp] and heightArray[z][xtemp] == heightArray[z][x]:
+                            if gridArray[z - 1][xtemp] and heightArray[z - 1][xtemp] == heightArray[z][x] and buildableAreaArray[z][x] == 0:
+                                buildableAreaArray[z][x] = buildableAreaArray[z - 1][xtemp]
+                                buildableArea = True
+                            xtemp += 1
+                    if(gridArray[z][x] and heightArray[z][x + 1] == heightArray[z][x]):
+                        if buildableAreaArray[z][x] == 0:
+                            buildableAreaArray[z][x] = currentID
+                            numAdjacent += 1
+                            buildableArea = True
+                        if buildableAreaArray[z][x + 1] == 0:
+                            buildableAreaArray[z][x + 1] = buildableAreaArray[z][x]
                 if z < gridArray.shape[0] - 1:
-                    if(gridArray[z + 1][x] and heightArray[z + 1][x] == heightArray[z][x] or
-                       level.blockAt(box.minx + x + xoffset, heightArray[z][x] - 1, box.minz + z + zoffset) == 44 and
-                       level.blockAt(box.minx + x + xoffset, heightArray[z][x] - 1, box.minz + z + zoffset + 1) == 44):
-                        buildableAreaArray[z][x] = currentID
-                        numAdjacent += 1
-                        buildableArea = True
+                    if(gridArray[z][x] and heightArray[z + 1][x] == heightArray[z][x]):
+                        if buildableAreaArray[z][x] == 0:
+                            buildableAreaArray[z][x] = currentID
+                            numAdjacent += 1
+                            buildableArea = True
+                        if buildableAreaArray[z + 1][x] == 0:
+                            buildableAreaArray[z + 1][x] = buildableAreaArray[z][x]
+                # if x > 0:
+                #     if(gridArray[z][x - 1] and heightArray[z][x - 1] == heightArray[z][x] or
+                #        level.blockAt(box.minx + x + xoffset, heightArray[z][x] - 1, box.minz + z + zoffset) == 44 and
+                #        level.blockAt(box.minx + x + xoffset - 1, heightArray[z][x] - 1, box.minz + z + zoffset) == 44):
+                #         buildableAreaArray[z][x] = buildableAreaArray[z][x - 1]
+                #         numAdjacent += 1
+                #         buildableArea = True
+                # if z > 0:
+                #     if(gridArray[z - 1][x] and heightArray[z - 1][x] == heightArray[z][x] or
+                #        level.blockAt(box.minx + x + xoffset, heightArray[z][x] - 1, box.minz + z + zoffset) == 44 and
+                #        level.blockAt(box.minx + x + xoffset, heightArray[z][x] - 1, box.minz + z + zoffset - 1) == 44):
+                #         buildableAreaArray[z][x] = buildableAreaArray[z - 1][x]
+                #         numAdjacent += 1
+                #         buildableArea = True
                 if(numAdjacent == 0 and buildableArea):
                     currentID += 1
                     buildableArea = False
         return buildableAreaArray
+    except Exception as e:
+        logger.error(e)
+
+def calculateGridPositions(gridArray):
+    try:
+        zgateWidth = (gridArray.shape[0] - 16) % 8
+        while zgateWidth < 6:
+            zgateWidth += 4
+        xgateWidth = (gridArray.shape[1] - 16) % 8
+        while xgateWidth < 6:
+            xgateWidth += 4
+        zleft = 0
+        xleft = 0
+        zlength = gridArray.shape[0] - 16
+        xlength = gridArray.shape[1] - 16
+        if (zlength - zgateWidth) / 4 % 2 == 0:
+            zleft = (zlength - zgateWidth) / 8
+        else:
+            zleft = (((zlength - zgateWidth) - 4) / 8)
+        if (xlength - xgateWidth) / 4 % 2 == 0:
+            xleft = (xlength - xgateWidth) / 8
+        else:
+            xleft = (((xlength - xgateWidth) - 4) / 8)
+        zgatePos = 6 + (zleft *4)
+        xgatePos = 6 + (xleft *4)
+        return zgateWidth + 4, xgateWidth + 4, zgatePos, xgatePos
     except Exception as e:
         logger.error(e)
