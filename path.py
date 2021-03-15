@@ -22,10 +22,10 @@ def getStartingPosition(mapArr):
                     if mapArr[row][col] == area:
                         a.append([row, col])
             startingPositions.append(a)
-        
+
         # print(startingPositions)
         return startingPositions
-        
+
     except Exception as e:
         logger.error(e)
 
@@ -115,11 +115,11 @@ def minDist(vertices, key, mstSet):
         min = INF # initialise min value
 
         for v in range(vertices):
-            
+
             if key[v] < min and mstSet[v] == False:
                 min = key[v]
                 minIndex = v
-        
+
         return minIndex
     except Exception as e:
         logger.error(e)
@@ -155,7 +155,7 @@ def primMST(vertices, matrix):
                 if matrix[minIndex][v] < key[v] and mstSet[v] == False:
                     key[v] = matrix[minIndex][v]
                     parent[v] = minIndex
-        
+
         # print(parent)
 
         links = []
@@ -170,13 +170,91 @@ def primMST(vertices, matrix):
 # A* Algorithm
 # =============================================================================================
 def getAStarStarting(pairsList, links):
-    aStar = []
+    a_star = []
     for link in links:
         for pair in pairsList:
             if (link[0] == pair[0] and link[1] == pair[2]) or (link[1] == pair[0] and link[0] == pair[2]):
                 coord = [pair[1], pair[3]]
-                aStar.append(coord)
-    return aStar
+                a_star.append(coord)
+    return a_star
+
+class Node():
+    def __init__(self, parent=None, position=None):
+        self.parent = parent
+        self.position = position
+        
+        self.g = 0
+        self.h = 0
+        self.f = 0
+
+def aStar(mapArr, start, end):
+    # input: start pos and end pos ([x1, z1], [x2, z2])
+    
+    # initialise open and close list
+    open_list = [] # nodes visited but not expanded
+    close_list = [] # nodes visited and expanded
+    
+    start_node = Node(None, start)
+    start_node.g = start_node.h = start_node.f = 0
+    end_node = Node(None, end)
+    end_node.g = end_node.h = end_node.f = 0
+    
+    # add start node to open list
+    open_list.append(start_node)
+    
+    while len(open_list) > 0:
+        
+        # get current node (lowest f)
+        current_node = open_list[0]
+        current_index = 0
+        for index, item in enumerate(open_list):
+            if item.f < current_node.f:
+                current_node = item
+                current_index = index
+        
+        open_list.pop(current_index) # remove current node from open list
+        close_list.append(current_node) # add current node to close list
+        
+        if current_node == end_node:
+            path = []
+            current = current_node
+            while current is not None:
+                path.append(current.position)
+                current = current.parent
+            reversed_path = path[::-1]
+            return reversed_path
+            
+        # generate children
+        children = []
+        for new_position in [[-1, 1], [0, 1], [1, 1], [-1, 0], [1, 0], [-1, -1], [-1, 0], [-1, 1]]:
+            if new_position in [[-1, 1], [1, 1], [-1, -1], [1, -1]]:
+                dist = 1.4
+            else:
+                dist = 1.0
+            node_position = [current_node.position[0] + new_position[0], current_node.position[1] + new_position[1]]
+            if node_position[0] > (len(mapArr) - 1) or node_position[0] < 0 or node_position[1] > (len(mapArr[len(mapArr) - 1]) - 1) or node_position[1] < 0:
+                # position out of range
+                continue
+            if mapArr[node_position[0]][node_position[1]] != 0:
+                # non-walkable terrain
+                continue
+            new_node = Node(current_node, node_position)
+            # g, h, f values
+            new_node.g = current_node.g + dist
+            new_node.h = euclid(node_position, end_node.position)
+            new_node.f = new_node.g + new_node.h
+            children.append(new_node)
+            
+        for child in children:
+            for closed_child in close_list:
+                if child == closed_child:
+                    # child in close list
+                    continue
+            for open_node in open_list:
+                if child == open_node and child.g > open_node.g:
+                    continue
+            
+            open_list.append(child)
 
 
 # =============================================================================================
@@ -187,7 +265,7 @@ def run(mapArr):
 
         vertices = len(startingPositions)
 
-        # input: 
+        # input:
         # pos = [x, z]
         # area = [pos]
         # startingPositions = [area]
@@ -201,8 +279,13 @@ def run(mapArr):
         # print(links)
 
         aStarStarting = getAStarStarting(pairsList, links)
-        print('aStarStarting')
-        print(aStarStarting)
+        # print('aStarStarting')
+        # print(aStarStarting)
+        
+        for pair in aStarStarting:
+            path = aStar(mapArr, pair[0], pair[1])
+            print('path: ')
+            print(path)
 
     except Exception as e:
         logger.error(e)
@@ -274,3 +357,4 @@ mapArr = [
 ]
 
 run(mapArr)
+
