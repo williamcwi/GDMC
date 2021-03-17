@@ -83,6 +83,72 @@ def average(arr):
     except Exception as e:
         logger.error(e)
 
+def removeBlocks(level, box, type, coord):
+    if type == 'corner':
+        minx = coord[0]
+        maxx = coord[0] + 8
+        minz = coord[2]
+        maxz = coord[2] + 8
+        miny = coord[1] + 12
+    
+        for x in xrange(minx, maxx):
+            for z in xrange(minz, maxz):
+                for y in xrange(miny, box.maxy):
+                    level.setBlockAt(x, y, z, 0)
+
+    elif type == 'pillar_z' or type == 'section_z' or type == 'water_pillar_z' or type == 'water_section_z':
+        if type == 'pillar_z':
+            minx = coord[0]
+            minz = coord[2]
+            maxz = coord[2] + 9
+            miny = coord[1] + 12
+        elif type == 'section_z':
+            minx = coord[0]
+            minz = coord[2]
+            maxz = coord[2] + 8
+            miny = coord[1] + 11
+        elif type == 'water_pillar_z':
+            minx = coord[0]
+            minz = coord[2]
+            maxz = coord[2] + 8
+            miny = coord[1] + 10
+        elif type == 'water_section_z':
+            minx = coord[0]
+            minz = coord[2]
+            maxz = coord[2] + 8
+            miny = coord[1] + 9
+
+        for z in xrange(minz, maxz):
+            for y in xrange(miny, box.maxy):
+                level.setBlockAt(minx, y, z, 0)
+
+    elif type == 'pillar_x' or type == 'section_x' or type == 'water_pillar_x' or type == 'water_section_x':
+        if type == 'pillar_x':
+            minx = coord[0]
+            maxx = coord[0] + 9
+            minz = coord[2]
+            miny = coord[1] + 12
+        elif type == 'section_x':
+            minx = coord[0]
+            maxx = coord[0] + 8
+            minz = coord[2]
+            miny = coord[1] + 11
+        elif type == 'water_pillar_z':
+            minx = coord[0]
+            maxx = coord[0] + 8
+            minz = coord[2]
+            miny = coord[1] + 10
+        elif type == 'water_section_z':
+            minx = coord[0]
+            maxx = coord[0] + 8
+            minz = coord[2]
+            miny = coord[1] + 9
+
+        for x in xrange(minx, maxx):
+            for y in xrange(miny, box.maxy):
+                level.setBlockAt(x, y, minz, 0)
+
+
 def place_wall_corners(level, box, heightmap, combinedHM):
     try:
         wall_type = 'corner'
@@ -110,6 +176,7 @@ def place_wall_corners(level, box, heightmap, combinedHM):
         ground = average(arr)
         level.copyBlocksFrom(wall_corner, wall_corner.bounds, Vector(box.maxx-8, ground, box.minz))
         corner_ground.append(ground)
+        removeBlocks(level, box, 'corner', [box.maxx-8, ground, box.minz])
         progress += 1
         logger.info('Placing {}s... ({}/4)'.format(building, progress))
 
@@ -129,6 +196,7 @@ def place_wall_corners(level, box, heightmap, combinedHM):
         ground = average(arr)
         level.copyBlocksFrom(wall_corner, wall_corner.bounds, Vector(box.minx, ground, box.minz))
         corner_ground.append(ground)
+        removeBlocks(level, box, 'corner', [box.minx, ground, box.minz])
         progress += 1
         logger.info('Placing {}s... ({}/4)'.format(building, progress))
 
@@ -148,6 +216,7 @@ def place_wall_corners(level, box, heightmap, combinedHM):
         ground = average(arr)
         level.copyBlocksFrom(wall_corner, wall_corner.bounds, Vector(box.minx, ground, box.maxz-8))
         corner_ground.append(ground)
+        removeBlocks(level, box, 'corner', [box.minx, ground, box.maxz-8])
         progress += 1
         logger.info('Placing {}s... ({}/4)'.format(building, progress))
         
@@ -167,6 +236,7 @@ def place_wall_corners(level, box, heightmap, combinedHM):
         ground = average(arr)
         level.copyBlocksFrom(wall_corner, wall_corner.bounds, Vector(box.maxx-8, ground, box.maxz-8))
         corner_ground.append(ground)
+        removeBlocks(level, box, 'corner', [box.maxx-8, ground, box.maxz-8])
         progress += 1
         logger.info('Placing {}s... ({}/4)'.format(building, progress))
 
@@ -234,28 +304,36 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
                 if wt == 0: #left
                     if heightmap[len(heightmap)-8-i][1] == -1:
                         level.copyBlocksFrom(water_left, water_left.bounds, Vector(box.maxx-8-i, ground+2, box.minz+1))
+                        removeBlocks(level, box, 'water_section_z', [box.maxx-8-i, ground+2, box.minz+1])
                     else: 
                         level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.maxx-8-i, ground, box.minz+1))
+                        removeBlocks(level, box, 'section_z', [box.maxx-8-i, ground, box.minz+1])
                     i += 1
                 elif wt == 1: # middle
                     if heightmap[len(heightmap)-8-i][1] == -1:
                         level.copyBlocksFrom(water_middle, water_middle.bounds, Vector(box.maxx-8-i, ground+2, box.minz+1))
+                        removeBlocks(level, box, 'water_section_z', [box.maxx-8-i, ground+2, box.minz+1])
                     else: 
                         level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.maxx-8-i, ground, box.minz+1))
+                        removeBlocks(level, box, 'section_z', [box.maxx-8-i, ground, box.minz+1])
                     i += 1
                 elif wt == 2: # right
                     if sections is not x_left - 1:
                         if heightmap[len(heightmap)-8-i][1] == -1:
                             level.copyBlocksFrom(water_right, water_right.bounds, Vector(box.maxx-8-i, ground+2, box.minz+1))
+                            removeBlocks(level, box, 'water_section_z', [box.maxx-8-i, ground+2, box.minz+1])
                         else: 
                             level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.maxx-8-i, ground, box.minz+1))
+                            removeBlocks(level, box, 'section_z', [box.maxx-8-i, ground, box.minz+1])
                         i += 1
                 elif wt == 3: # pillar
                     if sections is not x_left - 1:
                         if heightmap[len(heightmap)-8-i][1] == -1:
                             level.copyBlocksFrom(water_pillar, water_pillar.bounds, Vector(box.maxx-8-i, ground+2, box.minz+1))
+                            removeBlocks(level, box, 'water_pillar_z', [box.maxx-8-i, ground+2, box.minz+1])
                         else: 
                             level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.maxx-8-i, ground, box.minz))
+                            removeBlocks(level, box, 'pillar_z', [box.maxx-8-i, ground, box.minz])
                         i += 1
 
         # right: 
@@ -278,21 +356,27 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
                 if wt == 0: # right
                     if heightmap[8+i][1] == -1:
                         level.copyBlocksFrom(water_right, water_right.bounds, Vector(box.minx+7+i, ground+2, box.minz+1))
+                        removeBlocks(level, box, 'water_section_z', [box.minx+7+i, ground+2, box.minz+1])
                     else: 
                         level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.minx+7+i, ground, box.minz+1))
+                        removeBlocks(level, box, 'section_z', [box.minx+7+i, ground, box.minz+1])
                     i += 1
                 elif wt == 1: # middle
                     if heightmap[8+i][1] == -1:
                         level.copyBlocksFrom(water_middle, water_middle.bounds, Vector(box.minx+7+i, ground+2, box.minz+1))
+                        removeBlocks(level, box, 'water_section_z', [box.minx+7+i, ground+2, box.minz+1])
                     else: 
                         level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.minx+7+i, ground, box.minz+1))
+                        removeBlocks(level, box, 'section_z', [box.minx+7+i, ground, box.minz+1])
                     i += 1
                 elif wt == 2: #left
                     if sections is not x_right - 1:
                         if heightmap[8+i][1] == -1:
                             level.copyBlocksFrom(water_left, water_left.bounds, Vector(box.minx+7+i, ground+2, box.minz+1))
+                            removeBlocks(level, box, 'water_section_z', [box.minx+7+i, ground+2, box.minz+1])
                         else: 
                             level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.minx+7+i, ground, box.minz+1))
+                            removeBlocks(level, box, 'section_z', [box.minx+7+i, ground, box.minz+1])
                         i += 1
                     else: 
                         arr = []
@@ -312,8 +396,10 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
                     if sections is not x_right - 1:
                         if heightmap[8+i][1] == -1:
                             level.copyBlocksFrom(water_pillar, water_pillar.bounds, Vector(box.minx+7+i, ground+2, box.minz+1))
+                            removeBlocks(level, box, 'water_pillar_z', [box.minx+7+i, ground+2, box.minz+1])
                         else: 
                             level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.minx+7+i, ground, box.minz))
+                            removeBlocks(level, box, 'pillar_z', [box.minx+7+i, ground, box.minz])
                         i += 1
         progress += 1
 
@@ -348,21 +434,27 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
                 if wt == 0: #left
                     if heightmap[1][8+i] == -1:
                         level.copyBlocksFrom(water_left, water_left.bounds, Vector(box.minx+1, ground+2, box.minz+7+i))
+                        removeBlocks(level, box, 'water_section_x', [box.minx+1, ground+2, box.minz+7+i])
                     else: 
                         level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.minx+1, ground, box.minz+7+i))
+                        removeBlocks(level, box, 'section_x', [box.minx+1, ground, box.minz+7+i])
                     i += 1
                 elif wt == 1: # middle
                     if heightmap[1][8+i] == -1:
                         level.copyBlocksFrom(water_middle, water_middle.bounds, Vector(box.minx+1, ground+2, box.minz+7+i))
+                        removeBlocks(level, box, 'water_section_x', [box.minx+1, ground+2, box.minz+7+i])
                     else: 
                         level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.minx+1, ground, box.minz+7+i))
+                        removeBlocks(level, box, 'section_x', [box.minx+1, ground, box.minz+7+i])
                     i += 1
                 elif wt == 2: # right
                     if sections is not z_left - 1:
                         if heightmap[1][8+i] == -1:
                             level.copyBlocksFrom(water_right, water_right.bounds, Vector(box.minx+1, ground+2, box.minz+7+i))
+                            removeBlocks(level, box, 'water_section_x', [box.minx+1, ground+2, box.minz+7+i])
                         else: 
                             level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.minx+1, ground, box.minz+7+i))
+                            removeBlocks(level, box, 'section_x', [box.minx+1, ground, box.minz+7+i])
                         i += 1
                     else: 
                         arr = []
@@ -382,8 +474,10 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
                     if sections is not z_left - 1:
                         if heightmap[1][8+i] == -1:
                             level.copyBlocksFrom(water_pillar, water_pillar.bounds, Vector(box.minx+1, ground+2, box.minz+7+i))
+                            removeBlocks(level, box, 'water_pillar_x', [box.minx+1, ground+2, box.minz+7+i])
                         else: 
                             level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.minx, ground, box.minz+7+i))
+                            removeBlocks(level, box, 'pillar_x', [box.minx, ground, box.minz+7+i])
                         i += 1
 
         # right: 
@@ -405,28 +499,36 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
                 if wt == 0: # right
                     if heightmap[1][len(heightmap[1])-8-i] == -1:
                         level.copyBlocksFrom(water_right, water_right.bounds, Vector(box.minx+1, ground+2, box.maxz-8-i))
+                        removeBlocks(level, box, 'water_section_x', [box.minx+1, ground+2, box.maxz-8-i])
                     else: 
                         level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.minx+1, ground, box.maxz-8-i))
+                        removeBlocks(level, box, 'section_x', [box.minx+1, ground, box.maxz-8-i])
                     i += 1
                 elif wt == 1: # middle
                     if heightmap[1][len(heightmap[1])-8-i] == -1:
                         level.copyBlocksFrom(water_middle, water_middle.bounds, Vector(box.minx+1, ground+2, box.maxz-8-i))
+                        removeBlocks(level, box, 'water_section_x', [box.minx+1, ground+2, box.maxz-8-i])
                     else: 
                         level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.minx+1, ground, box.maxz-8-i))
+                        removeBlocks(level, box, 'section_x', [box.minx+1, ground, box.maxz-8-i])
                     i += 1
                 elif wt == 2: #left
                     if sections is not z_right - 1:
                         if heightmap[1][len(heightmap[1])-8-i] == -1:
                             level.copyBlocksFrom(water_left, water_left.bounds, Vector(box.minx+1, ground+2, box.maxz-8-i))
+                            removeBlocks(level, box, 'water_section_x', [box.minx+1, ground+2, box.maxz-8-i])
                         else: 
                             level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.minx+1, ground, box.maxz-8-i))
+                            removeBlocks(level, box, 'section_x', [box.minx+1, ground, box.maxz-8-i])
                         i += 1
                 elif wt == 3: # pillar
                     if sections is not z_right - 1:
                         if heightmap[1][len(heightmap[1])-8-i] == -1:
                             level.copyBlocksFrom(water_pillar, water_pillar.bounds, Vector(box.minx+1, ground+2, box.maxz-8-i))
+                            removeBlocks(level, box, 'water_pillar_x', [box.minx+1, ground+2, box.maxz-8-i])
                         else: 
                             level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.minx, ground, box.maxz-8-i))
+                            removeBlocks(level, box, 'pillar_x', [box.minx, ground, box.maxz-8-i])
                         i += 1
         progress += 1
 
@@ -461,28 +563,36 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
                 if wt == 0: #left
                     if heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2] == -1:
                         level.copyBlocksFrom(water_right, water_right.bounds, Vector(box.maxx-8-i, ground+2, box.maxz-9))
+                        removeBlocks(level, box, 'water_section_z', [box.maxx-8-i, ground+2, box.maxz-9])
                     else: 
                         level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.maxx-8-i, ground, box.maxz-9))
+                        removeBlocks(level, box, 'section_z', [box.maxx-8-i, ground, box.maxz-9])
                     i += 1
                 elif wt == 1: # middle
                     if heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2] == -1:
                         level.copyBlocksFrom(water_middle, water_middle.bounds, Vector(box.maxx-8-i, ground+2, box.maxz-9))
+                        removeBlocks(level, box, 'water_section_z', [box.maxx-8-i, ground+2, box.maxz-9])
                     else: 
                         level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.maxx-8-i, ground, box.maxz-9))
+                        removeBlocks(level, box, 'section_z', [box.maxx-8-i, ground, box.maxz-9])
                     i += 1
                 elif wt == 2: # right
                     if sections is not x_left - 1:
                         if heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2] == -1:
                             level.copyBlocksFrom(water_left, water_left.bounds, Vector(box.maxx-8-i, ground+2, box.maxz-9))
+                            removeBlocks(level, box, 'water_section_z', [box.maxx-8-i, ground+2, box.maxz-9])
                         else: 
                             level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.maxx-8-i, ground, box.maxz-9))
+                            removeBlocks(level, box, 'section_z', [box.maxx-8-i, ground, box.maxz-9])
                         i += 1
                 elif wt == 3: # pillar
                     if sections is not x_left - 1:
                         if heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2] == -1:
                             level.copyBlocksFrom(water_pillar, water_pillar.bounds, Vector(box.maxx-8-i, ground+2, box.maxz-9))
+                            removeBlocks(level, box, 'water_pillar_z', [box.maxx-8-i, ground+2, box.maxz-9])
                         else: 
                             level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.maxx-8-i, ground, box.maxz-9))
+                            removeBlocks(level, box, 'pillar_z', [box.maxx-8-i, ground, box.maxz-9])
                         i += 1
 
         # right: 
@@ -504,21 +614,27 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
                 if wt == 0: # right
                     if heightmap[8+i][len(heightmap[8+i])-2] == -1:
                         level.copyBlocksFrom(water_left, water_left.bounds, Vector(box.minx+7+i, ground+2, box.maxz-9))
+                        removeBlocks(level, box, 'water_section_z', [box.minx+7+i, ground+2, box.maxz-9])
                     else: 
                         level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.minx+7+i, ground, box.maxz-9))
+                        removeBlocks(level, box, 'section_z', [box.minx+7+i, ground, box.maxz-9])
                     i += 1
                 elif wt == 1: # middle
                     if heightmap[8+i][len(heightmap[8+i])-2] == -1:
                         level.copyBlocksFrom(water_middle, water_middle.bounds, Vector(box.minx+7+i, ground+2, box.maxz-9))
+                        removeBlocks(level, box, 'water_section_z', [box.minx+7+i, ground+2, box.maxz-9])
                     else: 
                         level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.minx+7+i, ground, box.maxz-9))
+                        removeBlocks(level, box, 'section_z', [box.minx+7+i, ground, box.maxz-9])
                     i += 1
                 elif wt == 2: #left
                     if sections is not x_right - 1:
                         if heightmap[8+i][len(heightmap[8+i])-2] == -1:
                             level.copyBlocksFrom(water_right, water_right.bounds, Vector(box.minx+7+i, ground+2, box.maxz-9))
+                            removeBlocks(level, box, 'water_section_z', [box.minx+7+i, ground+2, box.maxz-9])
                         else: 
                             level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.minx+7+i, ground, box.maxz-9))
+                            removeBlocks(level, box, 'section_z', [box.minx+7+i, ground, box.maxz-9])
                         i += 1
                     else: 
                         arr = []
@@ -538,8 +654,10 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
                     if sections is not x_right - 1:
                         if heightmap[8+i][len(heightmap[8+i])-2] == -1:
                             level.copyBlocksFrom(water_pillar, water_pillar.bounds, Vector(box.minx+7+i, ground+2, box.maxz-9))
+                            removeBlocks(level, box, 'water_pillar_z', [box.minx+7+i, ground+2, box.maxz-9])
                         else: 
                             level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.minx+7+i, ground, box.maxz-9))
+                            removeBlocks(level, box, 'pillar_z', [box.minx+7+i, ground, box.maxz-9])
                         i += 1
         progress += 1
 
@@ -574,21 +692,27 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
                 if wt == 0: #left
                     if heightmap[len(heightmap)-2][8+i] == -1:
                         level.copyBlocksFrom(water_right, water_right.bounds, Vector(box.maxx-9, ground+2, box.minz+7+i))
+                        removeBlocks(level, box, 'water_section_x', [box.maxx-9, ground+2, box.minz+7+i])
                     else: 
                         level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.maxx-9, ground, box.minz+7+i))
+                        removeBlocks(level, box, 'section_x', [box.maxx-9, ground, box.minz+7+i])
                     i += 1
                 elif wt == 1: # middle
                     if heightmap[len(heightmap)-2][8+i] == -1:
                         level.copyBlocksFrom(water_middle, water_middle.bounds, Vector(box.maxx-9, ground+2, box.minz+7+i))
+                        removeBlocks(level, box, 'water_section_x', [box.maxx-9, ground+2, box.minz+7+i])
                     else: 
                         level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.maxx-9, ground, box.minz+7+i))
+                        removeBlocks(level, box, 'section_x', [box.maxx-9, ground, box.minz+7+i])
                     i += 1
                 elif wt == 2: # right
                     if sections is not z_left - 1:
                         if heightmap[len(heightmap)-2][8+i] == -1:
                             level.copyBlocksFrom(water_left, water_left.bounds, Vector(box.maxx-9, ground+2, box.minz+7+i))
+                            removeBlocks(level, box, 'water_section_x', [box.maxx-9, ground+2, box.minz+7+i])
                         else: 
                             level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.maxx-9, ground, box.minz+7+i))
+                            removeBlocks(level, box, 'section_x', [box.maxx-9, ground, box.minz+7+i])
                         i += 1
                     else: 
                         arr = []
@@ -608,8 +732,10 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
                     if sections is not z_left - 1:
                         if heightmap[len(heightmap)-2][8+i] == -1:
                             level.copyBlocksFrom(water_pillar, water_pillar.bounds, Vector(box.maxx-9, ground+2, box.minz+7+i))
+                            removeBlocks(level, box, 'water_pillar_x', [box.maxx-9, ground+2, box.minz+7+i])
                         else: 
                             level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.maxx-9, ground, box.minz+7+i))
+                            removeBlocks(level, box, 'pillar_x', [box.maxx-9, ground, box.minz+7+i])
                         i += 1
 
         # right: 
@@ -631,28 +757,36 @@ def place_wall_sections(level, box, heightmap, combinedHM, x_left, x_right, z_le
                 if wt == 0: # right
                     if heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i] == -1:
                         level.copyBlocksFrom(water_left, water_left.bounds, Vector(box.maxx-9, ground+2, box.maxz-8-i))
+                        removeBlocks(level, box, 'water_section_x', [box.maxx-9, ground+2, box.maxz-8-i])
                     else: 
                         level.copyBlocksFrom(wall_left, wall_left.bounds, Vector(box.maxx-9, ground, box.maxz-8-i))
+                        removeBlocks(level, box, 'section_x', [box.maxx-9, ground, box.maxz-8-i])
                     i += 1
                 elif wt == 1: # middle
                     if heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i] == -1:
                         level.copyBlocksFrom(water_middle, water_middle.bounds, Vector(box.maxx-9, ground+2, box.maxz-8-i))
+                        removeBlocks(level, box, 'water_section_x', [box.maxx-9, ground+2, box.maxz-8-i])
                     else: 
                         level.copyBlocksFrom(wall_middle, wall_middle.bounds, Vector(box.maxx-9, ground, box.maxz-8-i))
+                        removeBlocks(level, box, 'section_x', [box.maxx-9, ground, box.maxz-8-i])
                     i += 1
                 elif wt == 2: #left
                     if sections is not z_right - 1:
                         if heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i] == -1:
                             level.copyBlocksFrom(water_right, water_right.bounds, Vector(box.maxx-9, ground+2, box.maxz-8-i))
+                            removeBlocks(level, box, 'water_section_x', [box.maxx-9, ground+2, box.maxz-8-i])
                         else: 
                             level.copyBlocksFrom(wall_right, wall_right.bounds, Vector(box.maxx-9, ground, box.maxz-8-i))
+                            removeBlocks(level, box, 'section_x', [box.maxx-9, ground, box.maxz-8-i])
                         i += 1
                 elif wt == 3: # pillar
                     if sections is not z_right - 1:
                         if heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i] == -1:
                             level.copyBlocksFrom(water_pillar, water_pillar.bounds, Vector(box.maxx-9, ground+2, box.maxz-8-i))
+                            removeBlocks(level, box, 'water_section_x', [box.maxx-9, ground+2, box.maxz-8-i])
                         else: 
                             level.copyBlocksFrom(wall_pillar, wall_pillar.bounds, Vector(box.maxx-9, ground, box.maxz-8-i))
+                            removeBlocks(level, box, 'section_x', [box.maxx-9, ground, box.maxz-8-i])
                         i += 1
         progress += 1
 
