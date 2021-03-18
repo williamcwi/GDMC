@@ -146,15 +146,20 @@ def claimBorder(level, box, afterHM, innerHeightArray, x, z, xoffset, zoffset):
 
 def addBorder(level, box, gridArray, heightArray, xoffset, zoffset):
     try:
+        zgateWidth, xgateWidth, zgatePos, xgatePos = calculateGridPositions(gridArray)
         for z in range(gridArray.shape[0]):
             for x in range(gridArray.shape[1]):
                 if(level.blockAt(box.minx + (x * 4) + xoffset, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset) != 44 and
                    level.blockAt(box.minx + (x * 4) + xoffset + 3, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset) != 44 and
                    level.blockAt(box.minx + (x * 4) + xoffset, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset + 3) != 44 and
                    level.blockAt(box.minx + (x * 4) + xoffset + 3, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset + 3) != 44):
+                # if not (((zgatePos <= z < (zgatePos + zgateWidth) and ((10 <= x < 15) or (gridArray.shape[0] - 13 <= x < gridArray.shape[0])))) or
+                   # ((10 <= z < 15) or (gridArray.shape[1] - 13 <= z < gridArray.shape[1]) and (xgatePos <= x < xgateWidth))):
+                    # print(0),
                     if westBorder(gridArray, heightArray, x, z):
                         for n in range(4):
                             level.setBlockAt(box.minx + (x * 4) + xoffset - 1, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset + n, 109)
+                            level.setBlockDataAt(box.minx + (x * 4) + xoffset - 1, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset + n, 1)
                         if northBorder(gridArray, heightArray, x, z):
                             if x > 0 and z > 0:
                                 if southBorder(gridArray, heightArray, x - 1, z - 1) == False:
@@ -166,6 +171,7 @@ def addBorder(level, box, gridArray, heightArray, xoffset, zoffset):
                     if eastBorder(gridArray, heightArray, x, z):
                         for n in range(4):
                             level.setBlockAt(box.minx + (x * 4) + xoffset + 4, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset + n, 109)
+                            level.setBlockDataAt(box.minx + (x * 4) + xoffset + 4, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset + n, 0)
                         if northBorder(gridArray, heightArray, x, z):
                             if x < gridArray.shape[1] - 1 and z > 0:
                                 if southBorder(gridArray, heightArray, x + 1, z - 1) == False:
@@ -177,9 +183,13 @@ def addBorder(level, box, gridArray, heightArray, xoffset, zoffset):
                     if northBorder(gridArray, heightArray, x, z):
                         for n in range(4):
                             level.setBlockAt(box.minx + (x * 4) + xoffset + n, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset - 1, 109)
+                            level.setBlockDataAt(box.minx + (x * 4) + xoffset + n, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset - 1, 3)
                     if southBorder(gridArray, heightArray, x, z):
                         for n in range(4):
                             level.setBlockAt(box.minx + (x * 4) + xoffset + n, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset + 4, 109)
+                            level.setBlockDataAt(box.minx + (x * 4) + xoffset + n, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset + 4, 2)
+                # else:
+                    # print(1),
     except Exception as e:
         logger.error(e)
 
@@ -252,11 +262,11 @@ def createBuildableAreaArray(level, box, afterHM, gridArray, heightArray, xoffse
         for z in range(zgateWidth):
             for x in range(5):
                 buildableAreaArray[zgatePos + z][9 + x] = 2
-                buildableAreaArray[zgatePos + z][(gridArray.shape[0] - 9) + x] = 3
+                buildableAreaArray[zgatePos + z][(gridArray.shape[1] - 9) + x] = 3
         for z in range(5):
             for x in range(xgateWidth):
                 buildableAreaArray[9 + z][xgatePos + x] = 1
-                buildableAreaArray[(gridArray.shape[1] - 13) + z][xgatePos + x] = 4
+                buildableAreaArray[(gridArray.shape[0] - 13) + z][xgatePos + x] = 4
         currentID = 5
         buildableArea = False
         for z in range(gridArray.shape[0]):
@@ -285,20 +295,6 @@ def createBuildableAreaArray(level, box, afterHM, gridArray, heightArray, xoffse
                             buildableArea = True
                         if buildableAreaArray[z + 1][x] == 0:
                             buildableAreaArray[z + 1][x] = buildableAreaArray[z][x]
-                # if x > 0:
-                #     if(gridArray[z][x - 1] and heightArray[z][x - 1] == heightArray[z][x] or
-                #        level.blockAt(box.minx + x + xoffset, heightArray[z][x] - 1, box.minz + z + zoffset) == 44 and
-                #        level.blockAt(box.minx + x + xoffset - 1, heightArray[z][x] - 1, box.minz + z + zoffset) == 44):
-                #         buildableAreaArray[z][x] = buildableAreaArray[z][x - 1]
-                #         numAdjacent += 1
-                #         buildableArea = True
-                # if z > 0:
-                #     if(gridArray[z - 1][x] and heightArray[z - 1][x] == heightArray[z][x] or
-                #        level.blockAt(box.minx + x + xoffset, heightArray[z][x] - 1, box.minz + z + zoffset) == 44 and
-                #        level.blockAt(box.minx + x + xoffset, heightArray[z][x] - 1, box.minz + z + zoffset - 1) == 44):
-                #         buildableAreaArray[z][x] = buildableAreaArray[z - 1][x]
-                #         numAdjacent += 1
-                #         buildableArea = True
                 if(numAdjacent == 0 and buildableArea):
                     currentID += 1
                     buildableArea = False
