@@ -69,3 +69,37 @@ def removeSurfaceWater(level, box, exclusion, heightMap, waterHM):
 
 
     editTerrainFF(level, box, alterDict, alterHeightDict)
+
+def FFFF (x, y, area):
+    area.append([x,y])
+    stonks = []
+    stonks.append([x,y])
+    length = len(stonks)
+    tempHM[x][y] = 999
+
+    while length >= 1:
+        x = stonks[0][0]
+        y = stonks[0][1]
+        stonks.pop(0)
+        if ((y - 1) >= (0 + exclusion)): # go to west
+            if tempHM[x][y - 1] == currentLevel:
+                stonks.append([x, y - 1])
+                area.append([x, y - 1])
+                tempHM[x][y - 1] = 999
+        if ((y + 1) < (len(tempHM[x]) - exclusion)): # go to east
+            if tempHM[x][y + 1] == currentLevel:
+                stonks.append([x, y + 1])
+                area.append([x, y + 1])
+                tempHM[x][y + 1] = 999
+        if ((x + 1) < (len(tempHM) - exclusion)): # go to south
+            if tempHM[x + 1][y] == currentLevel:
+                stonks.append([x + 1, y])
+                area.append([x + 1, y])
+                tempHM[x + 1][y] = 999
+        if ((x - 1) >= (0 + exclusion)): # go to north
+            if tempHM[x - 1][y] == currentLevel:
+                stonks.append([x - 1, y])
+                area.append([x - 1, y])
+                tempHM[x - 1][y] = 999
+        length = len(stonks)
+    return area
