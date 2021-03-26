@@ -21,10 +21,10 @@ def bestStartingPoint(box, afterHM):
 
 def calculateGrids(box, afterHM, xoffset, zoffset):
     try:
-        gridArray = np.full((math.ceil(box.length / 4), math.ceil(box.width / 4)), False)
-        innerGridArray = np.full((math.ceil(box.length / 4), math.ceil(box.width / 4)), False)
-        heightArray = np.full((math.ceil(box.length / 4), math.ceil(box.width / 4)), 0)
-        innerHeightArray = np.full((math.ceil(box.length / 4), math.ceil(box.width / 4)), 0)
+        gridArray = np.full((math.ceil(float(box.length) / 4), math.ceil(float(box.width) / 4)), False)
+        innerGridArray = np.full((math.ceil(float(box.length) / 4), math.ceil(float(box.width) / 4)), False)
+        heightArray = np.full((math.ceil(float(box.length) / 4), math.ceil(float(box.width) / 4)), 0)
+        innerHeightArray = np.full((math.ceil(float(box.length) / 4), math.ceil(float(box.width) / 4)), 0)
         tempGridArray = common.mapArray(gridArray)
         zgateWidth, xgateWidth, zgatePos, xgatePos = calculateGridPositions(np.array(tempGridArray))
         for z in range(zoffset + 12, box.length - 9, 4):
@@ -60,7 +60,7 @@ def calculateGrids(box, afterHM, xoffset, zoffset):
 
 def expandBuildableAreas(level, box, afterHM, gridArray, innerGridArray, heightArray, innerHeightArray, xoffset, zoffset):
     try:
-        buildableAreasArray = np.full((math.ceil(box.length / 4), math.ceil(box.width / 4)), False)
+        buildableAreasArray = np.full((math.ceil(float(box.length) / 4), math.ceil(float(box.width) / 4)), False)
         for z in range(gridArray.shape[0]):
             for x in range(gridArray.shape[1]):
                 buildableAreasArray[z][x] = getAdjacentBuildableAreas(gridArray, innerGridArray, x, z)
