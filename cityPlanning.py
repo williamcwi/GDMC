@@ -263,7 +263,7 @@ def createBuildableAreaArray(level, box, afterHM, gridArray, heightArray, xoffse
         for z in range(zgateWidth):
             for x in range(5):
                 buildableAreaArray[zgatePos + z][9 + x] = 2
-                buildableAreaArray[zgatePos + z][(gridArray.shape[1] - 14) + x] = 3
+                buildableAreaArray[zgatePos + z][(gridArray.shape[1] - 13) + x] = 3
         for z in range(5):
             for x in range(xgateWidth):
                 buildableAreaArray[9 + z][xgatePos + x] = 1
