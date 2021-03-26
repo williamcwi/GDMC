@@ -133,12 +133,12 @@ def removeBlocks(level, box, type, coord):
             maxx = coord[0] + 8
             minz = coord[2]
             miny = coord[1] + 11
-        elif type == 'water_pillar_z':
+        elif type == 'water_pillar_x':
             minx = coord[0]
             maxx = coord[0] + 8
             minz = coord[2]
             miny = coord[1] + 10
-        elif type == 'water_section_z':
+        elif type == 'water_section_x':
             minx = coord[0]
             maxx = coord[0] + 8
             minz = coord[2]
