@@ -270,10 +270,10 @@ def createBuildableAreaArray(level, box, afterHM, gridArray, heightArray, xoffse
                 buildableAreaArray[(buildableAreaArray.shape[0] - 13) + z][xgatePos + x] = 4
         currentID = 5
         buildableArea = False
-        for z in range(gridArray.shape[0]):
-            for x in range(gridArray.shape[1]):
+        for z in range(buildableAreaArray.shape[0]):
+            for x in range(buildableAreaArray.shape[1]):
                 numAdjacent = 0
-                if x < gridArray.shape[1] - 1:
+                if x < buildableAreaArray.shape[1] - 1:
                     if z > 0 and buildableAreaArray[z][x] == 0:
                         xtemp = x
                         while gridArray[z][xtemp] and heightArray[z][xtemp] == heightArray[z][x]:
@@ -288,7 +288,7 @@ def createBuildableAreaArray(level, box, afterHM, gridArray, heightArray, xoffse
                             buildableArea = True
                         if buildableAreaArray[z][x + 1] == 0:
                             buildableAreaArray[z][x + 1] = buildableAreaArray[z][x]
-                if z < gridArray.shape[0] - 1:
+                if z < buildableAreaArray.shape[0] - 1:
                     if(gridArray[z][x] and heightArray[z + 1][x] == heightArray[z][x]):
                         if buildableAreaArray[z][x] == 0:
                             buildableAreaArray[z][x] = currentID
