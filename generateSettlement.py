@@ -77,6 +77,9 @@ def perform(level, box, options):
         # Expand buildable areas
         gridArray, heightArray = cityPlanning.expandBuildableAreas(level, box, afterHM, gridArray, innerGridArray, heightArray, innerHeightArray, startingPoint[0], startingPoint[1])
 
+        # Remove buildable areas that is too small
+        gridArray = cityPlanning.screening(gridArray)
+
         # Add border around buildable areas
         cityPlanning.addBorder(level, box, gridArray, heightArray, startingPoint[0], startingPoint[1])
 

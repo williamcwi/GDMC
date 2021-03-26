@@ -2,6 +2,7 @@ from logger import Logger
 import math
 import numpy as np
 import common
+from copy import deepcopy
 
 logger = Logger('cityPlanning')
 
@@ -328,5 +329,64 @@ def calculateGridPositions(array):
         zgatePos = 6 + (zleft *4)
         xgatePos = 6 + (xleft *4)
         return zgateWidth + 4, xgateWidth + 4, zgatePos, xgatePos
+    except Exception as e:
+        logger.error(e)
+
+def screening(gridArray):
+    try:
+        tempGA = deepcopy(gridArray)
+        def FFFF (x, y, area):
+            area.append([x,y])
+            stonks = []
+            stonks.append([x,y])
+            length = len(stonks)
+            tempGA[x][y] = 999
+
+            while length >= 1:
+                x = stonks[0][0]
+                y = stonks[0][1]
+                stonks.pop(0)
+                if ((y - 1) >= (0)): # go to west
+                    if tempGA[x][y - 1] == 1:
+                        stonks.append([x, y - 1])
+                        area.append([x, y - 1])
+                        tempGA[x][y - 1] = 999
+                if ((y + 1) < (len(tempGA[x]))): # go to east
+                    if tempGA[x][y + 1] == 1:
+                        stonks.append([x, y + 1])
+                        area.append([x, y + 1])
+                        tempGA[x][y + 1] = 999
+                if ((x + 1) < (len(tempGA))): # go to south
+                    if tempGA[x + 1][y] == 1:
+                        stonks.append([x + 1, y])
+                        area.append([x + 1, y])
+                        tempGA[x + 1][y] = 999
+                if ((x - 1) >= (0)): # go to north
+                    if tempGA[x - 1][y] == 1:
+                        stonks.append([x - 1, y])
+                        area.append([x - 1, y])
+                        tempGA[x - 1][y] = 999
+                length = len(stonks)
+            return area
+        
+        for x in range((len(tempGA))):
+            for y in range((len(tempGA[0]))):
+                if tempGA[x][y] == 1:
+                    area = FFFF(x, y, [])
+                    if len(area) <= 4:
+                        for cell in area:
+                            gridArray[cell[0]][cell[1]] = 0
+                    else:
+                        valid = False
+                        for cell in area: # check if area contains minimum 2 x 2 (8 x 8) area
+                            if cell[0] + 2 < len(gridArray) and cell[1] + 2 < len(gridArray[0]):
+                                plotArea = list([gridArray[i][k] for i in range(cell[0], cell[0] + 2) for k in range(cell[1], cell[1] + 2)])
+                                if sum(plotArea) == 4:
+                                    valid = True
+                                    break
+                        if not valid:
+                            for cell in area:
+                                gridArray[cell[0]][cell[1]] = 0
+        return gridArray
     except Exception as e:
         logger.error(e)
