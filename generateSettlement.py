@@ -51,22 +51,19 @@ def perform(level, box, options):
 
         # Select biome
         biome, isIsland = biomes.selectBiome(level, box, hm)
+        
+        # Remove lava pools
+        terrains.removeLava(level, box, lhm, ghm, hm)
 
-        # TODO: Add test of selected area size for wall generation
-        alterDict, alterHeightDict = terrains.floodFill(hm, whm, 256, 7)
+        # Generate afterHM after Editing the terrain
+        afterHM = heightmap.heightMap(level, box)
 
-        # Edit terrain based on height map
-        terrains.editTerrainFF(level, box, alterDict, alterHeightDict)
-
+        terrains.execute(level, box, afterHM, whm, 256, 7)
         # Generate afterHM after Editing the terrain
         afterHM = heightmap.heightMap(level, box)
 
         # Return combinedHM (water and processed heightmap)
         combinedHM = terrains.findWaterSurface(whm, afterHM)
-        terrains.removeSurfaceWater(level, box, 9, afterHM, combinedHM)
-        
-        # Remove lava pools
-        terrains.removeLava(level, box, lhm, ghm, afterHM)
         
         # Generate walls
         generateWalls.place_walls(level, box, afterHM, combinedHM)
@@ -82,6 +79,8 @@ def perform(level, box, options):
 
         # Add border around buildable areas
         cityPlanning.addBorder(level, box, gridArray, heightArray, startingPoint[0], startingPoint[1])
+
+        brush.run(gridArray, afterHM, startingPoint, level, box)
 
         # Convert grid and height array to 1x1
         gridArray = common.mapArray(gridArray)
@@ -99,15 +98,11 @@ def perform(level, box, options):
             # f.close()
         # else:
             # with open(os.path.join(os.path.dirname(__file__),'test','test-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
-                # for z in range(buildableAreaArray.shape[0]):
                     # np.savetxt(f, buildableAreaArray[z], fmt='%2.0f', newline=" ")
             # f.close()
 
         # Places trees down
-        treePlacement.treePlacement(level, box, mapArr, afterHM)
-
-        afterHM = heightmap.heightMap(level, box)
-        brush.run(gridArray, afterHM, startingPoint, level, box)
+        # treePlacement.treePlacement(level, box, mapArr, afterHM)
 
         #---------->Experimential
         # incstart = time.time()
