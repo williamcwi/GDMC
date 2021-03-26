@@ -324,7 +324,7 @@ def calculateGridPositions(array):
         if (xlength - xgateWidth) / 4 % 2 == 0:
             xleft = (xlength - xgateWidth) / 8
         else:
-            xleft = (((xlength - xgateWidth) - 4) / 8)
+            xleft = (((xlength - xgateWidth) + 4) / 8)
         zgatePos = 6 + (zleft *4)
         xgatePos = 6 + (xleft *4)
         return zgateWidth + 4, xgateWidth + 4, zgatePos, xgatePos
