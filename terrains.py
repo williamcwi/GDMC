@@ -5,13 +5,18 @@ import os.path
 import datetime
 from copy import deepcopy
 import heightmap
+import numpy as np
 
 import sys
 sys.setrecursionlimit(65536)  #!!IMPORTANT to allow floodFill and RECURSIVE
 
 logger = Logger('Terrains')
 
-def floodFill(heightMap, waterHM, minimumArea, exclusion = 0): # Flood Fill RECURSIVE
+def execute(level, box, heightMap, waterHM, minimumArea, exclusion = 0):
+    alterDict, alterHeightDict = floodFill(level, box, heightMap, waterHM, minimumArea, exclusion)
+    editTerrainFF(level, box, alterDict, alterHeightDict)
+
+def floodFill(level, box, heightMap, waterHM, minimumArea, exclusion = 0): # Flood Fill RECURSIVE
     try:
         tempHM = deepcopy(heightMap)
         maskedHM = [['%04d' % 0 for k in range(len(heightMap[0]))] for j in range(len(heightMap))]  # initialse post-process HM
@@ -31,7 +36,7 @@ def floodFill(heightMap, waterHM, minimumArea, exclusion = 0): # Flood Fill RECU
         regionDict = {
             "wate" : -1,
             "lava" : -2,
-            999 : -7
+            9999 : 63
         }
         alterDict = dict()
         alterHeightDict = dict()
@@ -55,29 +60,32 @@ def floodFill(heightMap, waterHM, minimumArea, exclusion = 0): # Flood Fill RECU
             return area
 
         def FFZero(x, y, area, height, water, surroundingRegion):
+            if maskedHM[x][y] == "wate":
+                water.append([x,y])
+                height.append(waterHM[x][y])
+            else:
+                height.append(heightMap[x][y])
             maskedHM[x][y] = 999
-            if heightMap[x][y] == "wate":
-                water.append([x, y])
             area.append([x,y])
-            height.append(heightMap[x][y])
-            if len(area) <= max(min(10000, int(len(tempHM) * len(tempHM[0]) / 10)), 5000):
+            
+            if len(area) <= max(min(5000, int(len(tempHM) * len(tempHM[0]) / 10)), 3000):
                 if ((x + 1) < (len(maskedHM) - exclusion)): # go to south
-                    if maskedHM[x + 1][y] == "0000" or maskedHM[x + 1][y] == "wate":
+                    if maskedHM[x + 1][y] == "0000" or (maskedHM[x + 1][y] == "wate" and waterHM[x + 1][y] != 63):
                         area, height, water, surroundingRegion  = FFZero(x + 1, y, area, height, water, surroundingRegion)
                     elif maskedHM[x + 1][y] != "0000" and maskedHM[x + 1][y] != 999 and maskedHM[x + 1][y] not in excludedBlocks.values():
                         surroundingRegion.append(maskedHM[x + 1][y])
                 if ((y - 1) >= (0 + exclusion)):  # go to west
-                    if maskedHM[x][y - 1] == "0000" or maskedHM[x][y - 1] == "wate":
+                    if maskedHM[x][y - 1] == "0000" or (maskedHM[x][y - 1] == "wate" and waterHM[x][y - 1] != 63):
                         area, height, water, surroundingRegion  = FFZero(x, y - 1, area, height, water, surroundingRegion)
                     elif maskedHM[x][y - 1] != "0000" and maskedHM[x][y - 1] != 999 and maskedHM[x][y - 1] not in excludedBlocks.values():
                         surroundingRegion.append(maskedHM[x][y - 1])
                 if ((x - 1) >= (0 + exclusion)): # go to north
-                    if maskedHM[x - 1][y] == "0000" or maskedHM[x - 1][y] == "wate":
+                    if maskedHM[x - 1][y] == "0000" or (maskedHM[x - 1][y] == "wate" and waterHM[x - 1][y] != 63):
                         area, height, water, surroundingRegion  = FFZero(x - 1, y, area, height, water, surroundingRegion)
                     elif maskedHM[x - 1][y] != "0000" and maskedHM[x - 1][y] != 999 and maskedHM[x - 1][y] not in excludedBlocks.values():
                         surroundingRegion.append(maskedHM[x - 1][y])
                 if ((y + 1) < (len(maskedHM[x]) - exclusion)): # go to east
-                    if maskedHM[x][y + 1] == "0000" or maskedHM[x][y + 1] == "wate":
+                    if maskedHM[x][y + 1] == "0000" or (maskedHM[x][y + 1] == "wate" and waterHM[x][y + 1] != 63):
                         area, height, water, surroundingRegion  = FFZero(x, y + 1, area, height, water, surroundingRegion)
                     elif maskedHM[x][y + 1] != "0000" and maskedHM[x][y + 1] != 999 and maskedHM[x][y + 1] not in excludedBlocks.values():
                         surroundingRegion.append(maskedHM[x][y + 1])
@@ -91,11 +99,10 @@ def floodFill(heightMap, waterHM, minimumArea, exclusion = 0): # Flood Fill RECU
                     currentLevel = tempHM[x][y]
                     regionAlias = excludedBlocks.get(currentLevel, '%04d' % currentRegion) # switch between excluded blocks and region label
                     area = FF(x, y, [])
-                    
-                    if len(area) >= minimumArea or currentLevel < 0: # if area greater equals to the threshold
+                    if len(area) >= minimumArea: # if area greater equa, ls to the threshold
                         valid = False
                         for cell in area:
-                            if cell[0] + 12 < len(heightMap) and cell[1] + 12 <  len(heightMap[0]):
+                            if cell[0] + 12 < len(heightMap) and cell[1] + 12 < len(heightMap[0]):
                                 plotArea = list([heightMap[i][k] for i in range(cell[0], cell[0] + 12) for k in range(cell[1], cell[1] + 12)])
                                 if len(set(plotArea)) == 1 and list(set(plotArea))[0] == currentLevel:
                                     valid = True
@@ -106,7 +113,12 @@ def floodFill(heightMap, waterHM, minimumArea, exclusion = 0): # Flood Fill RECU
                             if currentLevel > 0:
                                 regionDict[currentRegion] = currentLevel
                                 currentRegion = currentRegion + 1
-                    
+                    elif regionAlias is "wate" or regionAlias is "lava":
+                        if waterHM[x][y] == 63 and len(area) > minimumArea:
+                            regionAlias = 9999
+                        for blocks in area:
+                            maskedHM[blocks[0]][blocks[1]] = regionAlias
+
         for x in range(exclusion, (len(maskedHM) - exclusion)):
             for y in range(exclusion, (len(maskedHM[0]) - exclusion)):
                 # logger.info(u"{} {}".format(x, y))
@@ -117,11 +129,13 @@ def floodFill(heightMap, waterHM, minimumArea, exclusion = 0): # Flood Fill RECU
                         region = max(set(surroundingRegion), key=surroundingRegion.count)   
                     if region != None and len(area) <= (minimumArea * 4):
                         for item in area:
-                            if heightMap[item[0]][item[1]] != -1:
+                                # diffHM[item[0]][item[1]] =  - (heightMap[item[0]][item[1]] - int((heightMap[item[0]+1][item[1]] + heightMap[item[0]-1][item[1]] + heightMap[item[0]][item[1]+1] + heightMap[item[0]][item[1]-1])/4)) if maskedHM[item[0]][item[1]] in excludedBlocks.values() else (regionDict.get(int(maskedHM[item[0]][item[1]])) - heightMap[item[0]][item[1]])
+                                alterDict[item[0],item[1]] = (regionDict.get(int(region)) - waterHM[item[0]][item[1]]) if heightMap[item[0]][item[1]] == -1 else (regionDict.get(int(region)) - heightMap[item[0]][item[1]])
+                                alterHeightDict[item[0],item[1]] = waterHM[item[0]][item[1]] if heightMap[item[0]][item[1]] == -1 else heightMap[item[0]][item[1]]
+                                if heightMap[item[0]][item[1]] == -1 and (regionDict.get(int(region)) - waterHM[item[0]][item[1]] > 0):
+                                    level.setBlockAt(box.minx + item[0], waterHM[item[0]][item[1]] - 1, box.minz + item[1], 2)
                                 maskedHM[item[0]][item[1]] = region
-                                #diffHM[item[0]][item[1]] =  - (heightMap[item[0]][item[1]] - int((heightMap[item[0]+1][item[1]] + heightMap[item[0]-1][item[1]] + heightMap[item[0]][item[1]+1] + heightMap[item[0]][item[1]-1])/4)) if maskedHM[item[0]][item[1]] in excludedBlocks.values() else (regionDict.get(int(maskedHM[item[0]][item[1]])) - heightMap[item[0]][item[1]])
-                                alterDict[item[0],item[1]] = - (heightMap[item[0]][item[1]] - int((heightMap[item[0]+1][item[1]] + heightMap[item[0]-1][item[1]] + heightMap[item[0]][item[1]+1] + heightMap[item[0]][item[1]-1])/4)) if maskedHM[item[0]][item[1]] in excludedBlocks.values() else (regionDict.get(int(maskedHM[item[0]][item[1]])) - heightMap[item[0]][item[1]])
-                                alterHeightDict[item[0],item[1]] = heightMap[item[0]][item[1]]
+                                
                     else:
                         tempHeight = deepcopy(height)
                         tempHeight.sort()
@@ -136,17 +150,44 @@ def floodFill(heightMap, waterHM, minimumArea, exclusion = 0): # Flood Fill RECU
                                 if len(tempHeight[int(len(tempHeight) * 0.75):len(tempHeight)]) > 5:
                                     for i in range(len(height)):
                                         if height[i] in upperRemoval and height[i] > 0 and targetHeight > 0:
-                                            alterDict[area[i][0], area[i][1]] = targetHeight - height[i]
-                                            alterHeightDict[area[i][0], area[i][1]] = height[i]
+                                            if len(water) < minimumArea:
+                                                if heightMap[area[i][0]][area[i][1]] == -1:
+                                                    # if waterHM[area[i][0]][area[i][1]] > 63 or waterHM[area[i][0]][area[i][1]] < 63:
+                                                        level.setBlockAt(box.minx + area[i][0], waterHM[area[i][0]][area[i][1]] - 1, box.minz + area[i][1], 2)
+                                                        level.setBlockDataAt(box.minx + area[i][0], waterHM[area[i][0]][area[i][1]] - 1, box.minz + area[i][1], 0)
+                                                        level.setBlockAt(box.minx + area[i][0], targetHeight - 1, box.minz + area[i][1], 2)
+                                                        level.setBlockDataAt(box.minx + area[i][0], targetHeight - 1, box.minz + area[i][1], 0)
+                                                alterDict[area[i][0], area[i][1]] = targetHeight - height[i]
+                                                alterHeightDict[area[i][0], area[i][1]] = height[i]
 
                             if len([i for i in list(set(tempHeight)) if i not in lowerRemoval]) > 1:
                                 targetHeight = min([i for i in list(set(tempHeight)) if i not in lowerRemoval])
                                 if len(tempHeight[0:int(len(tempHeight) * 0.1)]) > 5:
+                                    widthLFlag = False
+                                    widthRFlag = False
+                                    heightUFlag = False
+                                    heightLFlag = False
                                     for i in range(len(height)):
-                                        if height[i] in lowerRemoval and targetHeight > 0:
-                                            alterDict[area[i][0], area[i][1]] = targetHeight - height[i]
-                                            alterHeightDict[area[i][0], area[i][1]] = height[i]
-
+                                        if area[i] in water:
+                                            if area[i][0] <= 7:
+                                                widthLFlag = True
+                                            if area[i][1] <= 7:
+                                                heightUFlag = True
+                                            if area[i][0] >= box.length - 7:
+                                                widthRFlag = True
+                                            if area[i][1] >= box.width - 7:
+                                                heightLFlag = True
+                                    if sum([widthLFlag, widthRFlag, heightUFlag, heightLFlag]) <= 1:
+                                        for i in range(len(height)):
+                                            if height[i] in lowerRemoval and targetHeight > 0:
+                                                    if heightMap[area[i][0]][area[i][1]] == -1:
+                                                        # if len(water) < ((len(area) - len(water)) / 10) and (waterHM[area[i][0]][area[i][1]] > 63 or waterHM[area[i][0]][area[i][1]] < 63):
+                                                            level.setBlockAt(box.minx + area[i][0], waterHM[area[i][0]][area[i][1]] - 1, box.minz + area[i][1], 2)
+                                                            level.setBlockDataAt(box.minx + area[i][0], waterHM[area[i][0]][area[i][1]] - 1, box.minz + area[i][1], 0)
+                                                            level.setBlockAt(box.minx + area[i][0], targetHeight - 1, box.minz + area[i][1], 2)
+                                                            level.setBlockDataAt(box.minx + area[i][0], targetHeight - 1, box.minz + area[i][1], 0)
+                                                    alterDict[area[i][0], area[i][1]] = targetHeight - height[i]
+                                                    alterHeightDict[area[i][0], area[i][1]] = height[i]
 
         # afterHM = [[regionDict.get(maskedHM[j][k], tempHM[j][k]) if maskedHM[j][k] in excludedBlocks.values() else regionDict.get(int(maskedHM[j][k]), tempHM[j][k]) if maskedHM[j][k] != -7 else heightMap[j][k] for k in range(len(maskedHM[j]))] for j in range(len(maskedHM))]
         # ---------------HM naming---------------
@@ -176,70 +217,13 @@ def editTerrainFF(level, box, alterDict, alterHeightdict):
                 block = 0
             for e in xrange(abs(diff)):
                 level.setBlockAt(mappedx, (alterHeightdict[x, y] + (e * (diff / abs(diff)))), mappedz, block)
+                level.setBlockDataAt(mappedx, (alterHeightdict[x, y] + (e * (diff / abs(diff)))), mappedz, 0)
             if diff < 0 :
                 level.setBlockAt(mappedx, (alterHeightdict[x, y] + diff), mappedz, topblock)
+                level.setBlockDataAt(mappedx, (alterHeightdict[x, y] + diff), mappedz, 0)
 
     except Exception as e:
         logger.error(e)
-
-def removeSurfaceWater(level, box, exclusion, heightMap, waterHM):
-    hmCopy = deepcopy(heightMap)
-    alterDict = dict()
-    alterHeightDict = dict()
-
-    def FF(x, y, area, block, surroundingHeight):
-        if len(area) < 1000:
-            hmCopy[x][y] = 999
-            area.append([x, y])
-            if ((x + 1) < (len(heightMap))): # go to south
-                if hmCopy[x + 1][y] == -1:
-                    area, block, surroundingHeight = FF(x + 1, y, area, block, surroundingHeight)
-                elif hmCopy[x + 1][y] != 999 and heightMap[x + 1][y] != -1:
-                    surroundingHeight.append(heightMap[x + 1][y])
-                    block.append(level.blockAt(box.minx + x + 1, heightMap[x + 1][y] - 1, box.minz + y))
-            if ((y - 1) >= (0)):  # go to west
-                if hmCopy[x][y - 1] == -1:
-                    area, block, surroundingHeight = FF(x, y - 1, area, block, surroundingHeight)
-                elif hmCopy[x][y - 1] != 999 and heightMap[x][y - 1] != -1:
-                    surroundingHeight.append(heightMap[x][y - 1])
-                    block.append(level.blockAt(box.minx + x, heightMap[x][y - 1] - 1, box.minz + y - 1))
-            if ((x - 1) >= (0)): # go to north
-                if hmCopy[x - 1][y] == -1:
-                    area, block, surroundingHeight = FF(x - 1, y, area, block, surroundingHeight)
-                elif hmCopy[x - 1][y] != 999 and heightMap[x - 1][y] != -1:
-                    surroundingHeight.append(heightMap[x - 1][y])
-                    block.append(level.blockAt(box.minx + x - 1, heightMap[x - 1][y] - 1, box.minz + y))
-            if ((y + 1) < (len(heightMap[x]))): # go to east
-                if hmCopy[x][y + 1] == -1:
-                    area, block, surroundingHeight = FF(x, y + 1, area, block, surroundingHeight)
-                elif hmCopy[x][y + 1] != 999 and heightMap[x][y + 1] != -1:
-                    surroundingHeight.append(heightMap[x][y + 1])
-                    block.append(level.blockAt(box.minx + x, heightMap[x][y + 1] - 1, box.minz + y + 1))
-        return area, block, surroundingHeight
-
-    for x in range(exclusion, len(heightMap) - exclusion):
-        for y in range(exclusion, len(heightMap[0]) - exclusion):
-            if hmCopy[x][y] == -1:
-                height = waterHM[x][y]
-                area, block, surroundingHeight= FF(x, y, [], [], [])
-                targetBlock = max(set(block), key=block.count) if len(block) > 1 else 133
-                targetHeight = max(set(surroundingHeight), key=surroundingHeight.count) if len(block) > 1 else 133
-                valid = False if len([i for i in area if i[0] < exclusion or i[0] > len(heightMap) - exclusion or i[1] < exclusion or i[1] > len(heightMap[0]) - exclusion]) > 0 else True
-                if valid:
-                    if height > targetHeight:
-                        for cell in area:
-                            alterDict[cell[0], cell[1]] = targetHeight - height
-                            alterHeightDict[cell[0], cell[1]] = waterHM[cell[0]][cell[1]]
-                            level.setBlockAt(box.minx + cell[0], height - 1, box.minz + cell[1], targetBlock)
-                    if height < targetHeight:
-                        for cell in area:
-                            alterDict[cell[0], cell[1]] = targetHeight - height + 2
-                            alterHeightDict[cell[0], cell[1]] = waterHM[cell[0]][cell[1]] - 2
-                            if len(area) < 150:
-                                level.setBlockAt(box.minx + cell[0], height - 3, box.minz + cell[1], targetBlock)
-
-
-    editTerrainFF(level, box, alterDict, alterHeightDict)
 
 def findWaterSurface(waterHeightmap, processedHeightmap):
     try:
@@ -269,6 +253,7 @@ def removeLava(level, box, lavaHeightmap, groundHeightmap, processedHeightmap):
                     y2 = groundHeightmap[i][j]
                     for l in range(y2, y1):
                         level.setBlockAt(x, l, z, 2)
+                        level.setBlockDataAt(x, l, z, 0)
         logger.info('Removing lava pools...')
 
     except Exception as e:
