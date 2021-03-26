@@ -259,7 +259,7 @@ def createBuildableAreaArray(level, box, afterHM, gridArray, heightArray, xoffse
         gridArray = np.array(gridArray)
         heightArray = np.array(heightArray)
         buildableAreaArray = np.full((box.length, box.width), 0)
-        zgateWidth, xgateWidth, zgatePos, xgatePos = calculateGridPositions(gridArray)
+        zgateWidth, xgateWidth, zgatePos, xgatePos = calculateGridPositions(buildableAreaArray)
         for z in range(zgateWidth):
             for x in range(5):
                 buildableAreaArray[zgatePos + z][9 + x] = 2
@@ -303,18 +303,18 @@ def createBuildableAreaArray(level, box, afterHM, gridArray, heightArray, xoffse
     except Exception as e:
         logger.error(e)
 
-def calculateGridPositions(gridArray):
+def calculateGridPositions(array):
     try:
-        zgateWidth = (gridArray.shape[0] - 16) % 8
+        zgateWidth = (array.shape[0] - 16) % 8
         while zgateWidth < 6:
             zgateWidth += 4
-        xgateWidth = (gridArray.shape[1] - 16) % 8
+        xgateWidth = (array.shape[1] - 16) % 8
         while xgateWidth < 6:
             xgateWidth += 4
         zleft = 0
         xleft = 0
-        zlength = gridArray.shape[0] - 16
-        xlength = gridArray.shape[1] - 16
+        zlength = array.shape[0] - 16
+        xlength = array.shape[1] - 16
         if (zlength - zgateWidth) / 4 % 2 == 0:
             zleft = (zlength - zgateWidth) / 8
         else:
