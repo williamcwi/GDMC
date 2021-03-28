@@ -86,23 +86,24 @@ def perform(level, box, options):
         brush.run(gridArray, afterHM, startingPoint, level, box)
 
         # Convert grid and height array to 1x1
-        gridArray = common.mapArray(gridArray)
-        heightArray = common.mapArray(heightArray)
+        gridArray = common.mapArray(gridArray, startingPoint[0], startingPoint[1], box)
+        heightArray = common.mapArray(heightArray, startingPoint[0], startingPoint[1], box)
 
         # Create buildable area array
         buildableAreaArray = cityPlanning.createBuildableAreaArray(level, box, afterHM, gridArray, heightArray, startingPoint[0], startingPoint[1])
 
-        # gridArray = np.array(gridArray)
-        # heightArray = np.array(heightArray)
-        # if platform.system()==("Darwin") and int(platform.release()[:2]) >= 19:
-            # with open(os.path.join(os.path.expanduser("~/Desktop"),'test-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
-                # for z in range(buildableAreaArray.shape[0]):
-                    # np.savetxt(f, buildableAreaArray[z], fmt='%2.0f', newline=" ")
-            # f.close()
-        # else:
-            # with open(os.path.join(os.path.dirname(__file__),'test','test-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
-                    # np.savetxt(f, buildableAreaArray[z], fmt='%2.0f', newline=" ")
-            # f.close()
+        gridArray = np.array(gridArray)
+        heightArray = np.array(heightArray)
+        if platform.system()==("Darwin") and int(platform.release()[:2]) >= 19:
+            with open(os.path.join(os.path.expanduser("~/Desktop"),'test-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
+                for z in range(buildableAreaArray.shape[0]):
+                    np.savetxt(f, buildableAreaArray[z], fmt='%2.0f', newline=" ")
+            f.close()
+        else:
+            with open(os.path.join(os.path.dirname(__file__),'test','test-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
+                for z in range(buildableAreaArray.shape[0]):
+                    np.savetxt(f, buildableAreaArray[z], fmt='%2.0f', newline=" ")
+            f.close()
 
         # Places trees down
         # treePlacement.treePlacement(level, box, mapArr, afterHM)

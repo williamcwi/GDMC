@@ -26,7 +26,7 @@ def calculateGrids(box, afterHM, xoffset, zoffset):
         innerGridArray = np.full((math.ceil(float(box.length) / 4), math.ceil(float(box.width) / 4)), False)
         heightArray = np.full((math.ceil(float(box.length) / 4), math.ceil(float(box.width) / 4)), 0)
         innerHeightArray = np.full((math.ceil(float(box.length) / 4), math.ceil(float(box.width) / 4)), 0)
-        tempGridArray = common.mapArray(gridArray)
+        tempGridArray = common.mapArray(gridArray, 0, 0, box)
         zgateWidth, xgateWidth, zgatePos, xgatePos = calculateGridPositions(np.array(tempGridArray))
         for z in range(zoffset + 12, box.length - 9, 4):
             for x in range(xoffset + 12, box.width - 9, 4):
@@ -158,8 +158,6 @@ def claimBorder(level, box, afterHM, innerHeightArray, x, z, xoffset, zoffset):
 
 def addBorder(level, box, gridArray, heightArray, xoffset, zoffset):
     try:
-        print(xoffset)
-        print(zoffset)
         for z in range(gridArray.shape[0]):
             for x in range(gridArray.shape[1]):
                 if westBorder(gridArray, heightArray, x, z):
@@ -280,25 +278,25 @@ def createBuildableAreaArray(level, box, afterHM, gridArray, heightArray, xoffse
                     if z > 0 and buildableAreaArray[z][x] == 0:
                         xtemp = x
                         while gridArray[z][xtemp] and heightArray[z][xtemp] == heightArray[z][x]:
-                            if gridArray[z - 1][xtemp] and heightArray[z - 1][xtemp] == heightArray[z][x] and buildableAreaArray[z + zoffset][x + xoffset] == 0 and buildableAreaArray[z + zoffset - 1][xtemp + xoffset] > 4:
-                                buildableAreaArray[z + zoffset][x + xoffset] = buildableAreaArray[z + zoffset - 1][xtemp + xoffset]
+                            if gridArray[z - 1][xtemp] and heightArray[z - 1][xtemp] == heightArray[z][x] and buildableAreaArray[z + zoffset][x + xoffset] == 0 and buildableAreaArray[z - 1][xtemp] > 4:
+                                buildableAreaArray[z][x] = buildableAreaArray[z - 1][xtemp]
                                 buildableArea = True
                             xtemp += 1
                     if(gridArray[z][x] and heightArray[z][x + 1] == heightArray[z][x]):
-                        if buildableAreaArray[z + zoffset][x + xoffset] == 0:
-                            buildableAreaArray[z + zoffset][x + xoffset] = currentID
+                        if buildableAreaArray[z][x] == 0:
+                            buildableAreaArray[z][x] = currentID
                             numAdjacent += 1
                             buildableArea = True
-                        if buildableAreaArray[z + zoffset][x + xoffset + 1] == 0:
-                            buildableAreaArray[z + zoffset][x + xoffset + 1] = buildableAreaArray[z + zoffset][x + xoffset]
+                        if buildableAreaArray[z][x + 1] == 0 and buildableAreaArray[z][x] > 4:
+                            buildableAreaArray[z][x + 1] = buildableAreaArray[z][x]
                 if z < buildableAreaArray.shape[0] - 1:
                     if(gridArray[z][x] and heightArray[z + 1][x] == heightArray[z][x]):
-                        if buildableAreaArray[z + zoffset][x + xoffset] == 0:
-                            buildableAreaArray[z + zoffset][x + xoffset] = currentID
+                        if buildableAreaArray[z][x] == 0:
+                            buildableAreaArray[z][x] = currentID
                             numAdjacent += 1
                             buildableArea = True
-                        if buildableAreaArray[z + zoffset + 1][x + xoffset] == 0:
-                            buildableAreaArray[z + xoffset + 1][x + xoffset] = buildableAreaArray[z + zoffset][x + xoffset]
+                        if buildableAreaArray[z + 1][x] == 0 and buildableAreaArray[z][x] > 4:
+                            buildableAreaArray[z + 1][x] = buildableAreaArray[z][x]
                 if(numAdjacent == 0 and buildableArea):
                     currentID += 1
                     buildableArea = False
