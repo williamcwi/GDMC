@@ -52,9 +52,6 @@ def calculateGrids(box, afterHM, xoffset, zoffset):
                         if len(set(heights)) == 1 and heights[0] > 0:
                             innerGridArray[z / 4][x / 4] = True
                             innerHeightArray[z / 4][x / 4] = heights[0]
-        # for z in range(gridArray.shape[0]):
-            # for x in range(gridArray.shape[1]):
-                # print(heightArray[z][x])
         return xoffset, zoffset, gridArray, innerGridArray, heightArray, innerHeightArray
     except Exception as e:
         logger.error(e)
@@ -300,12 +297,9 @@ def createBuildableAreaArray(level, box, afterHM, gridArray, heightArray, xoffse
                 if(numAdjacent == 0 and buildableArea):
                     currentID += 1
                     buildableArea = False
-        print("test1")
         tempBuildableAreaArray = np.copy(buildableAreaArray)
-        print("test2")
         for z in range(9, buildableAreaArray.shape[0] - 9):
             for x in range(9, buildableAreaArray.shape[1] - 9):
-                print("test3")
                 if buildableAreaArray[z - 1][x] > 4 and buildableAreaArray[z][x] == 0:
                     tempBuildableAreaArray[z][x] = buildableAreaArray[z - 1][x]
                 if buildableAreaArray[z - 1][x + 1] > 4 and buildableAreaArray[z][x] == 0:
@@ -322,7 +316,6 @@ def createBuildableAreaArray(level, box, afterHM, gridArray, heightArray, xoffse
                     tempBuildableAreaArray[z][x] = buildableAreaArray[z][x - 1]
                 if buildableAreaArray[z - 1][x - 1] > 4 and buildableAreaArray[z][x] == 0:
                     tempBuildableAreaArray[z][x] = buildableAreaArray[z - 1][x - 1]
-        print("test4")
         buildableAreaArray = np.copy(tempBuildableAreaArray) 
         return buildableAreaArray
     except Exception as e:
