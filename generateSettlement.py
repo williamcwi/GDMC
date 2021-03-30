@@ -96,13 +96,13 @@ def perform(level, box, options):
         heightArray = np.array(heightArray)
         if platform.system()==("Darwin") and int(platform.release()[:2]) >= 19:
             with open(os.path.join(os.path.expanduser("~/Desktop"),'test-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
-                for z in range(buildableAreaArray.shape[0]):
-                    np.savetxt(f, buildableAreaArray[z], fmt='%2.0f', newline=" ")
+                for z in range(gridArray.shape[0]):
+                    np.savetxt(f, gridArray[z], fmt='%2.0f', newline=" ")
             f.close()
         else:
             with open(os.path.join(os.path.dirname(__file__),'test','test-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
-                for z in range(buildableAreaArray.shape[0]):
-                    np.savetxt(f, buildableAreaArray[z], fmt='%2.0f', newline=" ")
+                for z in range(gridArray.shape[0]):
+                    np.savetxt(f, gridArray[z], fmt='%2.0f', newline=" ")
             f.close()
 
         # Places trees down
