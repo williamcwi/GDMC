@@ -396,7 +396,7 @@ def placePath(level, box, paths, heightMap):
 
 
 # =============================================================================================
-def run(level, box, mapArr, heightMap):
+def generatePaths(level, box, mapArr, heightMap):
     try:
 
         startingPositions = getStartingPosition(mapArr)
