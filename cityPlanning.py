@@ -35,10 +35,14 @@ def calculateGrids(box, afterHM, xoffset, zoffset):
                     isGateArea = False
                     for ztemp in range(4):
                         for xtemp in range(4):
-                            if ((zgatePos <= z + ztemp < (zgatePos + zgateWidth) and ((10 <= x + xtemp < 15) or (len(tempGridArray) - 13 <= x + xtemp < len(tempGridArray))))):
+                            if (((zgatePos <= (z + ztemp) < (zgatePos + zgateWidth)) and ((10 <= (x + xtemp) < 15) or ((len(tempGridArray[0]) - 13) <= (x + xtemp) < len(tempGridArray[0]))))):
                                     isGateArea = True
-                            if ((10 <= z + ztemp < 15) or (len(tempGridArray[0]) - 13 <= z + ztemp < len(tempGridArray[0])) and (xgatePos <= x + xtemp < xgateWidth)):
+                                    break
+                            if (((10 <= (z + ztemp) < 15) or ((len(tempGridArray) - 13) <= (z + ztemp) < len(tempGridArray))) and (xgatePos <= (x + xtemp) < (xgatePos + xgateWidth))):
                                     isGateArea = True
+                                    break
+                            if isGateArea:
+                                break
                     if isGateArea == False:
                         for zgrid in range(-1, 5):
                             for xgrid in range(-1, 5):
