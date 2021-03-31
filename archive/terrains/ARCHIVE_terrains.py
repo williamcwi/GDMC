@@ -103,3 +103,53 @@ def FFFF (x, y, area):
                 tempHM[x - 1][y] = 999
         length = len(stonks)
     return area
+
+def FFZero(x, y, area, height, water, surroundingRegion): #Legacy Recursive FF
+    if maskedHM[x][y] == "wate":
+        water.append([x,y])
+        height.append(waterHM[x][y])
+    else:
+        height.append(heightMap[x][y])
+    maskedHM[x][y] = 999
+    area.append([x,y])
+    
+    if len(area) <= max(min(5000, int(len(tempHM) * len(tempHM[0]) / 10)), 3000):
+        if ((x + 1) < (len(maskedHM) - exclusion)): # go to south
+            if maskedHM[x + 1][y] == "0000" or (maskedHM[x + 1][y] == "wate" and waterHM[x + 1][y] != 63):
+                area, height, water, surroundingRegion  = FFZero(x + 1, y, area, height, water, surroundingRegion)
+            elif maskedHM[x + 1][y] != "0000" and maskedHM[x + 1][y] != 999 and maskedHM[x + 1][y] not in excludedBlocks.values():
+                surroundingRegion.append(maskedHM[x + 1][y])
+        if ((y - 1) >= (0 + exclusion)):  # go to west
+            if maskedHM[x][y - 1] == "0000" or (maskedHM[x][y - 1] == "wate" and waterHM[x][y - 1] != 63):
+                area, height, water, surroundingRegion  = FFZero(x, y - 1, area, height, water, surroundingRegion)
+            elif maskedHM[x][y - 1] != "0000" and maskedHM[x][y - 1] != 999 and maskedHM[x][y - 1] not in excludedBlocks.values():
+                surroundingRegion.append(maskedHM[x][y - 1])
+        if ((x - 1) >= (0 + exclusion)): # go to north
+            if maskedHM[x - 1][y] == "0000" or (maskedHM[x - 1][y] == "wate" and waterHM[x - 1][y] != 63):
+                area, height, water, surroundingRegion  = FFZero(x - 1, y, area, height, water, surroundingRegion)
+            elif maskedHM[x - 1][y] != "0000" and maskedHM[x - 1][y] != 999 and maskedHM[x - 1][y] not in excludedBlocks.values():
+                surroundingRegion.append(maskedHM[x - 1][y])
+        if ((y + 1) < (len(maskedHM[x]) - exclusion)): # go to east
+            if maskedHM[x][y + 1] == "0000" or (maskedHM[x][y + 1] == "wate" and waterHM[x][y + 1] != 63):
+                area, height, water, surroundingRegion  = FFZero(x, y + 1, area, height, water, surroundingRegion)
+            elif maskedHM[x][y + 1] != "0000" and maskedHM[x][y + 1] != 999 and maskedHM[x][y + 1] not in excludedBlocks.values():
+                surroundingRegion.append(maskedHM[x][y + 1])
+    return area, height, water, surroundingRegion
+
+def FF(x, y, area): #Legacy Recursive FF
+    tempHM[x][y] = 999
+    area.append([x,y])
+    if len(area) <= 10000:
+        if ((y - 1) >= (0 + exclusion)):  # go to west
+            if tempHM[x][y - 1] == currentLevel:
+                area = FF(x, y - 1, area)
+        if ((y + 1) < (len(tempHM[x]) - exclusion)): # go to east
+            if tempHM[x][y + 1] == currentLevel:
+                area = FF(x, y + 1, area)
+        if ((x + 1) < (len(tempHM) - exclusion)): # go to south
+            if tempHM[x + 1][y] == currentLevel:
+                area = FF(x + 1, y, area)
+        if ((x - 1) >= (0 + exclusion)): # go to north
+            if tempHM[x - 1][y] == currentLevel:
+                area = FF(x - 1, y, area)
+    return area
