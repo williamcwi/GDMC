@@ -32,7 +32,10 @@ foliage = [
     am.RedMushroom,
     am.HugeBrownMushroom,
     am.HugeRedMushroom,
-    am.Vines
+    am.Vines,
+    # Other
+    am.SnowLayer,
+    am.Snow
 ]
 
 foliageID = [f.ID for f in foliage]
