@@ -3,7 +3,7 @@ from logger import Logger
 import random
 from copy import deepcopy
 
-logger = Logger("Farm")
+logger = Logger("farm")
 
 def init(level, box, heightMap, buildMap):
     tempHM = deepcopy(buildMap)
@@ -54,27 +54,34 @@ def init(level, box, heightMap, buildMap):
 
     # --->Get Number of plot to build
     randomNumPlot = min(max(random.randint(int(len(sorted_x) * 0.4), int(len(sorted_x) * 0.8)), 2), len(sorted_x) - 1) if len(sorted_x) > 1 else 1
-
     plotList = sorted_x[:randomNumPlot]
-
     if len(plotList) >= 1:
-
+        logger.info("Building {} farm".format(len(plotList)))
         for plot in plotList: #Getting area for build
-            ranLocat = [min(random.randint(plot[0], plot[0] + 16), len(heightMap[0]) - 13), min(random.randint(plot[1], plot[1] + 16), len(heightMap) - 13)]
-            ranSize = min(max(random.randint(int(((box.width + box.length / 2)) * 0.7), int(((box.width + box.length / 2)) * 0.9)), 50), 200)
-            area = FFFF(ranLocat[0], ranLocat[1], [], ranSize)
+            valid = False
+            i = 0
+            while valid == False:
+                ranLocat = [min(random.randint(plot[0], plot[0] + 16), len(heightMap[0]) - 13), min(random.randint(plot[1], plot[1] + 16), len(heightMap) - 13)]
+                valid = True if tempHM[ranLocat[0]][ranLocat[1]] == 0 else False
+                i += 1 
+                if i > 256: break
 
-            for cell in area: # --->Placing Water Wheat and farmland
-                level.setBlockAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]] - 1, box.minz + cell[0], 60)
-                level.setBlockDataAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]], box.minz + cell[0], random.randint(3, 7))
-                level.setBlockAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]], box.minz + cell[0], 59)
-                level.setBlockDataAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]], box.minz + cell[0], random.randint(0, 6))
+            if valid:
+                ranSize = min(max(random.randint(int(((box.width + box.length / 2)) * 0.7), int(((box.width + box.length / 2)) * 0.9)), 50), 200)
+                area = FFFF(ranLocat[0], ranLocat[1], [], ranSize)
+                for cell in area: # --->Placing Water Wheat and farmland
+                    level.setBlockAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]] - 1, box.minz + cell[0], 60)
+                    level.setBlockDataAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]], box.minz + cell[0], random.randint(3, 7))
+                    level.setBlockAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]], box.minz + cell[0], 59)
+                    level.setBlockDataAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]], box.minz + cell[0], random.randint(0, 6))
 
-            for cell in area: # --->Placing Water Block
-                surrounding = set([heightMap[cell[1] + 1][cell[0]], heightMap[cell[1] - 1][cell[0]], heightMap[cell[1]][cell[0] + 1], heightMap[cell[1]][cell[0] - 1]])
-                surrounding_x = list(set([tempHM[cell[0] + 1][cell[1]], tempHM[cell[0] - 1][cell[1]], tempHM[cell[0]][cell[1] + 1], tempHM[cell[0]][cell[1] - 1]]))
-                if (min(surrounding) >= heightMap[cell[1]][cell[0]]) and (len(surrounding_x) == 1 and surrounding_x[0] == 999):
-                    level.setBlockAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]] - 1, box.minz + cell[0], 9)
-                    level.setBlockDataAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]], box.minz + cell[0], 0)
-                    level.setBlockAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]], box.minz + cell[0], 0)
-                    break
+                for cell in area: # --->Placing Water Block
+                    surrounding = set([heightMap[cell[1] + 1][cell[0]], heightMap[cell[1] - 1][cell[0]], heightMap[cell[1]][cell[0] + 1], heightMap[cell[1]][cell[0] - 1]])
+                    surrounding_x = list(set([tempHM[cell[0] + 1][cell[1]], tempHM[cell[0] - 1][cell[1]], tempHM[cell[0]][cell[1] + 1], tempHM[cell[0]][cell[1] - 1]]))
+                    if (min(surrounding) >= heightMap[cell[1]][cell[0]]) and (len(surrounding_x) == 1 and surrounding_x[0] == 999):
+                        level.setBlockAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]] - 1, box.minz + cell[0], 9)
+                        level.setBlockDataAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]], box.minz + cell[0], 0)
+                        level.setBlockAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]], box.minz + cell[0], 0)
+                        break
+    else:
+        logger.info("No farm")
