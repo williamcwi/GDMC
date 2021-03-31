@@ -1394,5 +1394,6 @@ def place_walls(level, box, afterHM, combinedHM):
         
         logger.info('Wall generation completed.')
 
+        return gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4, x_gate, z_gate
     except Exception as e:
         logger.error(e)

@@ -42,7 +42,7 @@ def mapArray(array, xoffset, zoffset, box):
     except Exception as e:
         logger.error(e)
 
-def mapGatePaveToHeighMap(minx, minz, heightmap, gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4, x_gate, z_gate):
+def mapGatePaveToHeightMap(minx, minz, heightmap, gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4, x_gate, z_gate):
     for x in xrange(gate_pos_1[0] - minx, (gate_pos_1[0] - minx + x_gate + 4)): # x_gate
         for z in xrange(gate_pos_1[2] - minz, (gate_pos_1[2] - minz + 14)):
             heightmap[x][z] = gate_pos_1[1]

@@ -32,7 +32,8 @@ blocks = [
   am.Netherrack,
   am.SoulSand,
   am.Clay,
-  am.Glowstone
+  am.Glowstone,
+  am.Sandstone
 ]
 blocktypes = [b.ID for b in blocks]
 

@@ -69,7 +69,7 @@ def perform(level, box, options):
         combinedHM = terrains.findWaterSurface(whm, afterHM)
         
         # Generate walls
-        generateWalls.place_walls(level, box, afterHM, combinedHM)
+        gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4, x_gate, z_gate = generateWalls.place_walls(level, box, afterHM, combinedHM)
 
         # Obtain new afterHM after placing walls
         afterHM = heightmap.heightMap(level, box)
@@ -127,6 +127,9 @@ def perform(level, box, options):
         # # Generate simple house
         # generateStructure.generateSimpleHouse(level, box)
         
+        # Include gate pavement in AfterHM
+        afterHM = common.mapGatePaveToHeightMap(box.minx, box.minz, afterHM, gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4, x_gate, z_gate)
+
         # Path finding algorithm
         path.generatePaths(level, box, buildableAreaArray, afterHM)
 
