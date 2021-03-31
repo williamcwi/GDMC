@@ -16,6 +16,7 @@ import cityPlanning
 import biomes
 import brush
 import farm
+import path
 import time
 import numpy as np
 
@@ -124,8 +125,8 @@ def perform(level, box, options):
         # # Generate simple house
         # generateStructure.generateSimpleHouse(level, box)
         
-        # # Path finding algorithm
-        # path.run()
+        # Path finding algorithm
+        path.run(buildableAreaArray)
 
     except Exception as e:
         logger.error(e)
