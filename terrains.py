@@ -59,6 +59,40 @@ def floodFill(level, box, heightMap, waterHM, minimumArea, exclusion = 0): # Flo
                         area = FF(x - 1, y, area)
             return area
 
+        def FFFF (x, y, area):
+            area.append([x,y])
+            stonks = []
+            stonks.append([x,y])
+            length = len(stonks)
+            tempHM[x][y] = 999
+
+            while length >= 1:
+                x = stonks[0][0]
+                y = stonks[0][1]
+                stonks.pop(0)
+                if ((y - 1) >= (0 + exclusion)): # go to west
+                    if tempHM[x][y - 1] == currentLevel:
+                        stonks.append([x, y - 1])
+                        area.append([x, y - 1])
+                        tempHM[x][y - 1] = 999
+                if ((y + 1) < (len(tempHM[x]) - exclusion)): # go to east
+                    if tempHM[x][y + 1] == currentLevel:
+                        stonks.append([x, y + 1])
+                        area.append([x, y + 1])
+                        tempHM[x][y + 1] = 999
+                if ((x + 1) < (len(tempHM) - exclusion)): # go to south
+                    if tempHM[x + 1][y] == currentLevel:
+                        stonks.append([x + 1, y])
+                        area.append([x + 1, y])
+                        tempHM[x + 1][y] = 999
+                if ((x - 1) >= (0 + exclusion)): # go to north
+                    if tempHM[x - 1][y] == currentLevel:
+                        stonks.append([x - 1, y])
+                        area.append([x - 1, y])
+                        tempHM[x - 1][y] = 999
+                length = len(stonks)
+            return area
+
         def FFZero(x, y, area, height, water, surroundingRegion):
             if maskedHM[x][y] == "wate":
                 water.append([x,y])
@@ -91,17 +125,69 @@ def floodFill(level, box, heightMap, waterHM, minimumArea, exclusion = 0): # Flo
                         surroundingRegion.append(maskedHM[x][y + 1])
             return area, height, water, surroundingRegion
 
+        def FFFFZero (x, y, area, height, water, surroundingRegion):
+            if maskedHM[x][y] == "wate":
+                water.append([x,y])
+                height.append(waterHM[x][y])
+            else:
+                height.append(heightMap[x][y])
+            area.append([x,y])
+            maskedHM[x][y] = 999
+            stonks = []
+            stonks.append([x,y])
+            length = len(stonks)
+            
+            while length >= 1:
+                x = stonks[0][0]
+                y = stonks[0][1]
+                stonks.pop(0)
+                if heightMap[x][y] == -1 :
+                    water.append([x,y])
+                    height.append(waterHM[x][y])
+                else:
+                    height.append(heightMap[x][y])
+                maskedHM[x][y] = 999
+                area.append([x,y])
+                if ((x + 1) < (len(maskedHM) - exclusion)): # go to west
+                    if maskedHM[x + 1][y] == "0000" or (maskedHM[x + 1][y] == "wate" and waterHM[x + 1][y] != 63):
+                        stonks.append([x + 1, y])
+                        maskedHM[x + 1][y] = 999
+                    elif maskedHM[x + 1][y] != "0000" and maskedHM[x + 1][y] != 999 and maskedHM[x + 1][y] not in excludedBlocks.values():
+                        surroundingRegion.append(maskedHM[x + 1][y])
+                if ((y - 1) >= (0 + exclusion)): # go to east
+                    if maskedHM[x][y - 1] == "0000" or (maskedHM[x][y - 1] == "wate" and waterHM[x][y - 1] != 63):
+                        stonks.append([x, y - 1])
+                        maskedHM[x][y - 1] = 999
+                    elif maskedHM[x][y - 1] != "0000" and maskedHM[x][y - 1] != 999 and maskedHM[x][y - 1] not in excludedBlocks.values():
+                        surroundingRegion.append(maskedHM[x][y - 1])
+                if ((x - 1) >= (0 + exclusion)): # go to south
+                    if maskedHM[x - 1][y] == "0000" or (maskedHM[x - 1][y] == "wate" and waterHM[x - 1][y] != 63):
+                        stonks.append([x - 1, y])
+                        maskedHM[x - 1][y] = 999
+                    elif maskedHM[x - 1][y] != "0000" and maskedHM[x - 1][y] != 999 and maskedHM[x - 1][y] not in excludedBlocks.values():
+                        surroundingRegion.append(maskedHM[x - 1][y])
+                if ((y + 1) < (len(maskedHM[x]) - exclusion)): # go to north
+                    if maskedHM[x][y + 1] == "0000" or (maskedHM[x][y + 1] == "wate" and waterHM[x][y + 1] != 63):
+                        stonks.append([x, y + 1])
+                        maskedHM[x][y + 1] = 999
+                    elif maskedHM[x][y + 1] != "0000" and maskedHM[x][y + 1] != 999 and maskedHM[x][y + 1] not in excludedBlocks.values():
+                        surroundingRegion.append(maskedHM[x][y + 1])
+                length = len(stonks)
+                # if len(area) >= max(min(5000, int(len(tempHM) * len(tempHM[0]) / 10)), 3000):
+                #     return area, height, water, surroundingRegion
+            return area, height, water, surroundingRegion
 
 
+        logger.info("Calucating Region")
         for x in range(exclusion, (len(tempHM) - exclusion)):
             for y in range(exclusion, (len(tempHM[0]) - exclusion)):
                 if tempHM[x][y] < 257 and tempHM[x][y] >= -20:
                     currentLevel = tempHM[x][y]
                     regionAlias = excludedBlocks.get(currentLevel, '%04d' % currentRegion) # switch between excluded blocks and region label
-                    area = FF(x, y, [])
+                    area = FFFF(x, y, [])
                     if len(area) >= minimumArea: # if area greater equa, ls to the threshold
                         valid = False
-                        for cell in area:
+                        for cell in area: # check if area contains minimum 12 x 12 area
                             if cell[0] + 12 < len(heightMap) and cell[1] + 12 < len(heightMap[0]):
                                 plotArea = list([heightMap[i][k] for i in range(cell[0], cell[0] + 12) for k in range(cell[1], cell[1] + 12)])
                                 if len(set(plotArea)) == 1 and list(set(plotArea))[0] == currentLevel:
@@ -119,11 +205,12 @@ def floodFill(level, box, heightMap, waterHM, minimumArea, exclusion = 0): # Flo
                         for blocks in area:
                             maskedHM[blocks[0]][blocks[1]] = regionAlias
 
+        logger.info("Calucating Non-Region")
         for x in range(exclusion, (len(maskedHM) - exclusion)):
             for y in range(exclusion, (len(maskedHM[0]) - exclusion)):
                 # logger.info(u"{} {}".format(x, y))
                 if maskedHM[x][y] == "0000":
-                    area, height, water, surroundingRegion = FFZero(x, y, [], [], [], [])
+                    area, height, water, surroundingRegion = FFFFZero(x, y, [], [], [], [])
                     region = None
                     if len(surroundingRegion) > 0:
                         region = max(set(surroundingRegion), key=surroundingRegion.count)   
@@ -147,7 +234,7 @@ def floodFill(level, box, heightMap, waterHM, minimumArea, exclusion = 0): # Flo
                             lowerRemoval = list(set(lowerRemoval))
                             if len([i for i in list(set(tempHeight)) if i not in upperRemoval]) > 1:
                                 targetHeight = max([i for i in list(set(tempHeight)) if i not in upperRemoval])
-                                if len(tempHeight[int(len(tempHeight) * 0.75):len(tempHeight)]) > 5:
+                                if len(tempHeight[int(len(tempHeight) * 0.75):len(tempHeight)]) > 3:
                                     for i in range(len(height)):
                                         if height[i] in upperRemoval and height[i] > 0 and targetHeight > 0:
                                             if len(water) < minimumArea:
@@ -162,13 +249,13 @@ def floodFill(level, box, heightMap, waterHM, minimumArea, exclusion = 0): # Flo
 
                             if len([i for i in list(set(tempHeight)) if i not in lowerRemoval]) > 1:
                                 targetHeight = min([i for i in list(set(tempHeight)) if i not in lowerRemoval])
-                                if len(tempHeight[0:int(len(tempHeight) * 0.1)]) > 5:
+                                if len(tempHeight[0:int(len(tempHeight) * 0.1)]) > 3:
                                     widthLFlag = False
                                     widthRFlag = False
                                     heightUFlag = False
                                     heightLFlag = False
                                     for i in range(len(height)):
-                                        if area[i] in water:
+                                        if area[i] in water: # if water is link to border of selection
                                             if area[i][0] <= 7:
                                                 widthLFlag = True
                                             if area[i][1] <= 7:
