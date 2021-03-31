@@ -126,7 +126,7 @@ def perform(level, box, options):
         # generateStructure.generateSimpleHouse(level, box)
         
         # Path finding algorithm
-        path.run(buildableAreaArray)
+        path.run(level, box, buildableAreaArray, afterHM)
 
     except Exception as e:
         logger.error(e)
