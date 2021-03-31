@@ -41,3 +41,19 @@ def mapArray(array, xoffset, zoffset, box):
         return mapArr
     except Exception as e:
         logger.error(e)
+
+def mapGatePaveToHeighMap(minx, minz, heightmap, gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4, x_gate, z_gate):
+    for x in xrange(gate_pos_1[0] - minx, (gate_pos_1[0] - minx + x_gate + 4)): # x_gate
+        for z in xrange(gate_pos_1[2] - minz, (gate_pos_1[2] - minz + 14)):
+            heightmap[x][z] = gate_pos_1[1]
+        
+        for z in xrange(gate_pos_3[2] - minz - 5, (gate_pos_3[2] - minz) + 8):
+            heightmap[x][z] = gate_pos_3[1]
+
+    for z in xrange(gate_pos_2[2] - minz, (gate_pos_2[2] - minz + z_gate + 4)): # z_gate
+        for x in xrange(gate_pos_2[0] - minx, (gate_pos_2[0] - minx + 14)):
+            heightmap[x][z] = gate_pos_2[1]
+        
+        for x in xrange(gate_pos_4[0] - minx - 5, (gate_pos_4[0] - minx) + 8):
+            heightmap[x][z] = gate_pos_4[1]
+    return heightmap
