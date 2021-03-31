@@ -441,5 +441,7 @@ def generatePaths(level, box, mapArr, heightMap):
 
         placePath(level, box, paths, heightMap)
 
+        logger.info('Path generation completed.')
+
     except Exception as e:
         logger.error(e)
