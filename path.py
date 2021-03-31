@@ -403,15 +403,20 @@ def generatePaths(level, box, mapArr, heightMap):
 
         vertices = len(startingPositions)
 
+        logger.info('Finding all possible paths...')
+
         # input:
         # pos = [x, z]
         # area = [pos]
         # startingPositions = [area]
+
         pairsList = getAllPairs(startingPositions)
         # print(pairsList)
 
         matrix = toMatrix(pairsList, vertices)
         # print(matrix)
+
+        logger.info("Running Prim's minimum spanning tree...")
 
         links = primMST(vertices, matrix)
         # print(links)
@@ -419,6 +424,8 @@ def generatePaths(level, box, mapArr, heightMap):
         aStarStarting = getAStarStarting(pairsList, links)
         # print('aStarStarting: ')
         # print(aStarStarting)
+
+        logger.info('Running A* algorithm...')
         
         paths = []
         for pair in aStarStarting:
@@ -429,6 +436,8 @@ def generatePaths(level, box, mapArr, heightMap):
             path = aStar(new_map, start, end)
             paths.append(path)
             # print(path)
+
+        logger.info('Placing paths...')
 
         placePath(level, box, paths, heightMap)
 
