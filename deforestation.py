@@ -33,6 +33,9 @@ foliage = [
     am.HugeBrownMushroom,
     am.HugeRedMushroom,
     am.Vines,
+    am.SugarCane,
+    am.Pumpkin,
+    am.CocoaPlant
     # Other
     am.SnowLayer,
     am.Snow
