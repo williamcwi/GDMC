@@ -11,6 +11,7 @@ import heightmap
 import generateStructure
 import generateWalls
 import deforestation
+import removeStructures
 import terrains
 import cityPlanning
 import biomes
@@ -45,6 +46,9 @@ def perform(level, box, options):
 
         # Deforestation
         deforestation.removeFoliage(level, box)
+
+        # Remove existing man made structures
+        removeStructures.removeManMadeBlocks(level, box)
 
         # Create Height Map
         hm = heightmap.heightMap(level, box)
@@ -89,7 +93,7 @@ def perform(level, box, options):
         # Convert grid and height array to 1x1
         newGridArray = common.mapArray(gridArray, startingPoint[0], startingPoint[1], box)
         newHeightArray = common.mapArray(heightArray, startingPoint[0], startingPoint[1], box)
-
+        
         # Create buildable area array
         buildableAreaArray = cityPlanning.createBuildableAreaArray(level, box, afterHM, newGridArray, newHeightArray, startingPoint[0], startingPoint[1])
 
@@ -106,7 +110,7 @@ def perform(level, box, options):
         #         for z in range(buildableAreaArray.shape[0]):
         #             np.savetxt(f, buildableAreaArray[z], fmt='%2.0f', newline=" ")
         #     f.close()
-
+        
         # Places trees down
         treePlacement.treePlacement(level, box, buildableAreaArray, afterHM)
 
