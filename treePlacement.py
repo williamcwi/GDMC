@@ -41,10 +41,10 @@ def findPosition(level, box):
             for x in range(int(math.ceil((box.maxx-(box.minx-z))/11))):
                 position = [tempStart[0]+(11*x), tempStart[1]+x]
                 # checks if the position is within the box x-axis selection and box z-axis selection
-                if box.minx <= position[0] <= box.maxx and box.minz <= position[1] <= box.maxz:
+                if box.minx < position[0] < box.maxx and box.minz < position[1] < box.maxz:
                     trees.append(position)
                 else:
-                    if position[0] <= box.maxx and position[1] <= box.maxz:
+                    if position[0] < box.maxx and position[1] < box.maxz:
                         continue
                     else:
                         break
@@ -57,13 +57,13 @@ def findPosition(level, box):
             #     trees.append(tempStart)
             for x in range(int(math.ceil((box.maxx-(box.minx-z))/11))):
                 position = [tempStart[0]-(11*x), tempStart[1]-x]
-                if box.minx <= position[0] <= box.maxx and box.minz <= position[1] <= box.maxz:
+                if box.minx < position[0] < box.maxx and box.minz < position[1] < box.maxz:
                     trees.append(position)
                     if position in trees:
                         trees.pop()
                         break
                 else: 
-                    if position[0] >= box.minx and position[1] >= box.minz:
+                    if position[0] > box.minx and position[1] > box.minz:
                         continue
                     else:
                         break
@@ -124,9 +124,9 @@ def generateTrees(heightMap, trees, level, box):
 
     #loops through the available tree plots
     for pos in trees:
-        x = pos[1] + box.minx
+        x = pos[0] + box.minx
         y = heightMap[pos[0]][pos[1]]
-        z = pos[0] + box.minz
+        z = pos[1] + box.minz
 
         random_tree = random.randint(1, 6)
 
