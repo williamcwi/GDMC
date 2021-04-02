@@ -87,7 +87,7 @@ def compareTreePosition(trees, mapArr, afterHM):
                 z = pos[0] + newPos[0]
                 x = pos[1] + newPos[1]
                 # checks if it is water or lava
-                if mapArr[z][x] != 0 or afterHM[z][x] == -1 or afterHM[z][x] == -2:
+                if mapArr[x][z] != 0 or afterHM[z][x] == -1 or afterHM[z][x] == -2:
                     trees.remove(pos)
                     break
         return trees
@@ -125,7 +125,7 @@ def generateTrees(heightMap, trees, level, box):
     #loops through the available tree plots
     for pos in trees:
         x = pos[1] + box.minx
-        y = heightMap[pos[1]][pos[0]]
+        y = heightMap[pos[0]][pos[1]]
         z = pos[0] + box.minz
 
         random_tree = random.randint(1, 6)
