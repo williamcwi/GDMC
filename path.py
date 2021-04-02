@@ -20,7 +20,8 @@ def getStartingPosition(mapArr):
             for col in range(len(mapArr[row])):
                 if mapArr[row][col] == area:
                     a.append([row, col])
-        startingPositions.append(a)
+        if a != []:
+            startingPositions.append(a)
 
     # print(startingPositions)
     return startingPositions
@@ -39,6 +40,7 @@ def euclid(pt1, pt2): # distance between two points
 
 def closest(origin, pts): # closest distance between point A and all points in array
     closestPoint = 999999
+    pos = pts[0]
     for pt in pts:
         if euclid(origin, pt) < closestPoint:
             closestPoint = euclid(origin, pt)
@@ -307,7 +309,7 @@ def placePath(level, box, paths, heightMap):
                     level.setBlockAt(previous_x, y, previous_z, 65)
                     level.setBlockDataAt(previous_x, y, previous_z, position)
 
-                elif block_difference < 1: # lower
+                elif block_difference < -1: # lower
                     
                     # find ladder position
                     if block[0] > previous_block[0]:
@@ -370,7 +372,7 @@ def placePath(level, box, paths, heightMap):
                         level.setBlockAt(previous_x, previous_y + ladder_increment, previous_z, 65)
                         level.setBlockDataAt(previous_x, previous_y + ladder_increment, previous_z, position)
 
-                elif block_difference < 1: # lower
+                elif block_difference < -1: # lower
                     # place ladder on new block
                     
                     # find ladder position
