@@ -35,7 +35,7 @@ foliage = [
     am.Vines,
     am.SugarCane,
     am.Pumpkin,
-    am.CocoaPlant
+    am.CocoaPlant,
     # Other
     am.SnowLayer,
     am.Snow
