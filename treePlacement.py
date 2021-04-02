@@ -146,10 +146,11 @@ def generateTrees(heightMap, trees, level, box):
 # acts as controller 
 def treePlacement(level, box, mapArr, afterHM):
     try:
+        paddedMapArr = mapArr.copy()
         trees = findPosition(level, box)
         # updates trees array
-        mapArr = reassignGate(mapArr)
-        trees = compareTreePosition(trees, mapArr, afterHM)
+        paddedMapArr = reassignGate(paddedMapArr)
+        trees = compareTreePosition(trees, paddedMapArr, afterHM)
         # print('trees')
         # print(trees)
         generateTrees(afterHM, trees, level, box)
