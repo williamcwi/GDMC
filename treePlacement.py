@@ -41,10 +41,10 @@ def findPosition(level, box):
             for x in range(int(math.ceil((box.maxx-(box.minx-z))/11))):
                 position = [tempStart[0]+(11*x), tempStart[1]+x]
                 # checks if the position is within the box x-axis selection and box z-axis selection
-                if box.minx < position[0] < box.maxx and box.minz < position[1] < box.maxz:
+                if box.minx <= position[0] <= box.maxx and box.minz <= position[1] <= box.maxz:
                     trees.append(position)
                 else:
-                    if position[0] < box.maxx and position[1] < box.maxz:
+                    if position[0] <= box.maxx and position[1] <= box.maxz:
                         continue
                     else:
                         break
@@ -57,13 +57,13 @@ def findPosition(level, box):
             #     trees.append(tempStart)
             for x in range(int(math.ceil((box.maxx-(box.minx-z))/11))):
                 position = [tempStart[0]-(11*x), tempStart[1]-x]
-                if box.minx < position[0] < box.maxx and box.minz < position[1] < box.maxz:
+                if box.minx <= position[0] <= box.maxx and box.minz <= position[1] <= box.maxz:
                     trees.append(position)
                     if position in trees:
                         trees.pop()
                         break
                 else: 
-                    if position[0] > box.minx and position[1] > box.minz:
+                    if position[0] >= box.minx and position[1] >= box.minz:
                         continue
                     else:
                         break
@@ -77,19 +77,49 @@ def findPosition(level, box):
         logger.error(e)
 
 # checks the buildableAreaArray with the trees array
-def compareTreePosition(trees, mapArr, afterHM):
+def compareTreePosition(pos, mapArr, afterHM):
     try:
-        for pos in reversed(trees): 
-            # checks the area around the tree position
+        # checks the adjacent area around the tree position
+        adj = [(0, 0), (0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]
+        
+        for newPos in adj:
+            z = pos[0] + newPos[0]
+            x = pos[1] + newPos[1]
+            # checks if it is water or lava
+            if mapArr[z][x] != 0 or afterHM[z][x] == -1 or afterHM[z][x] == -2:
+                return False
+        return True
+
+    except Exception as e:
+        logger.error(e)
+
+# checks adjacent area of the 3x3 tree pos
+def treePositions(trees, mapArr, afterHM):
+    try:
+        for idx, pos in reversed(list(enumerate(trees))): #[[0,0],[1,11]]
             adj = [(0, 0), (0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]
-            
-            for newPos in adj:
-                z = pos[0] + newPos[0]
-                x = pos[1] + newPos[1]
-                # checks if it is water or lava
-                if mapArr[x][z] != 0 or afterHM[z][x] == -1 or afterHM[z][x] == -2:
-                    trees.remove(pos)
+
+            randPlot = random.randint(0, len(adj)-1)
+            z = pos[0] + adj[randPlot][0]
+            x = pos[1] + adj[randPlot][1]
+
+            stop = False
+
+            while compareTreePosition([z, x], mapArr, afterHM) == False:
+                adj.pop(randPlot)
+
+                if len(adj) == 0:
+                    trees.pop(idx)
+                    stop = True
                     break
+
+                randPlot = random.randint(0, len(adj)-1)
+                z = pos[0] + adj[randPlot][0]
+                x = pos[1] + adj[randPlot][1]
+
+            if stop is not True:
+                trees[idx] = [z, x]
+
         return trees
 
     except Exception as e:
@@ -124,9 +154,9 @@ def generateTrees(heightMap, trees, level, box):
 
     #loops through the available tree plots
     for pos in trees:
-        x = pos[0] + box.minx
-        y = heightMap[pos[0]][pos[1]]
-        z = pos[1] + box.minz
+        x = pos[1] + box.minx
+        y = heightMap[pos[1]][pos[0]]
+        z = pos[0] + box.minz
 
         random_tree = random.randint(1, 6)
 
@@ -150,20 +180,9 @@ def treePlacement(level, box, mapArr, afterHM):
         trees = findPosition(level, box)
         # updates trees array
         paddedMapArr = reassignGate(paddedMapArr)
-        trees = compareTreePosition(trees, paddedMapArr, afterHM)
+        trees = treePositions(trees, paddedMapArr, afterHM)
         # print('trees')
         # print(trees)
         generateTrees(afterHM, trees, level, box)
     except Exception as e:
         logger.error(e)
-        
-# arr = [
-#     [0, 0, 0, 0],
-#     [0, 0, 0, 0],
-#     [1, 1, 1, 1],
-#     [1, 1, 1, 1],
-# ]
-
-# trees = [[0,2], [3,3]]
-
-# print(compareTreePosition(trees, arr))
