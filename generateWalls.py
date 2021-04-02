@@ -1017,7 +1017,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
         ground = heightmap[len(heightmap)-8][7]
         if ground == -1:
             pass
-        elif ground <= (corner_ground[0]+6):
+        elif ground < (corner_ground[0]+6):
             level.copyBlocksFrom(wall_base_corner, wall_base_corner.bounds, Vector(box.maxx-9, ground-3, box.minz+3))
             for y in range(256):
                 if level.blockAt(box.maxx-8, ground+3+y, box.minz+7) == 0:
@@ -1035,7 +1035,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
                     outer = heightmap[len(heightmap)-8-i][0]
                     if heightmap[len(heightmap)-8-i][1] == -1 or ground == -1:
                         pass
-                    elif ground <= (outer+6):
+                    elif ground < (outer+6):
                         if sections is not x_left - 1:
                             level.copyBlocksFrom(wall_base, wall_base.bounds, Vector(box.maxx-10-i, ground-3, box.minz+3))
                             for y in range(256):
@@ -1058,7 +1058,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
                     outer = heightmap[8+i][0]
                     if heightmap[8+i][1] == -1 or ground == -1:
                         pass
-                    elif ground <= (outer+6):
+                    elif ground < (outer+6):
                         if sections is not x_right - 1:
                             level.copyBlocksFrom(wall_base, wall_base.bounds, Vector(box.minx+5+i, ground-3, box.minz+3))
                             for y in range(256):
@@ -1086,7 +1086,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
         ground = heightmap[8][8]
         if ground == -1:
             pass
-        elif ground <= (corner_ground[1]+6):
+        elif ground < (corner_ground[1]+6):
             level.copyBlocksFrom(wall_base_corner, wall_base_corner.bounds, Vector(box.minx+3, ground-3, box.minz+3))
             for y in range(256):
                 if level.blockAt(box.minx+7, ground+3+y, box.minz+7) == 0:
@@ -1103,7 +1103,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
                     outer = heightmap[1][8+i]
                     if heightmap[1][8+i] == -1 or ground == -1:
                         pass
-                    elif ground <= (outer+6):
+                    elif ground < (outer+6):
                         if sections is not z_left - 1:
                             level.copyBlocksFrom(wall_base, wall_base.bounds, Vector(box.minx+3, ground-3, box.minz+5+i))
                             for y in range(256):
@@ -1125,7 +1125,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
                     outer = heightmap[1][len(heightmap[1])-8-i]
                     if heightmap[1][len(heightmap[1])-8-i] == -1 or ground == -1:
                         pass
-                    elif ground <= (outer+6):
+                    elif ground < (outer+6):
                         if sections is not z_right - 1:
                             level.copyBlocksFrom(wall_base, wall_base.bounds, Vector(box.minx+3, ground-3, box.maxz-10-i))
                             for y in range(256):
@@ -1152,7 +1152,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
         ground = heightmap[7][len(heightmap[8])-9]
         if ground == -1:
             pass
-        elif ground <= (corner_ground[2]+6):
+        elif ground < (corner_ground[2]+6):
             level.copyBlocksFrom(wall_base_corner, wall_base_corner.bounds, Vector(box.minx+3, ground-3, box.maxz-9))
             for y in range(256):
                 if level.blockAt(box.minx+7, ground+3+y, box.maxz-8) == 0:
@@ -1170,7 +1170,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
                     outer = heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2]
                     if heightmap[len(heightmap)-8-i][len(heightmap[len(heightmap)-8-i])-2] == -1 or ground == -1:
                         pass
-                    elif ground <= (outer+6):
+                    elif ground < (outer+6):
                         if sections is not x_left - 1:
                             level.copyBlocksFrom(wall_base, wall_base.bounds, Vector(box.maxx-10-i, ground-3, box.maxz-9))
                             for y in range(256):
@@ -1192,7 +1192,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
                     outer = heightmap[8+i][len(heightmap[8+i])-2]
                     if heightmap[8+i][len(heightmap[8+i])-2] == -1 or ground == -1:
                         pass
-                    elif ground <= (outer+6):
+                    elif ground < (outer+6):
                         if sections is not x_right - 1:
                             level.copyBlocksFrom(wall_base, wall_base.bounds, Vector(box.minx+5+i, ground-3, box.maxz-9))
                             for y in range(256):
@@ -1219,7 +1219,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
         ground = heightmap[len(heightmap)-8][len(heightmap[len(heightmap)-8])-8]
         if ground == -1:
             pass
-        elif ground <= (corner_ground[3]+6):
+        elif ground < (corner_ground[3]+6):
             level.copyBlocksFrom(wall_base_corner, wall_base_corner.bounds, Vector(box.maxx-9, ground-3, box.maxz-9))
             for y in range(256):
                 if level.blockAt(box.maxx-8, ground+3+y, box.maxz-8) == 0:
@@ -1236,7 +1236,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
                     outer = heightmap[len(heightmap)-2][8+i]
                     if heightmap[len(heightmap)-2][8+i] == -1 or ground == -1:
                         pass
-                    elif ground <= (outer+6):
+                    elif ground < (outer+6):
                         if sections is not z_left - 1:
                             level.copyBlocksFrom(wall_base, wall_base.bounds, Vector(box.maxx-9, ground-3, box.minz+5+i))
                             for y in range(256):
@@ -1258,7 +1258,7 @@ def place_wall_base(level, box, heightmap, combinedHM, x_left, x_right, z_left, 
                     outer = heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i]
                     if heightmap[len(heightmap)-2][len(heightmap[len(heightmap)-2])-8-i] == -1 or ground == -1:
                         pass
-                    elif ground <= (outer+6):
+                    elif ground < (outer+6):
                         if sections is not z_right - 1:
                             level.copyBlocksFrom(wall_base, wall_base.bounds, Vector(box.maxx-9, ground-3, box.maxz-10-i))
                             for y in range(256):
