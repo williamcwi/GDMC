@@ -41,10 +41,10 @@ def findPosition(level, box):
             for x in range(int(math.ceil((box.maxx-(box.minx-z))/11))):
                 position = [tempStart[0]+(11*x), tempStart[1]+x]
                 # checks if the position is within the box x-axis selection and box z-axis selection
-                if box.minx < position[0] < box.maxx and box.minz < position[1] < box.maxz:
+                if box.minx <= position[0] <= box.maxx and box.minz <= position[1] <= box.maxz:
                     trees.append(position)
                 else:
-                    if position[0] < box.maxx and position[1] < box.maxz:
+                    if position[0] <= box.maxx and position[1] <= box.maxz:
                         continue
                     else:
                         break
@@ -57,13 +57,13 @@ def findPosition(level, box):
             #     trees.append(tempStart)
             for x in range(int(math.ceil((box.maxx-(box.minx-z))/11))):
                 position = [tempStart[0]-(11*x), tempStart[1]-x]
-                if box.minx < position[0] < box.maxx and box.minz < position[1] < box.maxz:
+                if box.minx <= position[0] <= box.maxx and box.minz <= position[1] <= box.maxz:
                     trees.append(position)
                     if position in trees:
                         trees.pop()
                         break
                 else: 
-                    if position[0] > box.minx and position[1] > box.minz:
+                    if position[0] >= box.minx and position[1] >= box.minz:
                         continue
                     else:
                         break
@@ -76,36 +76,20 @@ def findPosition(level, box):
     except Exception as e:
         logger.error(e)
 
-
-# checks the mapArr with the trees array
-def compareTreePosition(trees, mapArr):
+# checks the buildableAreaArray with the trees array
+def compareTreePosition(trees, mapArr, afterHM):
     try:
-        # print mapArr
-        # print(trees)
-        # print(len(trees))
         for pos in reversed(trees): 
-            z = pos[0]
-            x = pos[1]
-            # print('testing')
-            # print(z, x)
-            # print(mapArr[z][x])
-            if mapArr[x][z] != 0:
-                trees.remove(pos)
-        # print(trees)
-        # print('Mapppp Arrr')
-        
-        # for i in trees:
-        #     print('test1')
-        #     print(i)
-        #     z = i[0]
-        #     x = i[1]
-        #     print('testing')
-        #     print(z, x)
-        #     print(mapArr[z][x])
-        #     # checks if the area is for trees (non-buildable areas)
-        #     if mapArr[z][x] != 0:
-        #         trees.remove(i)
-        # print(trees)
+            # checks the area around the tree position
+            adj = [(0, 0), (0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]
+            
+            for newPos in adj:
+                z = pos[0] + newPos[0]
+                x = pos[1] + newPos[1]
+                # checks if it is water or lava
+                if mapArr[z][x] != 0 or afterHM[z][x] == -1 or afterHM[z][x] == -2:
+                    trees.remove(pos)
+                    break
         return trees
 
     except Exception as e:
@@ -139,46 +123,39 @@ def generateTrees(heightMap, trees, level, box):
     tree_6 = MCSchematic(shape=(8,10,8), filename=filename)
 
     #loops through the available tree plots
-    
     for pos in trees:
-        x = pos[0] + box.minx
-        y = heightMap[pos[0]][pos[1]]
-        z = pos[1] + box.minz
+        x = pos[1] + box.minx
+        y = heightMap[pos[1]][pos[0]]
+        z = pos[0] + box.minz
 
-        if y > 0:
-            random_tree = random.randint(1, 6)
+        random_tree = random.randint(1, 6)
 
-            if random_tree == 1:
-                level.copyBlocksFrom(tree_1, tree_1.bounds, Vector(x-3, y, z-4))
-            elif random_tree == 2:
-                level.copyBlocksFrom(tree_2, tree_2.bounds, Vector(x-2, y, z-2))
-            elif random_tree == 3:
-                level.copyBlocksFrom(tree_3, tree_3.bounds, Vector(x-3, y, z-3))
-            elif random_tree == 4:
-                level.copyBlocksFrom(tree_4, tree_4.bounds, Vector(x-2, y, z-3))
-            elif random_tree == 5:
-                level.copyBlocksFrom(tree_5, tree_5.bounds, Vector(x-4, y, z-3))
-            else:
-                level.copyBlocksFrom(tree_6, tree_6.bounds, Vector(x-4, y, z-3))
+        if random_tree == 1:
+            level.copyBlocksFrom(tree_1, tree_1.bounds, Vector(x-3, y, z-4))
+        elif random_tree == 2:
+            level.copyBlocksFrom(tree_2, tree_2.bounds, Vector(x-2, y, z-2))
+        elif random_tree == 3:
+            level.copyBlocksFrom(tree_3, tree_3.bounds, Vector(x-3, y, z-3))
+        elif random_tree == 4:
+            level.copyBlocksFrom(tree_4, tree_4.bounds, Vector(x-2, y, z-3))
+        elif random_tree == 5:
+            level.copyBlocksFrom(tree_5, tree_5.bounds, Vector(x-4, y, z-3))
+        else:
+            level.copyBlocksFrom(tree_6, tree_6.bounds, Vector(x-4, y, z-3))
 
 # acts as controller 
 def treePlacement(level, box, mapArr, afterHM):
     try:
         trees = findPosition(level, box)
-        # # updates trees array
-        # print('map array beforeeeee')
-        # print(mapArr)
+        # updates trees array
         mapArr = reassignGate(mapArr)
-        # print('mapArr')
-        # print(mapArr)
-        # print(trees)
-        trees = compareTreePosition(trees, mapArr)
+        trees = compareTreePosition(trees, mapArr, afterHM)
         # print('trees')
         # print(trees)
         generateTrees(afterHM, trees, level, box)
     except Exception as e:
         logger.error(e)
-
+        
 # arr = [
 #     [0, 0, 0, 0],
 #     [0, 0, 0, 0],
