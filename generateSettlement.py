@@ -134,8 +134,10 @@ def perform(level, box, options):
         # Include gate pavement in AfterHM
         afterHM = common.mapGatePaveToHeightMap(box.minx, box.minz, afterHM, gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4, x_gate, z_gate)
 
+        combinedHM = terrains.findWaterSurface(whm, afterHM)
+
         # Path finding algorithm
-        path.generatePaths(level, box, buildableAreaArray, afterHM)
+        path.generatePaths(level, box, buildableAreaArray, combinedHM)
 
     except Exception as e:
         logger.error(e)
