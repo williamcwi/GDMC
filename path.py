@@ -13,15 +13,19 @@ def getStartingPosition(mapArr):
     for row in mapArr:
         temp.extend(row)
     noAreas = len(Counter(temp).keys()) # total number of areas including 0
+    print(Counter(temp).keys())
+    print(noAreas)
     startingPositions = []
-    for area in range(1, noAreas):
+    for area in Counter(temp).keys():
+        area = int(area)
+        if area == 0:
+            continue
         a = []
         for row in range(len(mapArr)):
             for col in range(len(mapArr[row])):
                 if mapArr[row][col] == area:
                     a.append([row, col])
-        if a != []:
-            startingPositions.append(a)
+        startingPositions.append(a)
 
     # print(startingPositions)
     return startingPositions
