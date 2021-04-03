@@ -22,6 +22,8 @@ import path
 import time
 import numpy as np
 
+# np.set_printoptions(threshold=sys.maxsize)
+
 inputs = [
     (
         ('Settlement Generator', 'title'),
@@ -111,7 +113,12 @@ def perform(level, box, options):
         #             np.savetxt(f, buildableAreaArray[z], fmt='%2.0f', newline=" ")
         #     f.close()
         
-        # Places trees down
+        # Include gate pavement in AfterHM
+        afterHM = common.mapGatePaveToHeightMap(box.minx, box.minz, afterHM, gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4, x_gate, z_gate)
+
+        combinedHM = terrains.findWaterSurface(whm, afterHM)
+        
+        # Places trees down and return treeMap
         treeMap = treePlacement.treePlacement(level, box, buildableAreaArray, afterHM)
 
         brush.run(gridArray, afterHM, startingPoint, level, box)
@@ -130,14 +137,9 @@ def perform(level, box, options):
 
         # # Generate simple house
         # generateStructure.generateSimpleHouse(level, box)
-        
-        # Include gate pavement in AfterHM
-        afterHM = common.mapGatePaveToHeightMap(box.minx, box.minz, afterHM, gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4, x_gate, z_gate)
-
-        combinedHM = terrains.findWaterSurface(whm, afterHM)
 
         # Path finding algorithm
-        path.generatePaths(level, box, buildableAreaArray, combinedHM)
+        path.generatePaths(level, box, buildableAreaArray, treeMap, combinedHM)
 
     except Exception as e:
         logger.error(e)

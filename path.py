@@ -169,7 +169,7 @@ class Node():
     def __eq__(self, other):
         return self.position == other.position
 
-def aStar(mapArr, start, end):
+def aStar(mapArr, treeMap, start, end):
     # input: mapArr, start pos and end pos (map, (x1, z1), (x2, z2))
 
     # initialise open and close list
@@ -236,7 +236,7 @@ def aStar(mapArr, start, end):
                 # position out of range
                 continue
 
-            if mapArr[node_position[0]][node_position[1]] != 0:
+            if mapArr[node_position[0]][node_position[1]] != 0 or treeMap[node_position[0]][node_position[1]] == 2:
                 # non-walkable terrain
                 continue
 
@@ -402,7 +402,7 @@ def placePath(level, box, paths, heightMap):
 
 
 # =============================================================================================
-def generatePaths(level, box, mapArr, heightMap):
+def generatePaths(level, box, mapArr, treeMap, heightMap):
     try:
 
         startingPositions = getStartingPosition(mapArr)
@@ -439,7 +439,7 @@ def generatePaths(level, box, mapArr, heightMap):
             start = (pair[0][0], pair[0][1])
             end = (pair[1][0], pair[1][1])
             # print(start, end)
-            path = aStar(new_map, start, end)
+            path = aStar(new_map, treeMap, start, end)
             paths.append(path)
             # print(path)
 
