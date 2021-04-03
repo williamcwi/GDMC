@@ -86,8 +86,9 @@ def compareTreePosition(pos, mapArr, afterHM):
             z = pos[0] + newPos[0]
             x = pos[1] + newPos[1]
             # checks if it is water or lava
-            if mapArr[x][z] != 0 or afterHM[z][x] == -1 or afterHM[z][x] == -2:
-                return False
+            if z < len(mapArr[0]) and x < len(mapArr) and z > 0 and x > 0:
+                if mapArr[x][z] != 0 or afterHM[z][x] == -1 or afterHM[z][x] == -2:
+                    return False
         return True
 
     except Exception as e:
