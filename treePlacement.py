@@ -188,14 +188,17 @@ def createTreeMap(box, trees):
 
         # loops through trees and adjacent blocks
         for validTree in trees:
-            adj = [(0, 0), (0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]
+            adj = [(0, 0), (0, -1), (0, 1), (-1, 0), (1, 0)]
             for treeArea in adj:
                 z = validTree[0] + treeArea[0]
                 x = validTree[1] + treeArea[1]
-                treeMap[x][z] = 1
-        print(trees)
+                if treeArea == (0, 0):
+                    treeMap[x][z] = 2
+                else: 
+                    treeMap[x][z] = 1
+
         return treeMap
-        
+     
     except Exception as e:
         logger.error(e)
 
