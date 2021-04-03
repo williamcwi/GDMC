@@ -33,8 +33,8 @@ def calculateGrids(box, afterHM, xoffset, zoffset):
                 if(z - 1 >= 9 and z + 5 <= box.length - 9 and x - 1 >= 9 and x + 5 <= box.width - 9):
                     heights = []
                     isGateArea = False
-                    for ztemp in range(4):
-                        for xtemp in range(4):
+                    for ztemp in range(-1, 5):
+                        for xtemp in range(-1, 5):
                             if (((zgatePos <= (z + ztemp) < (zgatePos + zgateWidth)) and ((10 <= (x + xtemp) < 15) or ((len(tempGridArray[0]) - 13) <= (x + xtemp) < len(tempGridArray[0]))))):
                                     isGateArea = True
                                     break
@@ -281,12 +281,31 @@ def createBuildableAreaArray(level, box, afterHM, gridArray, heightArray, xoffse
                 numAdjacent = 0
                 if x < buildableAreaArray.shape[1] - 1:
                     if z > 0 and buildableAreaArray[z][x] == 0:
-                        xtemp = x
-                        while gridArray[z][xtemp] and heightArray[z][xtemp] == heightArray[z][x]:
-                            if gridArray[z - 1][xtemp] and heightArray[z - 1][xtemp] == heightArray[z][x] and buildableAreaArray[z][x] == 0 and buildableAreaArray[z - 1][xtemp] > 4:
-                                buildableAreaArray[z][x] = buildableAreaArray[z - 1][xtemp]
-                                buildableArea = True
-                            xtemp += 1
+                        ztemp = z
+                        zAreasToCheck = True
+                        while zAreasToCheck:
+                            xtemp = x
+                            xAreasToCheck = True
+                            while xAreasToCheck:
+                                if gridArray[ztemp - 1][xtemp] and heightArray[ztemp - 1][xtemp] == heightArray[z][x] and buildableAreaArray[z][x] == 0 and buildableAreaArray[ztemp - 1][xtemp] > 4:
+                                    buildableAreaArray[z][x] = buildableAreaArray[ztemp - 1][xtemp]
+                                    buildableArea = True
+                                if gridArray[ztemp][xtemp] and heightArray[ztemp][xtemp] == heightArray[z][x]:
+                                    xtemp += 1
+                                else:
+                                    ztemp += 1
+                                    xAreasToCheck = False
+                            zAreasToCheck = False
+
+
+
+                        # ztemp = z
+                        # xtemp = x
+                        # while gridArray[ztemp][xtemp] and heightArray[ztemp][xtemp] == heightArray[z][x]: 
+                            # if gridArray[z - 1][xtemp] and heightArray[z - 1][xtemp] == heightArray[z][x] and buildableAreaArray[z][x] == 0 and buildableAreaArray[z - 1][xtemp] > 4:
+                                # buildableAreaArray[z][x] = buildableAreaArray[z - 1][xtemp]
+                                # buildableArea = True
+                            # xtemp += 1
                     if(gridArray[z][x] and heightArray[z][x + 1] == heightArray[z][x]):
                         if buildableAreaArray[z][x] == 0:
                             buildableAreaArray[z][x] = currentID
