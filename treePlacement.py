@@ -86,9 +86,8 @@ def compareTreePosition(pos, mapArr, afterHM):
             z = pos[0] + newPos[0]
             x = pos[1] + newPos[1]
             # checks if it is water or lava
-            if z < len(mapArr[0]) and x < len(mapArr) and z > 0 and x > 0:
-                if mapArr[x][z] != 0 or afterHM[z][x] == -1 or afterHM[z][x] == -2:
-                    return False
+            if mapArr[x][z] != 0 or afterHM[z][x] == -1 or afterHM[z][x] == -2:
+                return False
         return True
 
     except Exception as e:
@@ -174,6 +173,31 @@ def generateTrees(heightMap, trees, level, box):
         else:
             level.copyBlocksFrom(tree_6, tree_6.bounds, Vector(x-4, y, z-3))
 
+# creates tree map
+def createTreeMap(box, trees):
+    try:
+        # create map of zeros
+        treeMap = []
+        for z in range(box.length):
+            row = []
+            for x in range(box.width):
+                row.append(0)
+            treeMap.append(row)
+        print(len(treeMap))
+
+        # loops through trees and adjacent blocks
+        for validTree in trees:
+            adj = [(0, 0), (0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]
+            for treeArea in adj:
+                z = validTree[0] + treeArea[0]
+                x = validTree[1] + treeArea[1]
+                treeMap[x][z] = 1
+        print(trees)
+        return treeMap
+        
+    except Exception as e:
+        logger.error(e)
+
 # acts as controller 
 def treePlacement(level, box, mapArr, afterHM):
     try:
@@ -184,7 +208,7 @@ def treePlacement(level, box, mapArr, afterHM):
         paddedMapArr = reassignGate(paddedMapArr)
         trees = treePositions(trees, paddedMapArr, afterHM)
         # print('trees')
-        # print(len(trees))
         generateTrees(afterHM, trees, level, box)
+        treeMap = createTreeMap(box, trees)
     except Exception as e:
         logger.error(e)
