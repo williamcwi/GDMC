@@ -5,7 +5,7 @@ from copy import deepcopy
 
 logger = Logger("farm")
 
-def init(level, box, heightMap, buildMap):
+def init(level, box, heightMap, buildMap, treeMap):
     tempHM = deepcopy(buildMap)
 
     def FFFF (x, y, area, limit):
@@ -20,22 +20,22 @@ def init(level, box, heightMap, buildMap):
             y = stonks[0][1]
             stonks.pop(0)
             if ((y - 3) > (8)) and ((x + 1) < (len(tempHM) - 8)) and ((x - 1) > (8)): # go to east
-                if tempHM[x][y - 1] == 0 and ((tempHM[x][y - 3] == 0 and tempHM[x + 1][y - 3] == 0 and tempHM[x - 1][y - 3] == 999) or (tempHM[x][y - 3] == 999 and tempHM[x + 1][y - 3] == 999 and tempHM[x - 1][y - 3] == 999)) and heightMap[y - 1][x] != -1:
+                if tempHM[x][y - 1] == 0 and ((tempHM[x][y - 3] == 0 and tempHM[x + 1][y - 3] == 0 and tempHM[x - 1][y - 3] == 999) or (tempHM[x][y - 3] == 999 and tempHM[x + 1][y - 3] == 999 and tempHM[x - 1][y - 3] == 999)) and heightMap[y - 1][x] != -1 and treeMap[x][y - 1] != 1:
                     stonks.append([x, y - 1])
                     area.append([x, y - 1])
                     tempHM[x][y - 1] = 999
             if ((y + 3) < (len(tempHM[x]) - 8)) and ((x + 1) < (len(tempHM) - 8)) and ((x - 1) > (8)): # go to west
-                if tempHM[x][y + 1] == 0 and ((tempHM[x][y + 3] == 0 and tempHM[x + 1][y + 3] == 0 and tempHM[x - 1][y + 3] == 0) or (tempHM[x][y + 3] == 999 and tempHM[x + 1][y + 3] == 999 and tempHM[x - 1][y + 3] == 999)) and heightMap[y + 1][x] != -1:
+                if tempHM[x][y + 1] == 0 and ((tempHM[x][y + 3] == 0 and tempHM[x + 1][y + 3] == 0 and tempHM[x - 1][y + 3] == 0) or (tempHM[x][y + 3] == 999 and tempHM[x + 1][y + 3] == 999 and tempHM[x - 1][y + 3] == 999)) and heightMap[y + 1][x] != -1 and treeMap[x][y + 1] != 1:
                     stonks.append([x, y + 1])
                     area.append([x, y + 1])
                     tempHM[x][y + 1] = 999
             if ((x + 3) < (len(tempHM) - 8)) and ((y + 1) < (len(tempHM[x]) - 8)) and ((y - 1) > (8)): # go to north
-                if tempHM[x + 1][y] == 0 and ((tempHM[x + 3][y] == 0 and tempHM[x + 3][y + 1] == 0 and tempHM[x + 3][y - 1] == 0) or (tempHM[x + 3][y] == 999 and tempHM[x + 3][y + 1] == 999 and tempHM[x + 3][y - 1] == 999)) and heightMap[y][x - 1] != -1:
+                if tempHM[x + 1][y] == 0 and ((tempHM[x + 3][y] == 0 and tempHM[x + 3][y + 1] == 0 and tempHM[x + 3][y - 1] == 0) or (tempHM[x + 3][y] == 999 and tempHM[x + 3][y + 1] == 999 and tempHM[x + 3][y - 1] == 999)) and heightMap[y][x + 1] != -1 and treeMap[x + 1][y] != 1:
                     stonks.append([x + 1, y])
                     area.append([x + 1, y])
                     tempHM[x + 1][y] = 999
             if ((x - 3) > (8)) and ((y + 1) < (len(tempHM[x]) - 8)) and ((y - 1) > (8)): # go to south
-                if tempHM[x - 1][y] == 0 and ((tempHM[x - 3][y] == 0 and tempHM[x - 3][y + 1] == 0 and tempHM[x - 3][y - 1] == 0) or (tempHM[x - 3][y] == 999 and tempHM[x - 3][y + 1] == 999 and tempHM[x - 3][y - 1] == 999)) and heightMap[y][x - 1] != -1:
+                if tempHM[x - 1][y] == 0 and ((tempHM[x - 3][y] == 0 and tempHM[x - 3][y + 1] == 0 and tempHM[x - 3][y - 1] == 0) or (tempHM[x - 3][y] == 999 and tempHM[x - 3][y + 1] == 999 and tempHM[x - 3][y - 1] == 999)) and heightMap[y][x - 1] != -1 and treeMap[x - 1][y] != 1:
                     stonks.append([x - 1, y])
                     area.append([x - 1, y])
                     tempHM[x - 1][y] = 999
@@ -69,7 +69,7 @@ def init(level, box, heightMap, buildMap):
             if valid:
                 ranSize = min(max(random.randint(int(((box.width + box.length / 2)) * 0.7), int(((box.width + box.length / 2)) * 0.9)), 50), 200)
                 area = FFFF(ranLocat[0], ranLocat[1], [], ranSize)
-                for cell in area: # --->Placing Water Wheat and farmland
+                for cell in area: # --->Placing Wheat and farmland
                     level.setBlockAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]] - 1, box.minz + cell[0], 60)
                     level.setBlockDataAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]], box.minz + cell[0], random.randint(3, 7))
                     level.setBlockAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]], box.minz + cell[0], 59)

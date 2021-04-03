@@ -85,9 +85,10 @@ def compareTreePosition(pos, mapArr, afterHM):
         for newPos in adj:
             z = pos[0] + newPos[0]
             x = pos[1] + newPos[1]
-            # checks if it is water or lava
-            if mapArr[x][z] != 0 or afterHM[z][x] == -1 or afterHM[z][x] == -2:
-                return False
+            if z < len(mapArr[0]) and x < len(mapArr) and z > 0 and x > 0:
+                # checks if it is water or lava
+                if mapArr[x][z] != 0 or afterHM[z][x] == -1 or afterHM[z][x] == -2:
+                    return False
         return True
 
     except Exception as e:
@@ -210,5 +211,6 @@ def treePlacement(level, box, mapArr, afterHM):
         # print('trees')
         generateTrees(afterHM, trees, level, box)
         treeMap = createTreeMap(box, trees)
+        return treeMap
     except Exception as e:
         logger.error(e)

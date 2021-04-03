@@ -112,11 +112,11 @@ def perform(level, box, options):
         #     f.close()
         
         # Places trees down
-        treePlacement.treePlacement(level, box, buildableAreaArray, afterHM)
+        treeMap = treePlacement.treePlacement(level, box, buildableAreaArray, afterHM)
 
         brush.run(gridArray, afterHM, startingPoint, level, box)
 
-        farm.init(level, box, afterHM, buildableAreaArray)
+        farm.init(level, box, afterHM, buildableAreaArray, treeMap)
 
         #---------->Experimential
         # incstart = time.time()
