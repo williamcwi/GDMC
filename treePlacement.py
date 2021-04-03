@@ -35,16 +35,16 @@ def findPosition(level, box):
             if z == 1:
                 bottomStart = trees[len(trees)-1]
             # # checks if the start is within the box x-axis selection and z-axis selection
-            # if box.minx <= tempStart[0] <= box.maxx and box.minz <= tempStart[1] <= box.maxz:
+            # if box.minx < tempStart[0] < box.maxx and box.minz < tempStart[1] < box.maxz:
             #     trees.append(tempStart)
             # loops through the x-axis within the box selection and dividing it into 11 sections
             for x in range(int(math.ceil((box.maxx-(box.minx-z))/11))):
                 position = [tempStart[0]+(11*x), tempStart[1]+x]
                 # checks if the position is within the box x-axis selection and box z-axis selection
-                if box.minx <= position[0] <= box.maxx and box.minz <= position[1] <= box.maxz:
+                if box.minx < position[0] < box.maxx and box.minz < position[1] < box.maxz:
                     trees.append(position)
                 else:
-                    if position[0] <= box.maxx and position[1] <= box.maxz:
+                    if position[0] < box.maxx and position[1] < box.maxz:
                         continue
                     else:
                         break
@@ -53,17 +53,17 @@ def findPosition(level, box):
             tempStart = [bottomStart[0]+z, bottomStart[1]-(11*z)]
             if z == 0:
                 pass
-            # if box.minx <= tempStart[0] <= box.maxx and box.minz <= tempStart[1] <= box.maxz:
+            # if box.minx < tempStart[0] < box.maxx and box.minz < tempStart[1] < box.maxz:
             #     trees.append(tempStart)
             for x in range(int(math.ceil((box.maxx-(box.minx-z))/11))):
                 position = [tempStart[0]-(11*x), tempStart[1]-x]
-                if box.minx <= position[0] <= box.maxx and box.minz <= position[1] <= box.maxz:
+                if box.minx < position[0] < box.maxx and box.minz < position[1] < box.maxz:
                     trees.append(position)
                     if position in trees:
                         trees.pop()
                         break
                 else: 
-                    if position[0] >= box.minx and position[1] >= box.minz:
+                    if position[0] > box.minx and position[1] > box.minz:
                         continue
                     else:
                         break
@@ -86,7 +86,7 @@ def compareTreePosition(pos, mapArr, afterHM):
             z = pos[0] + newPos[0]
             x = pos[1] + newPos[1]
             # checks if it is water or lava
-            if mapArr[z][x] != 0 or afterHM[z][x] == -1 or afterHM[z][x] == -2:
+            if mapArr[x][z] != 0 or afterHM[z][x] == -1 or afterHM[z][x] == -2:
                 return False
         return True
 
@@ -154,9 +154,9 @@ def generateTrees(heightMap, trees, level, box):
 
     #loops through the available tree plots
     for pos in trees:
-        x = pos[1] + box.minx
-        y = heightMap[pos[1]][pos[0]]
-        z = pos[0] + box.minz
+        x = pos[0] + box.minx
+        y = heightMap[pos[0]][pos[1]]
+        z = pos[1] + box.minz
 
         random_tree = random.randint(1, 6)
 
@@ -176,13 +176,14 @@ def generateTrees(heightMap, trees, level, box):
 # acts as controller 
 def treePlacement(level, box, mapArr, afterHM):
     try:
+        logger.info('Generating trees...')
         paddedMapArr = mapArr.copy()
         trees = findPosition(level, box)
         # updates trees array
         paddedMapArr = reassignGate(paddedMapArr)
         trees = treePositions(trees, paddedMapArr, afterHM)
         # print('trees')
-        # print(trees)
+        # print(len(trees))
         generateTrees(afterHM, trees, level, box)
     except Exception as e:
         logger.error(e)
