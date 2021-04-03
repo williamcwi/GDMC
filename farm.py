@@ -20,22 +20,22 @@ def init(level, box, heightMap, buildMap, treeMap):
             y = stonks[0][1]
             stonks.pop(0)
             if ((y - 3) > (8)) and ((x + 1) < (len(tempHM) - 8)) and ((x - 1) > (8)): # go to east
-                if tempHM[x][y - 1] == 0 and ((tempHM[x][y - 3] == 0 and tempHM[x + 1][y - 3] == 0 and tempHM[x - 1][y - 3] == 999) or (tempHM[x][y - 3] == 999 and tempHM[x + 1][y - 3] == 999 and tempHM[x - 1][y - 3] == 999)) and heightMap[y - 1][x] != -1 and treeMap[x][y - 1] != 1:
+                if tempHM[x][y - 1] == 0 and ((tempHM[x][y - 3] == 0 and tempHM[x + 1][y - 3] == 0 and tempHM[x - 1][y - 3] == 999) or (tempHM[x][y - 3] == 999 and tempHM[x + 1][y - 3] == 999 and tempHM[x - 1][y - 3] == 999)) and heightMap[y - 1][x] != -1 and treeMap[x][y - 1] == 0:
                     stonks.append([x, y - 1])
                     area.append([x, y - 1])
                     tempHM[x][y - 1] = 999
             if ((y + 3) < (len(tempHM[x]) - 8)) and ((x + 1) < (len(tempHM) - 8)) and ((x - 1) > (8)): # go to west
-                if tempHM[x][y + 1] == 0 and ((tempHM[x][y + 3] == 0 and tempHM[x + 1][y + 3] == 0 and tempHM[x - 1][y + 3] == 0) or (tempHM[x][y + 3] == 999 and tempHM[x + 1][y + 3] == 999 and tempHM[x - 1][y + 3] == 999)) and heightMap[y + 1][x] != -1 and treeMap[x][y + 1] != 1:
+                if tempHM[x][y + 1] == 0 and ((tempHM[x][y + 3] == 0 and tempHM[x + 1][y + 3] == 0 and tempHM[x - 1][y + 3] == 0) or (tempHM[x][y + 3] == 999 and tempHM[x + 1][y + 3] == 999 and tempHM[x - 1][y + 3] == 999)) and heightMap[y + 1][x] != -1 and treeMap[x][y + 1] == 0:
                     stonks.append([x, y + 1])
                     area.append([x, y + 1])
                     tempHM[x][y + 1] = 999
             if ((x + 3) < (len(tempHM) - 8)) and ((y + 1) < (len(tempHM[x]) - 8)) and ((y - 1) > (8)): # go to north
-                if tempHM[x + 1][y] == 0 and ((tempHM[x + 3][y] == 0 and tempHM[x + 3][y + 1] == 0 and tempHM[x + 3][y - 1] == 0) or (tempHM[x + 3][y] == 999 and tempHM[x + 3][y + 1] == 999 and tempHM[x + 3][y - 1] == 999)) and heightMap[y][x + 1] != -1 and treeMap[x + 1][y] != 1:
+                if tempHM[x + 1][y] == 0 and ((tempHM[x + 3][y] == 0 and tempHM[x + 3][y + 1] == 0 and tempHM[x + 3][y - 1] == 0) or (tempHM[x + 3][y] == 999 and tempHM[x + 3][y + 1] == 999 and tempHM[x + 3][y - 1] == 999)) and heightMap[y][x + 1] != -1 and treeMap[x + 1][y] == 0:
                     stonks.append([x + 1, y])
                     area.append([x + 1, y])
                     tempHM[x + 1][y] = 999
             if ((x - 3) > (8)) and ((y + 1) < (len(tempHM[x]) - 8)) and ((y - 1) > (8)): # go to south
-                if tempHM[x - 1][y] == 0 and ((tempHM[x - 3][y] == 0 and tempHM[x - 3][y + 1] == 0 and tempHM[x - 3][y - 1] == 0) or (tempHM[x - 3][y] == 999 and tempHM[x - 3][y + 1] == 999 and tempHM[x - 3][y - 1] == 999)) and heightMap[y][x - 1] != -1 and treeMap[x - 1][y] != 1:
+                if tempHM[x - 1][y] == 0 and ((tempHM[x - 3][y] == 0 and tempHM[x - 3][y + 1] == 0 and tempHM[x - 3][y - 1] == 0) or (tempHM[x - 3][y] == 999 and tempHM[x - 3][y + 1] == 999 and tempHM[x - 3][y - 1] == 999)) and heightMap[y][x - 1] != -1 and treeMap[x - 1][y] == 0:
                     stonks.append([x - 1, y])
                     area.append([x - 1, y])
                     tempHM[x - 1][y] = 999
