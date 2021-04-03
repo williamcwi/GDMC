@@ -167,24 +167,28 @@ def addBorder(level, box, gridArray, heightArray, xoffset, zoffset):
                         level.setBlockDataAt(box.minx + (x * 4) + xoffset - 1, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset + n, 1)
                     if northBorder(gridArray, heightArray, x, z):
                         if x > 0 and z > 0:
-                            if southBorder(gridArray, heightArray, x - 1, z - 1) == False:
+                            if southBorder(gridArray, heightArray, x - 1, z - 1) == False and level.blockAt(box.minx + (x * 4) + xoffset - 1, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset - 1) != 109:
                                 level.setBlockAt(box.minx + (x * 4) + xoffset - 1, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset - 1, 109)
+                                level.setBlockDataAt(box.minx + (x * 4) + xoffset - 1, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset - 1, 1)
                     if southBorder(gridArray, heightArray, x, z):
                         if x > 0 and z < gridArray.shape[0] - 1:
-                            if northBorder(gridArray, heightArray, x - 1, z + 1) == False:
+                            if northBorder(gridArray, heightArray, x - 1, z + 1) == False and level.blockAt(box.minx + (x * 4) + xoffset - 1, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset + 4) != 109:
                                 level.setBlockAt(box.minx + (x * 4) + xoffset - 1, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset + 4, 109)
+                                level.setBlockDataAt(box.minx + (x * 4) + xoffset - 1, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset + 4, 1)
                 if eastBorder(gridArray, heightArray, x, z):
                     for n in range(4):
                         level.setBlockAt(box.minx + (x * 4) + xoffset + 4, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset + n, 109)
                         level.setBlockDataAt(box.minx + (x * 4) + xoffset + 4, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset + n, 0)
                     if northBorder(gridArray, heightArray, x, z):
                         if x < gridArray.shape[1] - 1 and z > 0:
-                            if southBorder(gridArray, heightArray, x + 1, z - 1) == False:
+                            if southBorder(gridArray, heightArray, x + 1, z - 1) == False and level.blockAt(box.minx + (x * 4) + xoffset + 4, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset - 1) != 109:
                                 level.setBlockAt(box.minx + (x * 4) + xoffset + 4, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset - 1, 109)
+                                level.setBlockDataAt(box.minx + (x * 4) + xoffset + 4, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset - 1, 0)
                     if southBorder(gridArray, heightArray, x, z):
                         if x < gridArray.shape[1] - 1 and z < gridArray.shape[0] - 1:
-                            if northBorder(gridArray, heightArray, x + 1, z + 1) == False:
+                            if northBorder(gridArray, heightArray, x + 1, z + 1) == False and level.blockAt(box.minx + (x * 4) + xoffset + 4, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset + 4) != 109:
                                 level.setBlockAt(box.minx + (x * 4) + xoffset + 4, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset + 4, 109)
+                                level.setBlockDataAt(box.minx + (x * 4) + xoffset + 4, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset + 4, 0)
                 if northBorder(gridArray, heightArray, x, z):
                     for n in range(4):
                         level.setBlockAt(box.minx + (x * 4) + xoffset + n, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset - 1, 109)
