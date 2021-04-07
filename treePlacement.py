@@ -7,7 +7,6 @@ from logger import Logger
 
 import sys
 import numpy
-# numpy.set_printoptions(threshold=sys.maxsize)
 
 from pymclevel import MCSchematic
 from pymclevel.box import Vector
@@ -34,9 +33,6 @@ def findPosition(level, box):
             tempStart = [start[0]-z, start[1]+(11*z)]
             if z == 1:
                 bottomStart = trees[len(trees)-1]
-            # # checks if the start is within the box x-axis selection and z-axis selection
-            # if box.minx < tempStart[0] < box.maxx and box.minz < tempStart[1] < box.maxz:
-            #     trees.append(tempStart)
             # loops through the x-axis within the box selection and dividing it into 11 sections
             for x in range(int(math.ceil((box.maxx-(box.minx-z))/11))):
                 position = [tempStart[0]+(11*x), tempStart[1]+x]
@@ -53,8 +49,6 @@ def findPosition(level, box):
             tempStart = [bottomStart[0]+z, bottomStart[1]-(11*z)]
             if z == 0:
                 pass
-            # if box.minx < tempStart[0] < box.maxx and box.minz < tempStart[1] < box.maxz:
-            #     trees.append(tempStart)
             for x in range(int(math.ceil((box.maxx-(box.minx-z))/11))):
                 position = [tempStart[0]-(11*x), tempStart[1]-x]
                 if box.minx < position[0] < box.maxx and box.minz < position[1] < box.maxz:
@@ -67,7 +61,7 @@ def findPosition(level, box):
                         continue
                     else:
                         break
-        #print(trees)
+
         for t in trees:
             t[0] -= box.minx
             t[1] -= box.minz
@@ -97,7 +91,7 @@ def compareTreePosition(pos, mapArr, afterHM):
 # checks adjacent area of the 3x3 tree pos
 def treePositions(trees, mapArr, afterHM):
     try:
-        for idx, pos in reversed(list(enumerate(trees))): #[[0,0],[1,11]]
+        for idx, pos in reversed(list(enumerate(trees))): 
             adj = [(0, 0), (0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]
 
             randPlot = random.randint(0, len(adj)-1)
@@ -208,10 +202,9 @@ def treePlacement(level, box, mapArr, afterHM):
         logger.info('Generating trees...')
         paddedMapArr = mapArr.copy()
         trees = findPosition(level, box)
-        # updates trees array
         paddedMapArr = reassignGate(paddedMapArr)
+        # updates trees array
         trees = treePositions(trees, paddedMapArr, afterHM)
-        # print('trees')
         generateTrees(afterHM, trees, level, box)
         treeMap = createTreeMap(box, trees)
         return treeMap
