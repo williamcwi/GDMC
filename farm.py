@@ -8,6 +8,7 @@ logger = Logger("farm")
 def init(level, box, heightMap, buildMap, treeMap):
     tempHM = deepcopy(buildMap)
 
+    # Flood fill method to find area for farm
     def FFFF (x, y, area, limit):
         area.append([x,y])
         stonks = []
@@ -60,15 +61,15 @@ def init(level, box, heightMap, buildMap, treeMap):
         for plot in plotList: #Getting area for build
             valid = False
             i = 0
-            while valid == False:
+            while valid == False: # get random location in chunks size to start surveying
                 ranLocat = [min(random.randint(plot[0], plot[0] + 16), len(heightMap[0]) - 13), min(random.randint(plot[1], plot[1] + 16), len(heightMap) - 13)]
                 valid = True if tempHM[ranLocat[0]][ranLocat[1]] == 0 else False
                 i += 1 
                 if i > 256: break
 
             if valid:
-                ranSize = min(max(random.randint(int(((box.width + box.length / 2)) * 0.7), int(((box.width + box.length / 2)) * 0.9)), 50), 200)
-                area = FFFF(ranLocat[0], ranLocat[1], [], ranSize)
+                ranSize = min(max(random.randint(int(((box.width + box.length / 2)) * 0.7), int(((box.width + box.length / 2)) * 0.9)), 50), 200) #get random size of farm
+                area = FFFF(ranLocat[0], ranLocat[1], [], ranSize) #survey for continous area form farm placement
                 for cell in area: # --->Placing Wheat and farmland
                     level.setBlockAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]] - 1, box.minz + cell[0], 60)
                     level.setBlockDataAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]], box.minz + cell[0], random.randint(3, 7))
@@ -78,7 +79,7 @@ def init(level, box, heightMap, buildMap, treeMap):
                 for cell in area: # --->Placing Water Block
                     surrounding = set([heightMap[cell[1] + 1][cell[0]], heightMap[cell[1] - 1][cell[0]], heightMap[cell[1]][cell[0] + 1], heightMap[cell[1]][cell[0] - 1]])
                     surrounding_x = list(set([tempHM[cell[0] + 1][cell[1]], tempHM[cell[0] - 1][cell[1]], tempHM[cell[0]][cell[1] + 1], tempHM[cell[0]][cell[1] - 1]]))
-                    if (min(surrounding) >= heightMap[cell[1]][cell[0]]) and (len(surrounding_x) == 1 and surrounding_x[0] == 999):
+                    if (min(surrounding) >= heightMap[cell[1]][cell[0]]) and (len(surrounding_x) == 1 and surrounding_x[0] == 999): # if surrounding is not higher than water blocks and buildable
                         level.setBlockAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]] - 1, box.minz + cell[0], 9)
                         level.setBlockDataAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]], box.minz + cell[0], 0)
                         level.setBlockAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]], box.minz + cell[0], 0)

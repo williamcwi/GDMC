@@ -40,7 +40,7 @@ def floodFill(level, box, heightMap, waterHM, minimumArea, exclusion = 0): # Flo
         }
         alterDict = dict()
         alterHeightDict = dict()
-
+        # Flood fill by Recursive to discover buildable area
         def FF(x, y, area):
             tempHM[x][y] = 999
             area.append([x,y])
@@ -58,7 +58,7 @@ def floodFill(level, box, heightMap, waterHM, minimumArea, exclusion = 0): # Flo
                     if tempHM[x - 1][y] == currentLevel:
                         area = FF(x - 1, y, area)
             return area
-
+        # Flood fill by Queue to discover buildable area
         def FFFF (x, y, area):
             area.append([x,y])
             stonks = []
@@ -92,7 +92,7 @@ def floodFill(level, box, heightMap, waterHM, minimumArea, exclusion = 0): # Flo
                         tempHM[x - 1][y] = 999
                 length = len(stonks)
             return area
-
+        # Flood fill by Recursive to discover non-assigned area
         def FFZero(x, y, area, height, water, surroundingRegion):
             if maskedHM[x][y] == "wate":
                 water.append([x,y])
@@ -124,7 +124,7 @@ def floodFill(level, box, heightMap, waterHM, minimumArea, exclusion = 0): # Flo
                     elif maskedHM[x][y + 1] != "0000" and maskedHM[x][y + 1] != 999 and maskedHM[x][y + 1] not in excludedBlocks.values():
                         surroundingRegion.append(maskedHM[x][y + 1])
             return area, height, water, surroundingRegion
-
+        # Flood fill by Queue to discover non-assigned area
         def FFFFZero (x, y, area, height, water, surroundingRegion):
             if maskedHM[x][y] == "wate":
                 water.append([x,y])
@@ -208,23 +208,21 @@ def floodFill(level, box, heightMap, waterHM, minimumArea, exclusion = 0): # Flo
         logger.info("Calucating Non-Region")
         for x in range(exclusion, (len(maskedHM) - exclusion)):
             for y in range(exclusion, (len(maskedHM[0]) - exclusion)):
-                # logger.info(u"{} {}".format(x, y))
                 if maskedHM[x][y] == "0000":
                     area, height, water, surroundingRegion = FFFFZero(x, y, [], [], [], [])
                     region = None
                     if len(surroundingRegion) > 0:
                         region = max(set(surroundingRegion), key=surroundingRegion.count)   
-                    if region != None and len(area) <= (minimumArea * 4):
-                        for item in area:
-                                # diffHM[item[0]][item[1]] =  - (heightMap[item[0]][item[1]] - int((heightMap[item[0]+1][item[1]] + heightMap[item[0]-1][item[1]] + heightMap[item[0]][item[1]+1] + heightMap[item[0]][item[1]-1])/4)) if maskedHM[item[0]][item[1]] in excludedBlocks.values() else (regionDict.get(int(maskedHM[item[0]][item[1]])) - heightMap[item[0]][item[1]])
+                    if region != None and len(area) <= (minimumArea * 4): #if non-assigned area is bordered with an assigned area
+                        for item in area: # Assign assigned area to non-assigned area
                                 alterDict[item[0],item[1]] = (regionDict.get(int(region)) - waterHM[item[0]][item[1]]) if heightMap[item[0]][item[1]] == -1 else (regionDict.get(int(region)) - heightMap[item[0]][item[1]])
                                 alterHeightDict[item[0],item[1]] = waterHM[item[0]][item[1]] if heightMap[item[0]][item[1]] == -1 else heightMap[item[0]][item[1]]
                                 if heightMap[item[0]][item[1]] == -1 and (regionDict.get(int(region)) - waterHM[item[0]][item[1]] > 0):
                                     level.setBlockAt(box.minx + item[0], waterHM[item[0]][item[1]] - 1, box.minz + item[1], 2)
                                 maskedHM[item[0]][item[1]] = region
                                 
-                    else:
-                        tempHeight = deepcopy(height)
+                    else: #if non-assigned area not bordered with an assigned area
+                        tempHeight = deepcopy(height) # remove top and bottom section to make way for buildable area
                         tempHeight.sort()
                         tempHeight = [i for i in tempHeight if i > 0]
                         if len(tempHeight) > 1:
@@ -268,7 +266,6 @@ def floodFill(level, box, heightMap, waterHM, minimumArea, exclusion = 0): # Flo
                                         for i in range(len(height)):
                                             if height[i] in lowerRemoval and targetHeight > 0:
                                                     if heightMap[area[i][0]][area[i][1]] == -1:
-                                                        # if len(water) < ((len(area) - len(water)) / 10) and (waterHM[area[i][0]][area[i][1]] > 63 or waterHM[area[i][0]][area[i][1]] < 63):
                                                             level.setBlockAt(box.minx + area[i][0], waterHM[area[i][0]][area[i][1]] - 1, box.minz + area[i][1], 2)
                                                             level.setBlockDataAt(box.minx + area[i][0], waterHM[area[i][0]][area[i][1]] - 1, box.minz + area[i][1], 0)
                                                             level.setBlockAt(box.minx + area[i][0], targetHeight - 1, box.minz + area[i][1], 2)
@@ -290,7 +287,7 @@ def floodFill(level, box, heightMap, waterHM, minimumArea, exclusion = 0): # Flo
         logger.error(e)
 
 def editTerrainFF(level, box, alterDict, alterHeightdict):
-    try:
+    try: # Edit terrain by height and location by dictionary passed
         for key, value in alterDict:
             x = key
             y = value
