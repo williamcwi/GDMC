@@ -232,7 +232,7 @@ def floodFill(level, box, heightMap, waterHM, minimumArea, exclusion = 0): # Flo
                             lowerRemoval = list(set(lowerRemoval))
                             if len([i for i in list(set(tempHeight)) if i not in upperRemoval]) > 1:
                                 targetHeight = max([i for i in list(set(tempHeight)) if i not in upperRemoval])
-                                if len(tempHeight[int(len(tempHeight) * 0.75):len(tempHeight)]) > 3:
+                                if len(tempHeight[int(len(tempHeight) * 0.75):len(tempHeight)]) > 1:
                                     for i in range(len(height)):
                                         if height[i] in upperRemoval and height[i] > 0 and targetHeight > 0:
                                             if len(water) < minimumArea:
@@ -247,7 +247,7 @@ def floodFill(level, box, heightMap, waterHM, minimumArea, exclusion = 0): # Flo
 
                             if len([i for i in list(set(tempHeight)) if i not in lowerRemoval]) > 1:
                                 targetHeight = min([i for i in list(set(tempHeight)) if i not in lowerRemoval])
-                                if len(tempHeight[0:int(len(tempHeight) * 0.1)]) > 3:
+                                if len(tempHeight[0:int(len(tempHeight) * 0.1)]) > 1:
                                     widthLFlag = False
                                     widthRFlag = False
                                     heightUFlag = False
