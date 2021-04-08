@@ -72,7 +72,7 @@ def init(level, box, heightMap, buildMap, treeMap):
                 area = FFFF(ranLocat[0], ranLocat[1], [], ranSize) #survey for continous area form farm placement
                 for cell in area: # --->Placing Wheat and farmland
                     level.setBlockAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]] - 1, box.minz + cell[0], 60)
-                    level.setBlockDataAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]], box.minz + cell[0], random.randint(3, 7))
+                    level.setBlockDataAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]] - 1, box.minz + cell[0], random.randint(3, 7))
                     level.setBlockAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]], box.minz + cell[0], 59)
                     level.setBlockDataAt(box.minx + cell[1] , heightMap[cell[1]][cell[0]], box.minz + cell[0], random.randint(0, 6))
 
