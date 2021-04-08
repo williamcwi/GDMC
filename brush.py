@@ -105,7 +105,7 @@ def run(gridArray, heightMap, startingPoint, level, box):
         prevPlotRemaining = plotRemaining
         for index in range(10):
             plotRemaining = sumPlotAvilable
-            logger.info(u'{} - calc - {}'.format(index, plotRemaining))
+            logger.info(u'Attempt {} - {} Locations'.format(index, plotRemaining))
             build = True
             localPlotWeightingDict = plotWeightingDict.copy()
             localPlotNumDict = plotNumDict.copy()
@@ -167,10 +167,8 @@ def run(gridArray, heightMap, startingPoint, level, box):
                 prevPlotRemaining = plotRemaining
                 if (idle >= (sumPlotAvilable * 5)):
                     build = False
-                    logger.info(u'{} - idleOut - {}'.format(index, plotRemaining))
                 if plotRemaining <= 0:
                     build = False
-                    logger.info(u'{} - outOut - {}'.format(index, plotRemaining))
             attemptBuildDict[index] = builtDict #store allocation list
             attemptOccDict[index] = occPlot #store occupied plot list
             attemptScoringDict[index] = round((scoring * (float(len(occPlot)) / float(sumPlotAvilable)))) if len(occPlot) > 1 else 0   #store fitness of generation   
