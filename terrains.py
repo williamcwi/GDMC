@@ -235,15 +235,14 @@ def floodFill(level, box, heightMap, waterHM, minimumArea, exclusion = 0): # Flo
                                 if len(tempHeight[int(len(tempHeight) * 0.75):len(tempHeight)]) > 1:
                                     for i in range(len(height)):
                                         if height[i] in upperRemoval and height[i] > 0 and targetHeight > 0:
-                                            if len(water) < minimumArea:
-                                                if heightMap[area[i][0]][area[i][1]] == -1:
-                                                    # if waterHM[area[i][0]][area[i][1]] > 63 or waterHM[area[i][0]][area[i][1]] < 63:
-                                                        level.setBlockAt(box.minx + area[i][0], waterHM[area[i][0]][area[i][1]] - 1, box.minz + area[i][1], 2)
-                                                        level.setBlockDataAt(box.minx + area[i][0], waterHM[area[i][0]][area[i][1]] - 1, box.minz + area[i][1], 0)
-                                                        level.setBlockAt(box.minx + area[i][0], targetHeight - 1, box.minz + area[i][1], 2)
-                                                        level.setBlockDataAt(box.minx + area[i][0], targetHeight - 1, box.minz + area[i][1], 0)
-                                                alterDict[area[i][0], area[i][1]] = targetHeight - height[i]
-                                                alterHeightDict[area[i][0], area[i][1]] = height[i]
+                                            if heightMap[area[i][0]][area[i][1]] == -1:
+                                                # if waterHM[area[i][0]][area[i][1]] > 63 or waterHM[area[i][0]][area[i][1]] < 63:
+                                                    level.setBlockAt(box.minx + area[i][0], waterHM[area[i][0]][area[i][1]] - 1, box.minz + area[i][1], 2)
+                                                    level.setBlockDataAt(box.minx + area[i][0], waterHM[area[i][0]][area[i][1]] - 1, box.minz + area[i][1], 0)
+                                                    level.setBlockAt(box.minx + area[i][0], targetHeight - 1, box.minz + area[i][1], 2)
+                                                    level.setBlockDataAt(box.minx + area[i][0], targetHeight - 1, box.minz + area[i][1], 0)
+                                            alterDict[area[i][0], area[i][1]] = targetHeight - height[i]
+                                            alterHeightDict[area[i][0], area[i][1]] = height[i]
 
                             if len([i for i in list(set(tempHeight)) if i not in lowerRemoval]) > 1:
                                 targetHeight = min([i for i in list(set(tempHeight)) if i not in lowerRemoval])
