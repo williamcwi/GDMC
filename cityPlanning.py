@@ -4,18 +4,23 @@ import numpy as np
 import common
 from copy import deepcopy
 
-logger = Logger('cityPlanning')
+name = 'cityPlanning'
+logger = Logger(name)
 
 def bestStartingPoint(box, afterHM):
     try:
+        logger.info('Calculating optimal starting x and z coordinates for grid...')
         pointDict = dict()
         for x in range(4):
             for z in range(4):
+                # Iterate through all 16 combinations of x and z offset
                 xoffset, zoffset, gridArray, innerGridArray, heightArray, innerHeightArray = calculateGrids(box, afterHM, x, z)
-                # print(np.sum(gridArray))
                 pointDict[str(xoffset), str(zoffset)] = np.sum(gridArray)
+        # Find the x and z offset resulting in the highest number of flat 4x4 areas
         bestPoint = (max(pointDict, key = pointDict.get))
+        # This becomes the starting point for the grid
         xoffset, zoffset, gridArray, innerGridArray, heightArray, innerHeightArray = calculateGrids(box, afterHM, int(bestPoint[0]), int(bestPoint[1]))
+        logger.info('Placing grid with x offset {} and z offset {}'.format(xoffset, zoffset))
         return map(int, bestPoint), gridArray, innerGridArray, heightArray, innerHeightArray
     except Exception as e:
         logger.error(e)
@@ -33,6 +38,7 @@ def calculateGrids(box, afterHM, xoffset, zoffset):
                 if(z - 1 >= 9 and z + 5 <= box.length - 9 and x - 1 >= 9 and x + 5 <= box.width - 9):
                     heights = []
                     isGateArea = False
+                    # Check that the 4x4 area does not overlap with where the gate entrances will be placed
                     for ztemp in range(-1, 5):
                         for xtemp in range(-1, 5):
                             if (((zgatePos <= (z + ztemp) < (zgatePos + zgateWidth)) and ((10 <= (x + xtemp) < 15) or ((len(tempGridArray[0]) - 13) <= (x + xtemp) < len(tempGridArray[0]))))):
@@ -43,17 +49,20 @@ def calculateGrids(box, afterHM, xoffset, zoffset):
                                     break
                             if isGateArea:
                                 break
+                    # Only attempt to label the 4x4 area as buildable if it is not a gate area
                     if isGateArea == False:
                         for zgrid in range(-1, 5):
                             for xgrid in range(-1, 5):
                                 heights.append(afterHM[x + xgrid][z + zgrid])
                         if len(set(heights)) == 1 and heights[0] > 0:
+                            # If entire 6x6 area containing 4x4 has the same height level, label it as a buildable area. The 6x6 is checked so that a border can be added
                             gridArray[z / 4][x / 4] = True
                             heightArray[z / 4][x / 4] = heights[0]
                         for zgrid in range(4):
                             for xgrid in range(4):
                                 heights.append(afterHM[x + xgrid][z + zgrid])
                         if len(set(heights)) == 1 and heights[0] > 0:
+                            # An "inner" buildable area is one in which the 4x4 area is flat, but the 6x6 containing it is not
                             innerGridArray[z / 4][x / 4] = True
                             innerHeightArray[z / 4][x / 4] = heights[0]
         return xoffset, zoffset, gridArray, innerGridArray, heightArray, innerHeightArray
@@ -62,15 +71,18 @@ def calculateGrids(box, afterHM, xoffset, zoffset):
 
 def expandBuildableAreas(level, box, afterHM, gridArray, innerGridArray, heightArray, innerHeightArray, xoffset, zoffset):
     try:
-        buildableAreasArray = np.full((math.ceil(float(box.length) / 4), math.ceil(float(box.width) / 4)), False)
+        logger.info('Expanding buildable areas...')
+        buildableAreasArray = np.full((math.ceil(float(box.length) / 4), math.ceil(float(box.width) / 4)), 0)
         for z in range(gridArray.shape[0]):
             for x in range(gridArray.shape[1]):
                 buildableAreasArray[z][x] = getAdjacentBuildableAreas(gridArray, innerGridArray, x, z)
         for z in range(gridArray.shape[0]):
             for x in range(gridArray.shape[1]):
                 if hasMostBuildableAreas(buildableAreasArray, x, z) and innerGridArray[z][x] == True and gridArray[z][x] == False:
-                    print("Claiming border.")
+                    # "Claim" a border adjacent to multiple other buildable areas. Only the largest adjacent buildable area is allowed to claim the border
+                    logger.info('Claiming border at region {},{}'.format(x, z))
                     claimBorder(level, box, afterHM, innerHeightArray, x, z, xoffset, zoffset)
+                    # Set the corresponding 6x6 area to buildable, as it has now been claimed
                     gridArray[z][x] = True
                     heightArray[z][x] = innerHeightArray[z][x]
         return gridArray, heightArray
@@ -81,6 +93,7 @@ def getAdjacentBuildableAreas(gridArray, innerGridArray, x, z):
     try:
         adjacentBuildableAreas = 0
         if innerGridArray[z][x] == True and gridArray[z][x] == False:
+            # Add up the number of adjacent 4x4 buildable areas
             if x > 0:
                 if gridArray[z][x - 1]:
                     adjacentBuildableAreas += 1
@@ -105,11 +118,13 @@ def getAdjacentBuildableAreas(gridArray, innerGridArray, x, z):
             if z < gridArray.shape[0] - 1:
                 if gridArray[z + 1][x]:
                     adjacentBuildableAreas += 1
+        return adjacentBuildableAreas
     except Exception as e:
         logger.error(e)
 
 def hasMostBuildableAreas(buildableAreasArray, x, z):
     try:
+        # Compares a buildable area with all adjacent areas to find which one is connected to the most buildable areas
         if x > 0:
             if buildableAreasArray[z][x - 1] > buildableAreasArray[z][x]:
                 return False
@@ -145,12 +160,15 @@ def claimBorder(level, box, afterHM, innerHeightArray, x, z, xoffset, zoffset):
                 xpos = (x * 4) + xoffset + xgrid
                 zpos = (z * 4) + zoffset + zgrid
                 ypos = afterHM[xpos][zpos]
+                # "Claims" border by raising/lowering the height level of each block to that of the inner area
                 if innerHeightArray[z][x] < ypos:
                     while innerHeightArray[z][x] < ypos:
+                        # Lowers the height level
                         level.setBlockAt(box.minx + xpos, ypos, box.minz + zpos, 0)
                         ypos -= 1
                 if innerHeightArray[z][x] > ypos:
                     while innerHeightArray[z][x] > ypos:
+                        # Raises the height level
                         block = level.blockAt(box.minx + xpos, ypos, box.minz + zpos)
                         level.setBlockAt(box.minx + xpos, ypos, box.minz + zpos, block)
                         ypos += 1
@@ -159,8 +177,10 @@ def claimBorder(level, box, afterHM, innerHeightArray, x, z, xoffset, zoffset):
 
 def addBorder(level, box, gridArray, heightArray, xoffset, zoffset):
     try:
+        logger.info('Adding stone brick borders...')
         for z in range(gridArray.shape[0]):
             for x in range(gridArray.shape[1]):
+                # Adds stone brick borders around buildable areas in all four cardinal directions, then adds corner stairs as necessary.
                 if westBorder(gridArray, heightArray, x, z):
                     for n in range(4):
                         level.setBlockAt(box.minx + (x * 4) + xoffset - 1, heightArray[z][x] - 1, box.minz + (z * 4) + zoffset + n, 109)
@@ -262,10 +282,12 @@ def southBorder(gridArray, heightArray, x, z):
 
 def createBuildableAreaArray(level, box, afterHM, gridArray, heightArray, xoffset, zoffset):
     try:
+        logger.info('Labelling buildable areas...')
         gridArray = np.array(gridArray)
         heightArray = np.array(heightArray)
         buildableAreaArray = np.full((box.length, box.width), 0)
         zgateWidth, xgateWidth, zgatePos, xgatePos = calculateGridPositions(buildableAreaArray)
+        # Adds the north, west, east, and south gates as the first areas to connect, labelled 1 through 4
         for z in range(zgateWidth):
             for x in range(5):
                 buildableAreaArray[zgatePos + z][9 + x] = 2
@@ -279,12 +301,14 @@ def createBuildableAreaArray(level, box, afterHM, gridArray, heightArray, xoffse
         for z in range(buildableAreaArray.shape[0]):
             for x in range(buildableAreaArray.shape[1]):
                 numAdjacent = 0
+                # Labels all blocks that are part of buildable areas, ensuring each area has a unique identifying number
                 if x < buildableAreaArray.shape[1] - 1:
                     if z > 0 and buildableAreaArray[z][x] == 0:
                         ztemp = z
                         xtemp = x
                         xAreasToCheck = True
                         zAreasToCheck = True
+                        # Checks if the current block connects to any existing buildable areas. If so, labels it with the same number
                         while zAreasToCheck:
                             while xAreasToCheck:
                                 if gridArray[ztemp - 1][xtemp] and heightArray[ztemp - 1][xtemp] == heightArray[z][x] and buildableAreaArray[z][x] == 0 and buildableAreaArray[ztemp - 1][xtemp] > 4:
@@ -317,9 +341,11 @@ def createBuildableAreaArray(level, box, afterHM, gridArray, heightArray, xoffse
                         if buildableAreaArray[z + 1][x] == 0 and buildableAreaArray[z][x] > 4:
                             buildableAreaArray[z + 1][x] = buildableAreaArray[z][x]
                 if(numAdjacent == 0 and buildableArea):
+                    # Iterates to the next number once it has run out of blocks to label with the existing one
                     currentID += 1
                     buildableArea = False
         tempBuildableAreaArray = np.copy(buildableAreaArray)
+        # Adds the border blocks to the buildable area labelling
         for z in range(9, buildableAreaArray.shape[0] - 9):
             for x in range(9, buildableAreaArray.shape[1] - 9):
                 if buildableAreaArray[z - 1][x] > 4 and buildableAreaArray[z][x] == 0:
@@ -345,6 +371,7 @@ def createBuildableAreaArray(level, box, afterHM, gridArray, heightArray, xoffse
 
 def calculateGridPositions(array):
     try:
+        # Calculates where the gate entrances for the walls will be. Used in several methods to avoid overlap with buildable areas
         zgateWidth = (array.shape[0] - 16) % 8
         while zgateWidth < 6:
             zgateWidth += 4
