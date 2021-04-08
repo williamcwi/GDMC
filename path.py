@@ -2,9 +2,24 @@ from logger import Logger
 from collections import Counter
 import math
 
+
 name = 'path'
 logger = Logger(name)
 
+
+# Buildable area filter
+# =============================================================================================
+def areaScreening(mapArr):
+    toZero = []
+    for x in range(1, len(mapArr) - 1):
+        for y in range(1, len(mapArr[0]) - 1):
+            if mapArr[x][y] > 0:
+                plotArea = list([mapArr[i][k] for i in range(x - 1, x + 2) for k in range(y - 1, y + 2)])
+                if len(set(plotArea)) == 1:
+                    toZero.append([x,y])
+    for cell in toZero:
+        mapArr[cell[0]][cell[1]] = 0
+    return mapArr
 
 # Convert 2DArray to startingPosition
 # =============================================================================================
