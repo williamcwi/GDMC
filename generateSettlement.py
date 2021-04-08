@@ -26,15 +26,24 @@ import numpy as np
 
 inputs = [
     (
-        ('Settlement Generator', 'title'),
+        ('2021 Settlement Generation Challenge', 'title'),
         
         ('By William, Selina, Ho Kiu, Rhys', 'label'),
+        ('University of Kent - CO600 submission', 'label'),
         ('', 'label'),
+        ('Installation: ', 'label'),
+        ('1. Drop all files in MCEdit filters folder, including the schematics folder', 'label'),
+        ('2. Make a selection of where to generate the settlement', 'label'),
+        ('The filter script will automatically select 1 to 256 for y-axis', 'label'),
+        ('3. Click on filter -> filter', 'label'),
+        ('4. Wait for settlement to generate', 'label'),
+        ('Generation time may vary depending of the selection', 'label'),
+        ('Check terminal for information on generation progress', 'label'),
 
-    ),
-    (
-        ('Settlement Settings', 'title'),
-    )
+    )# ,
+    # (
+    #     ('Settlement Settings', 'title'),
+    # )
 ]
 
 name = 'generateSettlement'
@@ -101,20 +110,10 @@ def perform(level, box, options):
 
         gridArray = np.array(gridArray)
         heightArray = np.array(heightArray)
-
-        # if platform.system()==("Darwin") and int(platform.release()[:2]) >= 19:
-        #     with open(os.path.join(os.path.expanduser("~/Desktop"),'test-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
-        #         for z in range(buildableAreaArray.shape[0]):
-        #             np.savetxt(f, buildableAreaArray[z], fmt='%2.0f', newline=" ")
-        #     f.close()
-        # else:
-        #     with open(os.path.join(os.path.dirname(__file__),'test','test-'+ datetime.datetime.now().strftime('%H%M%S') +'.txt'), 'w+') as f:
-        #         for z in range(buildableAreaArray.shape[0]):
-        #             np.savetxt(f, buildableAreaArray[z], fmt='%2.0f', newline=" ")
-        #     f.close()
         
         # Include gate pavement in AfterHM
         afterHM = common.mapGatePaveToHeightMap(box.minx, box.minz, afterHM, gate_pos_1, gate_pos_2, gate_pos_3, gate_pos_4, x_gate, z_gate)
+        whm = heightmap.waterHeightMap(level, box)
 
         combinedHM = terrains.findWaterSurface(whm, afterHM)
         
@@ -124,19 +123,6 @@ def perform(level, box, options):
         brush.run(gridArray, afterHM, startingPoint, level, box)
 
         farm.init(level, box, afterHM, buildableAreaArray, treeMap)
-
-        #---------->Experimential
-        # incstart = time.time()
-        # brush.CTPFF(afterHM, 9, 169, level, box)
-        # incend = time.time()
-        # logger.debug(u'{} sec used'.format(round(incend - incstart, 2)))
-
-        #---------->Genetic A
-        # # Determine plots
-        # plots.run(gridArray)
-
-        # # Generate simple house
-        # generateStructure.generateSimpleHouse(level, box)
 
         # Path finding algorithm
         path.generatePaths(level, box, buildableAreaArray, treeMap, combinedHM)
