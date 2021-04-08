@@ -98,9 +98,6 @@ def perform(level, box, options):
         # Remove buildable areas that is too small
         gridArray = cityPlanning.screening(gridArray)
 
-        # Add border around buildable areas
-        cityPlanning.addBorder(level, box, gridArray, heightArray, startingPoint[0], startingPoint[1])
-
         # Convert grid and height array to 1x1
         newGridArray = common.mapArray(gridArray, startingPoint[0], startingPoint[1], box)
         newHeightArray = common.mapArray(heightArray, startingPoint[0], startingPoint[1], box)
@@ -120,8 +117,13 @@ def perform(level, box, options):
         # Places trees down and return treeMap
         treeMap = treePlacement.treePlacement(level, box, buildableAreaArray, afterHM)
 
+        # Add border around buildable areas
+        cityPlanning.addBorder(level, box, gridArray, heightArray, startingPoint[0], startingPoint[1])
+
+        # Building Allocation
         brush.run(gridArray, afterHM, startingPoint, level, box)
 
+        # Constructing Farm
         farm.init(level, box, afterHM, buildableAreaArray, treeMap)
 
         # Path finding algorithm
