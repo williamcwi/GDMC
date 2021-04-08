@@ -231,7 +231,7 @@ def aStar(mapArr, treeMap, start, end):
         children = []
 
         adjacent = [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]
-        orthogonal = [(0, -1), (0, 1), (-1, 0), (1, 0)]
+        orthogonal = [[0, -1], [0, 1], [-1, 0], [1, 0]]
 
         # all adjacent including diagonal
         # for new_position in adjacent:
@@ -245,7 +245,7 @@ def aStar(mapArr, treeMap, start, end):
         for new_position in orthogonal:
             dist = 1.0
 
-            node_position = (current_node.position[0] + new_position[0], current_node.position[1] + new_position[1])
+            node_position = [current_node.position[0] + new_position[0], current_node.position[1] + new_position[1]]
 
             if node_position[0] > (len(mapArr) - 1) or node_position[0] < 0 or node_position[1] > (len(mapArr[len(mapArr)-1]) -1) or node_position[1] < 0:
                 # position out of range
@@ -263,15 +263,25 @@ def aStar(mapArr, treeMap, start, end):
             children.append(new_node)
 
         for child in children:
+            VALID_FLAG = True
             for closed_child in close_list:
                 if child == closed_child:
+                    VALID_FLAG = False
                     # child in close list
+                    continue
+                if (child.position[0] == closed_child.position[0]) and (child.position[1] == closed_child.position[1]):
+                    VALID_FLAG = False
                     continue
             for open_node in open_list:
                 if child == open_node and child.g > open_node.g:
                     # greater g distance from start
+                    VALID_FLAG = False
                     continue
-            open_list.append(child)
+                if (child.position[0] == open_node.position[0]) and (child.position[1] == open_node.position[1]):
+                    VALID_FLAG = False
+                    continue
+            if VALID_FLAG:
+                open_list.append(child)
 
 def newMap(mapArr, start, end):
     mapArr[start[0]][start[1]] = 0
@@ -420,10 +430,9 @@ def placePath(level, box, paths, heightMap):
 def generatePaths(level, box, mapArr, treeMap, heightMap):
     try:
 
+        mapArr = areaScreening(mapArr)
         startingPositions = getStartingPosition(mapArr)
-
         vertices = len(startingPositions)
-
         logger.info('Finding all possible paths...')
 
         # input:
@@ -432,7 +441,6 @@ def generatePaths(level, box, mapArr, treeMap, heightMap):
         # startingPositions = [area]
 
         pairsList = getAllPairs(startingPositions)
-        # print(pairsList)
 
         matrix = toMatrix(pairsList, vertices)
         # print(matrix)
@@ -440,19 +448,17 @@ def generatePaths(level, box, mapArr, treeMap, heightMap):
         logger.info("Running Prim's minimum spanning tree...")
 
         links = primMST(vertices, matrix)
-        # print(links)
 
         aStarStarting = getAStarStarting(pairsList, links)
         # print('aStarStarting: ')
         # print(aStarStarting)
-
         logger.info('Running A* algorithm...')
         
         paths = []
         for pair in aStarStarting:
             new_map = newMap(mapArr, pair[0], pair[1])
-            start = (pair[0][0], pair[0][1])
-            end = (pair[1][0], pair[1][1])
+            start = [pair[0][0], pair[0][1]]
+            end = [pair[1][0], pair[1][1]]
             # print(start, end)
             path = aStar(new_map, treeMap, start, end)
             paths.append(path)
