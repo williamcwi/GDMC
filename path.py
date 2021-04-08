@@ -311,6 +311,11 @@ def placePath(level, box, paths, heightMap):
 
                 if block_difference > 1: # higher
 
+                    level.setBlockAt(x, y, z, 98)
+                    level.setBlockDataAt(x, y, z, 0)
+                    level.setBlockAt(x, y+1, z, 0)
+                    level.setBlockDataAt(x, y+1, z, 0)
+
                     # find ladder position
                     if block[0] > previous_block[0]:
                         position = 2 # north
@@ -336,11 +341,13 @@ def placePath(level, box, paths, heightMap):
                     level.setBlockAt(previous_x, y, previous_z, 65)
                     level.setBlockDataAt(previous_x, y, previous_z, position)
 
-                    level.setBlockAt(x, y, z, 98)
-                    level.setBlockDataAt(x, y, z, 0)
-
                 elif block_difference < -1: # lower
                     
+                    level.setBlockAt(x, y, z, 98)
+                    level.setBlockDataAt(x, y, z, 0)
+                    level.setBlockAt(x, y+1, z, 0)
+                    level.setBlockDataAt(x, y+1, z, 0)
+
                     # find ladder position
                     if block[0] > previous_block[0]:
                         position = 3 # south
@@ -365,9 +372,6 @@ def placePath(level, box, paths, heightMap):
                     
                     level.setBlockAt(x, previous_y, z, 65)
                     level.setBlockDataAt(x, previous_y, z, position)
-
-                    level.setBlockAt(x, y, z, 98)
-                    level.setBlockDataAt(x, y, z, 0)
             else:
                 x = box.minx + block[1]
                 y = heightMap[block[1]][block[0]] - 1
@@ -386,6 +390,11 @@ def placePath(level, box, paths, heightMap):
                     level.setBlockDataAt(x, y, z, 0)
                 elif block_difference > 1: # higher
                     # place ladder on previous block
+
+                    level.setBlockAt(x, y, z, 98)
+                    level.setBlockDataAt(x, y, z, 0)
+                    level.setBlockAt(x, y+1, z, 0)
+                    level.setBlockDataAt(x, y+1, z, 0)
                     
                     # find ladder position
                     if block[0] > previous_block[0]:
@@ -405,11 +414,13 @@ def placePath(level, box, paths, heightMap):
                         level.setBlockAt(previous_x, previous_y + ladder_increment, previous_z, 65)
                         level.setBlockDataAt(previous_x, previous_y + ladder_increment, previous_z, position)
 
-                    level.setBlockAt(x, y, z, 98)
-                    level.setBlockDataAt(x, y, z, 0)
-
                 elif block_difference < -1: # lower
                     # place ladder on new block
+
+                    level.setBlockAt(x, y, z, 98)
+                    level.setBlockDataAt(x, y, z, 0)
+                    level.setBlockAt(x, y+1, z, 0)
+                    level.setBlockDataAt(x, y+1, z, 0)
                     
                     # find ladder position
                     if block[0] > previous_block[0]:
@@ -428,9 +439,6 @@ def placePath(level, box, paths, heightMap):
 
                         level.setBlockAt(x, y + ladder_increment, z, 65)
                         level.setBlockDataAt(x, y + ladder_increment, z, position)
-
-                    level.setBlockAt(x, y, z, 98)
-                    level.setBlockDataAt(x, y, z, 0)
                 
                 # update previous block
                 previous_block = block
