@@ -1,7 +1,4 @@
 # Generative Design in Minecraft (GDMC)  
 
-In this project we have written an algorithm that can create a settlement on an unknown Minecraft map. Our goal was to create a settlement that:
-
-adapted to the environment
-aligned with logical human settlement behaviour
-was aethetically pleasing
+The Generative Design in Minecraft (GDMC) is an AI Settlement Generation Competition in Minecraft. As a team, we used different procedural content generation algorithms to create a settlement on an unknown Minecraft map. Our aim is to produce an algorithm that is adaptive towards the provided map, creates a settlement that satisfies a range of functional requirements. 
+More information about the competition can be found [here](https://gendesignmc.engineering.nyu.edu)
